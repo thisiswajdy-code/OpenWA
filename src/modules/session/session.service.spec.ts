@@ -6915,6 +6915,41 @@ describe('SessionService', () => {
       }
     });
 
+    it('attaches recipientPhone to message.sent for a 1:1 send to an @lid when RESOLVE_LID_TO_PHONE is on', async () => {
+      process.env.RESOLVE_LID_TO_PHONE = 'true';
+      try {
+        mockEngine.resolveContactPhone.mockResolvedValue('628111222333');
+        const callbacks = await startAndCaptureCallbacks();
+
+        callbacks.onMessageCreate!(
+          makeMessage({ id: 'own-lid-send', from: 'me@c.us', to: '111@lid', chatId: '111@lid', fromMe: true }),
+        );
+        await flush();
+
+        const sent = dispatchedEvents('message.sent');
+        expect(sent).toHaveLength(1);
+        expect((sent[0][2] as IncomingMessage).recipientPhone).toBe('628111222333');
+        expect(mockEngine.resolveContactPhone).toHaveBeenCalledWith('111@lid');
+      } finally {
+        delete process.env.RESOLVE_LID_TO_PHONE;
+      }
+    });
+
+    it('does not attach recipientPhone to message.sent when RESOLVE_LID_TO_PHONE is unset', async () => {
+      delete process.env.RESOLVE_LID_TO_PHONE;
+      const callbacks = await startAndCaptureCallbacks();
+
+      callbacks.onMessageCreate!(
+        makeMessage({ id: 'own-lid-send', from: 'me@c.us', to: '111@lid', chatId: '111@lid', fromMe: true }),
+      );
+      await flush();
+
+      const sent = dispatchedEvents('message.sent');
+      expect(sent).toHaveLength(1);
+      expect((sent[0][2] as IncomingMessage).recipientPhone).toBeUndefined();
+      expect(mockEngine.resolveContactPhone).not.toHaveBeenCalled();
+    });
+
     it('does not resolve senderPhone when RESOLVE_LID_TO_PHONE is unset (default off)', async () => {
       delete process.env.RESOLVE_LID_TO_PHONE;
       const callbacks = await startAndCaptureCallbacks();

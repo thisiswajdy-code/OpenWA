@@ -181,6 +181,12 @@ export interface IncomingMessage {
    * populated for `isLidSender` messages.
    */
   senderPhone?: string | null;
+  /**
+   * Best-effort phone number (MSISDN digits) of the recipient of an own 1:1 send to a privacy id,
+   * resolved when `RESOLVE_LID_TO_PHONE` is on. `null` when the engine cannot map it. Only set on
+   * `message.sent` whose `to` is an `@lid`.
+   */
+  recipientPhone?: string | null;
   /** Sender contact info, best-effort from the WhatsApp Web cache. Sync fields only (no network). */
   contact?: MessageContact;
   /** Styling of a text status/story: background as `#RRGGBB`. Only set by engines that expose it. */

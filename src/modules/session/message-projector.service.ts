@@ -1155,6 +1155,16 @@ export class MessageProjector {
 
     const announced = this.withChangesMadeInFlight(id, finalMessage);
     if (!announced) return;
+    // Mirror of the inbound senderPhone resolution: a 1:1 send to a privacy id (`@lid`) carries a
+    // best-effort recipientPhone (digits or null), opt-in via the same RESOLVE_LID_TO_PHONE flag.
+    if (
+      resolveFeatureFlags(this.configService).resolveLidToPhone &&
+      !announced.isGroup &&
+      typeof announced.to === 'string' &&
+      announced.to.endsWith('@lid')
+    ) {
+      announced.recipientPhone = await this.lidResolver.resolveSenderPhone(id, announced.to);
+    }
     void this.webhookService.dispatch(id, 'message.sent', announced);
     // Emit real-time event to WebSocket clients (as message.sent, not message.received)
     this.eventsGateway.emitMessageSent(id, announced);
