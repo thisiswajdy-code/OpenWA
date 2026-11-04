@@ -772,8 +772,8 @@ How it fits together:
   `/socket.io` so those keep returning real API/WebSocket responses. Opt out with
   `SERVE_DASHBOARD=false`.
 - The static site in `site/` (the homepage in Hebrew and English and the sign-up pages) is served at
-  `/` by a second `ServeStaticModule`, with a CSP of its own that admits Google Fonts. It is
-  checked in, not built, and the image copies it next to `dashboard/dist`.
+  `/` by a second `ServeStaticModule`, with a CSP of its own that admits Google Fonts and the payment
+  page iframe. It is checked in, not built, and the image copies it next to `dashboard/dist`.
 - Run it directly with `npm run prod` (build + serve) or `node dist/main` against a prebuilt image.
 
 In development the build is absent, so serve-static stays inert and the Vite dev server (port

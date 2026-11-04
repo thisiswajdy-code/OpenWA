@@ -48,7 +48,7 @@ export class RegisterResponseDto {
   email!: string;
 
   @ApiProperty({
-    description: 'The page where the customer saves a card; open it (it refuses to be framed).',
+    description: 'The page where the customer saves a card; embed or open it.',
     example: 'https://arvy.store/billing/setup/3f2b…',
   })
   paymentLink!: string;
