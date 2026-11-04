@@ -66,6 +66,7 @@
     "webhooks": "Webhooks",
     "templates": "Vorlagen",
     "apiKeys": "API-Schlüssel",
+    "users": "Benutzer",
     "messageTester": "Nachrichtentester",
     "infrastructure": "Infrastruktur",
     "plugins": "Plugins",
@@ -841,6 +842,49 @@
       "hint": "In der Zeitzone dieses Browsers. Leer lassen für einen Schlüssel, der nie abläuft.",
       "clear": "Ablauf entfernen",
       "invalid": "Datum und Uhrzeit vollständig eingeben, höchstens bis zum Jahr 9999, oder das Feld leeren, damit der Schlüssel nie abläuft."
+    }
+  },
+  "users": {
+    "title": "Benutzer",
+    "subtitle": "Verwalte, wer sich mit E-Mail und Passwort am Dashboard anmeldet",
+    "createBtn": "Benutzer erstellen",
+    "modalTitle": "Benutzer erstellen",
+    "createdTitle": "Benutzer erstellt",
+    "email": "E-Mail",
+    "emailPlaceholder": "name@example.com",
+    "emailInvalid": "Gib eine gültige E-Mail-Adresse ein.",
+    "password": "Passwort",
+    "passwordHint": "{{min}} bis {{max}} Zeichen.",
+    "passwordTooShort": "Verwende mindestens {{min}} Zeichen.",
+    "newPassword": "Neues Passwort (optional)",
+    "newPasswordHint": "Leer lassen, um das aktuelle Passwort zu behalten.",
+    "active": "Aktiv",
+    "activeHint": "Ein inaktiver Benutzer kann sich nicht anmelden.",
+    "columns": {
+      "email": "E-Mail",
+      "role": "Rolle",
+      "status": "Status",
+      "lastSignIn": "Letzte Anmeldung",
+      "actions": "Aktionen"
+    },
+    "empty": {
+      "title": "Noch keine Benutzer",
+      "description": "Erstelle einen Benutzer, der sich mit E-Mail und Passwort anmeldet",
+      "loadErrorTitle": "Benutzer konnten nicht geladen werden",
+      "forbiddenTitle": "Kein Zugriff auf Benutzer",
+      "forbiddenDesc": "Zum Verwalten von Benutzern ist ein Admin-Schlüssel erforderlich, der nicht auf bestimmte Sitzungen beschränkt ist."
+    },
+    "confirm": {
+      "deleteTitle": "Benutzer löschen",
+      "deleteMessage": "Möchtest du <strong>{{email}}</strong> wirklich dauerhaft löschen? Der Benutzer wird überall abgemeldet und diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "actions": {
+      "edit": "Benutzer bearbeiten",
+      "delete": "Löschen"
+    },
+    "edit": {
+      "title": "Benutzer bearbeiten",
+      "signOutNote": "Eine Änderung von Passwort, Rolle oder Aktiv-Status meldet diesen Benutzer überall ab."
     }
   },
   "logs": {

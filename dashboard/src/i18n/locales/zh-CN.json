@@ -66,6 +66,7 @@
     "webhooks": "Webhooks",
     "templates": "模板",
     "apiKeys": "API 密钥",
+    "users": "用户",
     "messageTester": "消息测试器",
     "infrastructure": "基础设施",
     "plugins": "插件",
@@ -841,6 +842,49 @@
       "hint": "使用此浏览器的时区。留空则密钥永不过期。",
       "clear": "移除过期时间",
       "invalid": "请填写不晚于 9999 年的完整日期和时间，或清空此字段使密钥永不过期。"
+    }
+  },
+  "users": {
+    "title": "用户",
+    "subtitle": "管理使用邮箱和密码登录控制台的用户",
+    "createBtn": "创建用户",
+    "modalTitle": "创建用户",
+    "createdTitle": "用户已创建",
+    "email": "邮箱",
+    "emailPlaceholder": "name@example.com",
+    "emailInvalid": "请输入有效的邮箱地址。",
+    "password": "密码",
+    "passwordHint": "{{min}} 到 {{max}} 个字符。",
+    "passwordTooShort": "至少使用 {{min}} 个字符。",
+    "newPassword": "新密码（可选）",
+    "newPasswordHint": "留空则保留当前密码。",
+    "active": "活跃",
+    "activeHint": "非活跃用户无法登录。",
+    "columns": {
+      "email": "邮箱",
+      "role": "角色",
+      "status": "状态",
+      "lastSignIn": "最近登录",
+      "actions": "操作"
+    },
+    "empty": {
+      "title": "暂无用户",
+      "description": "创建一个用户以使用邮箱和密码登录",
+      "loadErrorTitle": "无法加载用户",
+      "forbiddenTitle": "无权访问用户",
+      "forbiddenDesc": "管理用户需要一个不受特定会话限制的管理员密钥。"
+    },
+    "confirm": {
+      "deleteTitle": "删除用户",
+      "deleteMessage": "确定要永久删除 <strong>{{email}}</strong> 吗？该用户将在所有地方退出登录，此操作无法撤销。"
+    },
+    "actions": {
+      "edit": "编辑用户",
+      "delete": "删除"
+    },
+    "edit": {
+      "title": "编辑用户",
+      "signOutNote": "更改密码、角色或活跃状态会使该用户在所有地方退出登录。"
     }
   },
   "logs": {

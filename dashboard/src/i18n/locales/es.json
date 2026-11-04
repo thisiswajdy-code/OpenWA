@@ -67,6 +67,7 @@
     "numberChecker": "Verificador de números",
     "webhooks": "Webhooks",
     "apiKeys": "Claves API",
+    "users": "Usuarios",
     "messageTester": "Probador de mensajes",
     "infrastructure": "Infraestructura",
     "plugins": "Plugins",
@@ -797,6 +798,49 @@
       "hint": "En la zona horaria de este navegador. Déjalo vacío para una clave que nunca caduca.",
       "clear": "Quitar caducidad",
       "invalid": "Introduce una fecha y hora completas, no posteriores al año 9999, o vacía el campo para una clave que nunca caduca."
+    }
+  },
+  "users": {
+    "title": "Usuarios",
+    "subtitle": "Gestiona quién inicia sesión en el panel con correo y contraseña",
+    "createBtn": "Crear usuario",
+    "modalTitle": "Crear usuario",
+    "createdTitle": "Usuario creado",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "nombre@example.com",
+    "emailInvalid": "Introduce una dirección de correo válida.",
+    "password": "Contraseña",
+    "passwordHint": "De {{min}} a {{max}} caracteres.",
+    "passwordTooShort": "Usa al menos {{min}} caracteres.",
+    "newPassword": "Nueva contraseña (opcional)",
+    "newPasswordHint": "Déjalo vacío para conservar la contraseña actual.",
+    "active": "Activo",
+    "activeHint": "Un usuario inactivo no puede iniciar sesión.",
+    "columns": {
+      "email": "Correo",
+      "role": "Rol",
+      "status": "Estado",
+      "lastSignIn": "Último inicio de sesión",
+      "actions": "Acciones"
+    },
+    "empty": {
+      "title": "Aún no hay usuarios",
+      "description": "Crea un usuario para iniciar sesión con correo y contraseña",
+      "loadErrorTitle": "No se pudieron cargar los usuarios",
+      "forbiddenTitle": "Sin acceso a los usuarios",
+      "forbiddenDesc": "Para gestionar usuarios se necesita una clave de administrador que no esté restringida a sesiones específicas."
+    },
+    "confirm": {
+      "deleteTitle": "Eliminar usuario",
+      "deleteMessage": "¿Seguro que quieres eliminar permanentemente a <strong>{{email}}</strong>? Se cerrará su sesión en todas partes y esta acción no se puede deshacer."
+    },
+    "actions": {
+      "edit": "Editar usuario",
+      "delete": "Eliminar"
+    },
+    "edit": {
+      "title": "Editar usuario",
+      "signOutNote": "Cambiar la contraseña, el rol o el estado activo cierra la sesión de este usuario en todas partes."
     }
   },
   "logs": {

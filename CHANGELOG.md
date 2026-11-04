@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add chat and contact menus to the dashboard Chats page: pin, mute, archive, mark unread, save, rename and block a contact, leave a group, and clear or delete a chat on whatsapp-web.js only until #1891 is fixed. Thanks @rjsebening.
 - Add an Archived view to the dashboard chat list. Thanks @rjsebening.
 - Add a group info dialog to the dashboard Chats page that edits a group and manages its participants. Thanks @rjsebening.
+- Add a Users page to the dashboard where an admin creates, edits, deactivates and deletes the users that sign in with email and password, in every dashboard language.
 
 ### Changed
 

@@ -4,6 +4,7 @@ import {
   webhookApi,
   templateApi,
   apiKeyApi,
+  userApi,
   auditApi,
   infraApi,
   pluginsApi,
@@ -28,6 +29,7 @@ export const queryKeys = {
   webhooks: ['webhooks'] as const,
   templates: (sessionId: string) => ['sessions', sessionId, 'templates'] as const,
   apiKeys: ['apiKeys'] as const,
+  users: ['users'] as const,
   logs: (params: { severity?: string; page: number; limit: number }) => ['logs', params] as const,
   infraStatus: ['infra', 'status'] as const,
   plugins: ['plugins'] as const,
@@ -246,6 +248,52 @@ export function useRevokeApiKeyMutation() {
     mutationFn: (id: string) => apiKeyApi.revoke(id),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys });
+    },
+  });
+}
+
+// ── Dashboard User Queries ────────────────────────────────────────────
+
+export function useUsersQuery() {
+  return useQuery({
+    queryKey: queryKeys.users,
+    queryFn: userApi.list,
+    staleTime: 30_000,
+  });
+}
+
+export function useCreateUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { email: string; password: string; role: string }) => userApi.create(data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.users });
+    },
+  });
+}
+
+export function useUpdateUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { email?: string; password?: string; role?: string; isActive?: boolean };
+    }) => userApi.update(id, data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.users });
+    },
+  });
+}
+
+export function useDeleteUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => userApi.delete(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.users });
     },
   });
 }

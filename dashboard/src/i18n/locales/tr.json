@@ -66,6 +66,7 @@
     "webhooks": "Webhook'lar",
     "templates": "Şablonlar",
     "apiKeys": "API Anahtarları",
+    "users": "Kullanıcılar",
     "messageTester": "Mesaj Test Aracı",
     "infrastructure": "Altyapı",
     "plugins": "Eklentiler",
@@ -841,6 +842,49 @@
       "hint": "Bu tarayıcının saat diliminde. Süresi hiç dolmayan bir anahtar için boş bırakın.",
       "clear": "Son kullanma tarihini kaldır",
       "invalid": "9999 yılını geçmeyen eksiksiz bir tarih ve saat girin ya da süresi hiç dolmayan bir anahtar için alanı temizleyin."
+    }
+  },
+  "users": {
+    "title": "Kullanıcılar",
+    "subtitle": "Panele e-posta ve şifreyle kimlerin giriş yapacağını yönetin",
+    "createBtn": "Kullanıcı Oluştur",
+    "modalTitle": "Kullanıcı Oluştur",
+    "createdTitle": "Kullanıcı oluşturuldu",
+    "email": "E-posta",
+    "emailPlaceholder": "ad@example.com",
+    "emailInvalid": "Geçerli bir e-posta adresi girin.",
+    "password": "Şifre",
+    "passwordHint": "{{min}} ile {{max}} karakter arası.",
+    "passwordTooShort": "En az {{min}} karakter kullanın.",
+    "newPassword": "Yeni şifre (isteğe bağlı)",
+    "newPasswordHint": "Mevcut şifreyi korumak için boş bırakın.",
+    "active": "Aktif",
+    "activeHint": "Devre dışı bir kullanıcı giriş yapamaz.",
+    "columns": {
+      "email": "E-posta",
+      "role": "Rol",
+      "status": "Durum",
+      "lastSignIn": "Son giriş",
+      "actions": "İşlemler"
+    },
+    "empty": {
+      "title": "Henüz kullanıcı yok",
+      "description": "E-posta ve şifreyle giriş yapmak için bir kullanıcı oluşturun",
+      "loadErrorTitle": "Kullanıcılar yüklenemedi",
+      "forbiddenTitle": "Kullanıcılara erişim yok",
+      "forbiddenDesc": "Kullanıcıları yönetmek, belirli oturumlarla sınırlı olmayan bir yönetici anahtarı gerektirir."
+    },
+    "confirm": {
+      "deleteTitle": "Kullanıcıyı Sil",
+      "deleteMessage": "<strong>{{email}}</strong> kullanıcısını kalıcı olarak silmek istediğinizden emin misiniz? Her yerde oturumu kapatılır ve bu işlem geri alınamaz."
+    },
+    "actions": {
+      "edit": "Kullanıcıyı düzenle",
+      "delete": "Sil"
+    },
+    "edit": {
+      "title": "Kullanıcıyı düzenle",
+      "signOutNote": "Şifre, rol veya aktiflik durumunu değiştirmek bu kullanıcının oturumunu her yerde kapatır."
     }
   },
   "logs": {

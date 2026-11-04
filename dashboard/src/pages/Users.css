@@ -1,0 +1,337 @@
+/* The Users page shares its table, badge and modal conventions with ApiKeys.css; the selectors are
+   scoped to .users-page so neither page's tweaks leak into the other. Logical sides only: the
+   layout mirrors for Hebrew and Arabic (see rtl-sides.test.ts). */
+.users-page {
+  padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.users-page .page-header {
+  margin-bottom: 2rem;
+}
+
+.users-page .users-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.users-page .users-table-container {
+  background: var(--bg-white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  width: 100%;
+  overflow-x: auto;
+}
+
+.users-page .users-table {
+  width: 100%;
+  font-size: 0.875rem;
+  border-collapse: collapse;
+}
+
+.users-page .users-table thead tr.table-row.header th {
+  background: var(--bg-light);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  padding: 1.125rem 1.5rem;
+  text-align: start;
+}
+
+.users-page .users-table tbody tr.table-row td {
+  padding: 1.125rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.users-page .users-table tbody tr.table-row:last-child td {
+  border-bottom: none;
+}
+
+.users-page .users-table tbody tr.table-row:hover {
+  background: rgba(37, 211, 102, 0.05);
+}
+
+.users-page .users-table tbody tr.table-row:nth-child(even) {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.users-page .users-table tbody tr.table-row:nth-child(even):hover {
+  background: rgba(37, 211, 102, 0.05);
+}
+
+.users-page .email-cell {
+  font-weight: 500;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.users-page .permission-badge {
+  font-size: 0.6875rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--info);
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.users-page .status-badge {
+  font-size: 0.6875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.users-page .status-badge.active {
+  background: rgba(37, 211, 102, 0.1);
+  color: var(--primary-text);
+}
+
+.users-page .status-badge.inactive {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--error-text);
+}
+
+.users-page .last-sign-in {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.users-page .actions-cell {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+
+.users-page .icon-btn {
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.users-page .icon-btn:hover {
+  background: var(--bg-light);
+  color: var(--text-primary);
+}
+
+.users-page .icon-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--error-text);
+}
+
+/* Empty Table State */
+.users-page .empty-table-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.users-page .empty-table-state svg {
+  margin-bottom: 1rem;
+  opacity: 0.4;
+  color: var(--text-muted);
+}
+
+.users-page .empty-table-state h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.users-page .empty-table-state p {
+  margin: 0;
+  font-size: 0.875rem;
+  max-width: 300px;
+}
+
+/* Confirmation Modal Styles */
+.users-page .confirm-modal {
+  max-width: 400px;
+}
+
+.users-page .confirm-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.users-page .confirm-warning-icon {
+  color: var(--warning-text);
+}
+
+.users-page .confirm-message {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.users-page .confirm-message strong {
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+/* Form fields in the create and edit modals. */
+.users-page .modal-body > select {
+  margin-bottom: 1rem;
+}
+
+.users-page .user-field-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.875rem;
+}
+
+.users-page .user-field-hint.error {
+  color: var(--error-text);
+}
+
+.users-page .user-active-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.users-page .user-active-row input {
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+.users-page .user-sign-out-note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin: 0 0 1rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+}
+
+.users-page .user-sign-out-note svg {
+  flex: none;
+  margin-top: 0.125rem;
+  color: var(--warning, #f59e0b);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .users-page {
+    padding: 1rem;
+  }
+
+  .users-page .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .users-page .users-table-container {
+    overflow-x: visible;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  /* Switch to card layout on mobile */
+  .users-page .users-table {
+    display: block;
+  }
+
+  .users-page .users-table thead {
+    display: none;
+  }
+
+  .users-page .users-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .users-page .users-table tbody tr.table-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .users-page .users-table tbody tr.table-row:hover,
+  .users-page .users-table tbody tr.table-row:nth-child(even),
+  .users-page .users-table tbody tr.table-row:nth-child(even):hover {
+    background: var(--bg-white);
+  }
+
+  .users-page .users-table tbody tr.table-row td {
+    padding: 0;
+    border-bottom: none;
+    display: block;
+  }
+
+  /* Email cell - prominent at top */
+  .users-page .users-table tbody tr.table-row td:first-child {
+    order: 1;
+  }
+
+  .users-page .users-table tbody tr.table-row td:first-child .email-cell {
+    font-size: 1.125rem;
+    font-weight: 600;
+    display: block;
+    color: var(--text-primary);
+  }
+
+  /* Role & status sit together as chips */
+  .users-page .users-table tbody tr.table-row td:has(.permission-badge),
+  .users-page .users-table tbody tr.table-row td:has(.status-badge) {
+    display: inline-block;
+    order: 2;
+    margin-inline-end: 0.5rem;
+  }
+
+  /* Actions cell - bottom with separator */
+  .users-page .users-table tbody tr.table-row td:last-child {
+    order: 5;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .users-page .users-table tbody tr.table-row td:last-child .actions-cell {
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-page {
+    padding: 0.75rem;
+  }
+}

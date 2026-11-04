@@ -216,6 +216,18 @@ export interface CreatedApiKey extends ApiKey {
   apiKey: string;
 }
 
+/** A dashboard user that signs in with email and password; the password is never returned. */
+export interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'operator' | 'viewer';
+  isActive: boolean;
+  /** The last successful sign-in; absent before the first. */
+  lastLoginAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AuditLog {
   id: string;
   action: string;
@@ -1231,6 +1243,26 @@ export const apiKeyApi = {
     }),
   delete: (id: string) => request<void>(`/auth/api-keys/${id}`, { method: 'DELETE' }),
   revoke: (id: string) => request<ApiKey>(`/auth/api-keys/${id}/revoke`, { method: 'POST' }),
+};
+
+// =============================================================================
+// Dashboard User API
+// =============================================================================
+
+export const userApi = {
+  list: () => request<User[]>('/auth/users'),
+  create: (data: { email: string; password: string; role: string }) =>
+    request<User>('/auth/users', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  /** A password, role or `isActive: false` change signs the user out everywhere. */
+  update: (id: string, data: { email?: string; password?: string; role?: string; isActive?: boolean }) =>
+    request<User>(`/auth/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  delete: (id: string) => request<void>(`/auth/users/${id}`, { method: 'DELETE' }),
 };
 
 // =============================================================================

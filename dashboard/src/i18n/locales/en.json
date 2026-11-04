@@ -66,6 +66,7 @@
     "webhooks": "Webhooks",
     "templates": "Templates",
     "apiKeys": "API Keys",
+    "users": "Users",
     "messageTester": "Message Tester",
     "infrastructure": "Infrastructure",
     "plugins": "Plugins",
@@ -841,6 +842,49 @@
       "hint": "In this browser's time zone. Leave empty for a key that never expires.",
       "clear": "Remove expiry",
       "invalid": "Enter a complete date and time no later than the year 9999, or clear the field for a key that never expires."
+    }
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Manage who signs in to the dashboard with an email and password",
+    "createBtn": "Create User",
+    "modalTitle": "Create User",
+    "createdTitle": "User created",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "emailInvalid": "Enter a valid email address.",
+    "password": "Password",
+    "passwordHint": "{{min}} to {{max}} characters.",
+    "passwordTooShort": "Use at least {{min}} characters.",
+    "newPassword": "New password (optional)",
+    "newPasswordHint": "Leave empty to keep the current password.",
+    "active": "Active",
+    "activeHint": "An inactive user cannot sign in.",
+    "columns": {
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "lastSignIn": "Last sign-in",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No users yet",
+      "description": "Create a user to sign in with an email and password",
+      "loadErrorTitle": "Could not load users",
+      "forbiddenTitle": "No access to users",
+      "forbiddenDesc": "Managing users requires an admin key that is not restricted to specific sessions."
+    },
+    "confirm": {
+      "deleteTitle": "Delete User",
+      "deleteMessage": "Are you sure you want to permanently delete <strong>{{email}}</strong>? They are signed out everywhere and this action cannot be undone."
+    },
+    "actions": {
+      "edit": "Edit user",
+      "delete": "Delete"
+    },
+    "edit": {
+      "title": "Edit user",
+      "signOutNote": "Changing the password, role or active state signs this user out everywhere."
     }
   },
   "logs": {

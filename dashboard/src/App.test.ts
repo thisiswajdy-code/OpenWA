@@ -22,7 +22,8 @@ function installFetchStub(): void {
     if (path === '/api/auth/validate') return Promise.resolve(jsonResponse({ valid: true, role, scoped }));
     if (path === '/api/audit' || path.startsWith('/api/audit?'))
       return Promise.resolve(jsonResponse({ data: [], total: 0 }));
-    if (path === '/api/sessions' || path === '/api/webhooks') return Promise.resolve(jsonResponse([]));
+    if (path === '/api/sessions' || path === '/api/webhooks' || path === '/api/auth/users')
+      return Promise.resolve(jsonResponse([]));
     return Promise.resolve(jsonResponse({ message: `unstubbed ${path}` }, 404));
   }) as typeof fetch;
 }
@@ -92,9 +93,29 @@ test('an admin keeps the Logs entry and the route', async () => {
   assert.equal(window.location.pathname, '/logs');
 });
 
-// API keys, Infrastructure and Plugins read routes that refuse any session-scoped key, so a scoped
-// admin opening one by URL or reload must be sent home rather than mount a page whose reads all 403.
-for (const page of ['api-keys', 'infrastructure', 'plugins']) {
+// Users: the dashboard users are managed by routes only an unscoped ADMIN key may call, exactly like
+// API keys, so the page and its sidebar entry are gated the same way.
+const usersLink = (): Element | null => document.querySelector('a[href="/users"]');
+
+test('an operator gets no Users entry and /users sends them home', async () => {
+  renderAt('/users', 'operator');
+  await rtl.waitFor(() => assert.ok(document.querySelector('a[href="/sessions"]')));
+  assert.equal(usersLink() === null, true, 'the Users nav entry is shown to an operator');
+  await rtl.waitFor(() => assert.equal(window.location.pathname, '/'));
+  assert.ok(!requested.includes('/api/auth/users'), 'an operator was sent the users list request');
+});
+
+test('an unscoped admin keeps the Users entry and the route', async () => {
+  renderAt('/users', 'admin');
+  await rtl.waitFor(() => assert.ok(usersLink(), 'the Users nav entry is missing for an admin'));
+  await rtl.waitFor(() => assert.ok(document.querySelector('.users-page'), 'the Users page did not mount'));
+  assert.equal(window.location.pathname, '/users');
+});
+
+// API keys, Users, Infrastructure and Plugins read routes that refuse any session-scoped key, so a
+// scoped admin opening one by URL or reload must be sent home rather than mount a page whose reads
+// all 403.
+for (const page of ['api-keys', 'users', 'infrastructure', 'plugins']) {
   test(`a session-scoped admin opening /${page} is sent home without calling its routes`, async () => {
     scoped = true;
     window.sessionStorage.setItem('openwa_key_scoped', 'true');
@@ -102,7 +123,7 @@ for (const page of ['api-keys', 'infrastructure', 'plugins']) {
     await rtl.waitFor(() => assert.ok(document.querySelector('a[href="/sessions"]')));
     await rtl.waitFor(() => assert.equal(window.location.pathname, '/'));
     await new Promise(resolve => setTimeout(resolve, 50));
-    const refused = requested.filter(path => /^\/api\/(auth\/api-keys|infra|plugins)/.test(path));
+    const refused = requested.filter(path => /^\/api\/(auth\/api-keys|auth\/users|infra|plugins)/.test(path));
     assert.deepEqual(refused, [], 'the page sent reads a session-scoped key is refused on');
   });
 }

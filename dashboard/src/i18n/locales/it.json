@@ -68,6 +68,7 @@
     "webhooks": "Webhook",
     "templates": "Modelli",
     "apiKeys": "Chiavi API",
+    "users": "Utenti",
     "messageTester": "Messaggio di prova",
     "infrastructure": "Infrastruttura",
     "plugins": "Plugin",
@@ -847,6 +848,49 @@
       "hint": "Nel fuso orario di questo browser. Lascia vuoto per una chiave che non scade mai.",
       "clear": "Rimuovi scadenza",
       "invalid": "Inserisci data e ora complete, non oltre l'anno 9999, oppure svuota il campo per una chiave che non scade mai."
+    }
+  },
+  "users": {
+    "title": "Utenti",
+    "subtitle": "Gestisci chi accede alla dashboard con email e password",
+    "createBtn": "Crea utente",
+    "modalTitle": "Crea utente",
+    "createdTitle": "Utente creato",
+    "email": "Email",
+    "emailPlaceholder": "nome@example.com",
+    "emailInvalid": "Inserisci un indirizzo email valido.",
+    "password": "Password",
+    "passwordHint": "Da {{min}} a {{max}} caratteri.",
+    "passwordTooShort": "Usa almeno {{min}} caratteri.",
+    "newPassword": "Nuova password (facoltativa)",
+    "newPasswordHint": "Lascia vuoto per mantenere la password attuale.",
+    "active": "Attivo",
+    "activeHint": "Un utente inattivo non può accedere.",
+    "columns": {
+      "email": "Email",
+      "role": "Ruolo",
+      "status": "Stato",
+      "lastSignIn": "Ultimo accesso",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "title": "Nessun utente",
+      "description": "Crea un utente per accedere con email e password",
+      "loadErrorTitle": "Impossibile caricare gli utenti",
+      "forbiddenTitle": "Nessun accesso agli utenti",
+      "forbiddenDesc": "Per gestire gli utenti serve una chiave amministratore non limitata a sessioni specifiche."
+    },
+    "confirm": {
+      "deleteTitle": "Elimina utente",
+      "deleteMessage": "Sei sicuro di voler eliminare definitivamente <strong>{{email}}</strong>? Verrà disconnesso ovunque e questa azione non può essere annullata."
+    },
+    "actions": {
+      "edit": "Modifica utente",
+      "delete": "Elimina"
+    },
+    "edit": {
+      "title": "Modifica utente",
+      "signOutNote": "Cambiare password, ruolo o stato attivo disconnette questo utente ovunque."
     }
   },
   "logs": {

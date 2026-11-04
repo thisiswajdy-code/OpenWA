@@ -67,6 +67,7 @@
     "numberChecker": "Verificador de números",
     "webhooks": "Webhooks",
     "apiKeys": "Chaves API",
+    "users": "Usuários",
     "messageTester": "Testador de mensagens",
     "infrastructure": "Infraestrutura",
     "plugins": "Plugins",
@@ -797,6 +798,49 @@
       "hint": "No fuso horário deste navegador. Deixe em branco para uma chave que nunca expira.",
       "clear": "Remover expiração",
       "invalid": "Informe data e hora completas, até o ano 9999, ou limpe o campo para uma chave que nunca expira."
+    }
+  },
+  "users": {
+    "title": "Usuários",
+    "subtitle": "Gerencie quem entra no painel com e-mail e senha",
+    "createBtn": "Criar usuário",
+    "modalTitle": "Criar usuário",
+    "createdTitle": "Usuário criado",
+    "email": "E-mail",
+    "emailPlaceholder": "nome@example.com",
+    "emailInvalid": "Informe um endereço de e-mail válido.",
+    "password": "Senha",
+    "passwordHint": "De {{min}} a {{max}} caracteres.",
+    "passwordTooShort": "Use pelo menos {{min}} caracteres.",
+    "newPassword": "Nova senha (opcional)",
+    "newPasswordHint": "Deixe em branco para manter a senha atual.",
+    "active": "Ativo",
+    "activeHint": "Um usuário inativo não consegue entrar.",
+    "columns": {
+      "email": "E-mail",
+      "role": "Função",
+      "status": "Status",
+      "lastSignIn": "Último acesso",
+      "actions": "Ações"
+    },
+    "empty": {
+      "title": "Nenhum usuário ainda",
+      "description": "Crie um usuário para entrar com e-mail e senha",
+      "loadErrorTitle": "Não foi possível carregar os usuários",
+      "forbiddenTitle": "Sem acesso aos usuários",
+      "forbiddenDesc": "Gerenciar usuários exige uma chave de administrador que não esteja restrita a sessões específicas."
+    },
+    "confirm": {
+      "deleteTitle": "Excluir usuário",
+      "deleteMessage": "Tem certeza que deseja excluir permanentemente <strong>{{email}}</strong>? A sessão dele será encerrada em todos os lugares e esta ação não pode ser desfeita."
+    },
+    "actions": {
+      "edit": "Editar usuário",
+      "delete": "Excluir"
+    },
+    "edit": {
+      "title": "Editar usuário",
+      "signOutNote": "Alterar a senha, a função ou o status ativo encerra a sessão deste usuário em todos os lugares."
     }
   },
   "logs": {

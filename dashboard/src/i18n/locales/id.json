@@ -66,6 +66,7 @@
     "webhooks": "Webhook",
     "templates": "Templat",
     "apiKeys": "Kunci API",
+    "users": "Pengguna",
     "messageTester": "Penguji Pesan",
     "infrastructure": "Infrastruktur",
     "plugins": "Plugin",
@@ -841,6 +842,49 @@
       "hint": "Menggunakan zona waktu browser ini. Kosongkan untuk kunci yang tidak pernah kedaluwarsa.",
       "clear": "Hapus tanggal kedaluwarsa",
       "invalid": "Masukkan tanggal dan waktu yang lengkap, paling lambat tahun 9999, atau kosongkan kolom ini untuk kunci yang tidak pernah kedaluwarsa."
+    }
+  },
+  "users": {
+    "title": "Pengguna",
+    "subtitle": "Kelola siapa yang masuk ke dasbor dengan email dan kata sandi",
+    "createBtn": "Buat Pengguna",
+    "modalTitle": "Buat Pengguna",
+    "createdTitle": "Pengguna dibuat",
+    "email": "Email",
+    "emailPlaceholder": "nama@example.com",
+    "emailInvalid": "Masukkan alamat email yang valid.",
+    "password": "Kata sandi",
+    "passwordHint": "{{min}} sampai {{max}} karakter.",
+    "passwordTooShort": "Gunakan minimal {{min}} karakter.",
+    "newPassword": "Kata sandi baru (opsional)",
+    "newPasswordHint": "Kosongkan untuk mempertahankan kata sandi saat ini.",
+    "active": "Aktif",
+    "activeHint": "Pengguna tidak aktif tidak dapat masuk.",
+    "columns": {
+      "email": "Email",
+      "role": "Peran",
+      "status": "Status",
+      "lastSignIn": "Masuk terakhir",
+      "actions": "Aksi"
+    },
+    "empty": {
+      "title": "Belum ada pengguna",
+      "description": "Buat pengguna untuk masuk dengan email dan kata sandi",
+      "loadErrorTitle": "Tidak dapat memuat pengguna",
+      "forbiddenTitle": "Tidak ada akses ke pengguna",
+      "forbiddenDesc": "Mengelola pengguna memerlukan kunci admin yang tidak dibatasi ke sesi tertentu."
+    },
+    "confirm": {
+      "deleteTitle": "Hapus Pengguna",
+      "deleteMessage": "Yakin ingin menghapus permanen <strong>{{email}}</strong>? Pengguna ini akan dikeluarkan di mana pun dan tindakan ini tidak dapat dibatalkan."
+    },
+    "actions": {
+      "edit": "Edit pengguna",
+      "delete": "Hapus"
+    },
+    "edit": {
+      "title": "Edit pengguna",
+      "signOutNote": "Mengubah kata sandi, peran, atau status aktif akan mengeluarkan pengguna ini di mana pun."
     }
   },
   "logs": {

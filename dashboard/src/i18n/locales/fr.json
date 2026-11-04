@@ -68,6 +68,7 @@
     "webhooks": "Webhooks",
     "templates": "Templates",
     "apiKeys": "Clés API",
+    "users": "Utilisateurs",
     "messageTester": "Testeur de messages",
     "infrastructure": "Infrastructure",
     "plugins": "Plugins",
@@ -847,6 +848,49 @@
       "hint": "Dans le fuseau horaire de ce navigateur. Laissez vide pour une clé qui n'expire jamais.",
       "clear": "Retirer l'expiration",
       "invalid": "Saisissez une date et une heure complètes, au plus tard en l'an 9999, ou videz le champ pour une clé qui n'expire jamais."
+    }
+  },
+  "users": {
+    "title": "Utilisateurs",
+    "subtitle": "Gérez qui se connecte au tableau de bord avec un e-mail et un mot de passe",
+    "createBtn": "Créer un utilisateur",
+    "modalTitle": "Créer un utilisateur",
+    "createdTitle": "Utilisateur créé",
+    "email": "E-mail",
+    "emailPlaceholder": "nom@example.com",
+    "emailInvalid": "Saisissez une adresse e-mail valide.",
+    "password": "Mot de passe",
+    "passwordHint": "De {{min}} à {{max}} caractères.",
+    "passwordTooShort": "Utilisez au moins {{min}} caractères.",
+    "newPassword": "Nouveau mot de passe (facultatif)",
+    "newPasswordHint": "Laissez vide pour conserver le mot de passe actuel.",
+    "active": "Actif",
+    "activeHint": "Un utilisateur inactif ne peut pas se connecter.",
+    "columns": {
+      "email": "E-mail",
+      "role": "Rôle",
+      "status": "Statut",
+      "lastSignIn": "Dernière connexion",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "Aucun utilisateur pour l'instant",
+      "description": "Créez un utilisateur pour se connecter avec un e-mail et un mot de passe",
+      "loadErrorTitle": "Impossible de charger les utilisateurs",
+      "forbiddenTitle": "Aucun accès aux utilisateurs",
+      "forbiddenDesc": "La gestion des utilisateurs nécessite une clé administrateur qui n'est pas limitée à des sessions précises."
+    },
+    "confirm": {
+      "deleteTitle": "Supprimer l'utilisateur",
+      "deleteMessage": "Êtes-vous sûr de vouloir supprimer définitivement <strong>{{email}}</strong> ? Il sera déconnecté partout et cette action est irréversible."
+    },
+    "actions": {
+      "edit": "Modifier l'utilisateur",
+      "delete": "Supprimer"
+    },
+    "edit": {
+      "title": "Modifier l'utilisateur",
+      "signOutNote": "Modifier le mot de passe, le rôle ou l'état actif déconnecte cet utilisateur partout."
     }
   },
   "logs": {
