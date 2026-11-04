@@ -5242,6 +5242,50 @@ Delete the login key the request presents. A key that is not a login key (no own
 
 **Errors:** `401` missing/invalid key · `403` the key is session-scoped or restricted with `allowedChats`
 
+#### POST /api/auth/register
+
+Self-service sign-up from the site (`/signup.html`): create a dashboard user and the recurring payment link for the Scalorus WA account. The user is created **inactive** (`operator` role) and cannot sign in until a card is saved on `paymentLink`; `GET /api/auth/register/:id` activates it once the link reports that.
+
+**Auth:** public. Rate-limited per client IP like `POST /api/auth/login`: 5 attempts a minute, 20 a quarter hour, 100 an hour (`429` beyond). Enabled only when `ARVY_API_TOKEN` is set.
+
+**Request body**
+
+```json
+{ "name": "Dana", "email": "dana@example.com", "password": "correct horse battery staple", "locale": "he" }
+```
+
+`name` (optional, ≤ 120) and `locale` (optional, `he` | `en` | `ar`) go to the payment page. `email` is trimmed and lower-cased; `password` is 8 to 128 characters.
+
+The link is 12 monthly charges of **USD 30**; when the payment service refuses USD (`422`), it is created as **ILS 95** instead and that choice is remembered for the process lifetime. The first charge date is today in Israel time.
+
+**Response** `201`
+
+```json
+{
+  "id": "0a941dac-a965-45e7-b318-74ae8be134f0",
+  "email": "dana@example.com",
+  "paymentLink": "https://arvy.store/billing/setup/3f2b…",
+  "amount": 30,
+  "currencyCode": "USD",
+  "chargeFrequency": "monthly",
+  "paymentsNumber": 12,
+  "status": "pending_card",
+  "active": false
+}
+```
+
+**Errors:** `400` malformed body or an undeclared field · `409` a user with this email already exists · `429` too many attempts from this client IP · `502` the payment service refused or did not answer (the user is not kept, so the email stays free) · `503` sign-up is not enabled
+
+#### GET /api/auth/register/:id
+
+Where a sign-up's payment stands. Reads the link from the payment service; the first time it reports `active` (or `completed`) the user is activated, so the sign-up page polls this until `active` is true and then sends the customer to the dashboard.
+
+**Auth:** public (`id` is the unguessable user id the sign-up answered with).
+
+**Response** `200` — the same body as `POST /api/auth/register`, with the current `status` and `active`.
+
+**Errors:** `404` no sign-up with this id · `502` the payment service did not answer
+
 #### POST /api/auth/users
 
 Create a dashboard user.

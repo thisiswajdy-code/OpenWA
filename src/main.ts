@@ -6,7 +6,14 @@ import { NestFactory } from '@nestjs/core';
 import { INestApplication, ShutdownSignal } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerModule } from '@nestjs/swagger';
-import { AppModule, DASHBOARD_DIST, dashboardServingEnabled, dashboardBuildPresent } from './app.module';
+import {
+  AppModule,
+  DASHBOARD_BASE_PATH,
+  DASHBOARD_DIST,
+  dashboardServingEnabled,
+  dashboardBuildPresent,
+  sitePresent,
+} from './app.module';
 import { ShutdownService } from './common/services/shutdown.service';
 import { LoggerService, LogLevel, createLogger } from './common/services/logger.service';
 import {
@@ -267,12 +274,15 @@ async function bootstrap() {
     bootstrapLogger.log(`Swagger docs: ${publicUrl}/api/docs`);
   }
 
-  // Make the dashboard-serving outcome explicit so a missing build (no UI on `/`)
+  if (sitePresent) {
+    bootstrapLogger.log(`Site: serving homepage and sign-up at ${publicUrl}`);
+  }
+  // Make the dashboard-serving outcome explicit so a missing build (no UI on `/app`)
   // is obvious instead of a silent 404.
   if (!dashboardServingEnabled) {
     bootstrapLogger.log('Dashboard: serving disabled (SERVE_DASHBOARD=false); API only');
   } else if (dashboardBuildPresent) {
-    bootstrapLogger.log(`Dashboard: serving bundled UI at ${publicUrl}`);
+    bootstrapLogger.log(`Dashboard: serving bundled UI at ${publicUrl}${DASHBOARD_BASE_PATH}`);
   } else {
     bootstrapLogger.warn(
       `Dashboard: no build at ${DASHBOARD_DIST} - UI disabled (API still serves /api). ` +

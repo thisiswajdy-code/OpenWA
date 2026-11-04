@@ -90,12 +90,21 @@ if (process.env.MCP_ENABLED === 'true') {
 export const DASHBOARD_DIST = path.resolve(__dirname, '..', 'dashboard', 'dist');
 export const dashboardServingEnabled = process.env.SERVE_DASHBOARD !== 'false';
 export const dashboardBuildPresent = fs.existsSync(path.join(DASHBOARD_DIST, 'index.html'));
+/** The dashboard lives under this prefix; the site (homepage, sign-up) owns `/`. */
+export const DASHBOARD_BASE_PATH = '/app';
+
+// The static site (homepage and sign-up pages, plain HTML in site/) is served at `/` by this same
+// process. It is checked in, not built, so it is present whenever the repository is, and the
+// production image copies it next to dashboard/dist.
+export const SITE_DIR = path.resolve(__dirname, '..', 'site');
+export const sitePresent = fs.existsSync(path.join(SITE_DIR, 'index.html'));
 
 const serveStaticModules: Array<Type | DynamicModule> = [];
 if (dashboardServingEnabled && dashboardBuildPresent) {
   serveStaticModules.push(
     ServeStaticModule.forRoot({
       rootPath: DASHBOARD_DIST,
+      serveRoot: DASHBOARD_BASE_PATH,
       // Let Nest own these so unknown API/socket routes return real 404s/JSON rather
       // than the SPA index.html fallback (Express 5 / path-to-regexp v8 wildcard syntax).
       exclude: ['/api/{*splat}', '/socket.io/{*splat}', '/mcp', '/mcp/{*splat}'],
@@ -112,6 +121,18 @@ if (dashboardServingEnabled && dashboardBuildPresent) {
       // ServeStaticModule has no explicit off switch, so this is a renderPath literal that no
       // real request can match.
       renderPath: '/__openwa_spa_fallback_owned_by_main_ts__',
+    }),
+  );
+}
+if (sitePresent) {
+  serveStaticModules.push(
+    ServeStaticModule.forRoot({
+      rootPath: SITE_DIR,
+      // Files only (`/` is index.html through the index option): the site has no client-side
+      // routes, so the module's catch-all fallback stays off for the same reasons as above.
+      exclude: ['/api/{*splat}', '/socket.io/{*splat}', '/mcp', '/mcp/{*splat}', `${DASHBOARD_BASE_PATH}/{*splat}`],
+      serveStaticOptions: { index: 'index.html' },
+      renderPath: '/__openwa_site_fallback_disabled__',
     }),
   );
 }

@@ -268,6 +268,8 @@ COPY --from=builder /app/dist ./dist
 # Copy the bundled dashboard SPA; ServeStaticModule serves it from this same process/port
 # (app.module.ts resolves dashboard/dist relative to dist/). Single container, single port.
 COPY --from=builder /app/dashboard/dist ./dashboard/dist
+# The static site (homepage and sign-up pages), served at `/`; the dashboard lives under /app.
+COPY --from=builder /app/site ./site
 
 # Create data directories with correct ownership. Only ./data is chowned, NOT all of /app: the app
 # tree (node_modules, dist) only needs read access, which root-owned files already grant, and the

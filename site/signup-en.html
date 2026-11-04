@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scalorus WA — Create your account</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;600&family=Heebo:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="signup.css">
+</head>
+<body>
+<div class="min-h-dvh bg-background text-foreground">
+<header class="fixed inset-x-0 top-4 z-50 px-4">
+<div class="mx-auto grid max-w-5xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-full border bg-card/80 px-4 py-2.5 shadow-lift backdrop-blur-xl sm:flex sm:justify-between">
+<a class="flex items-center gap-2 font-display text-xl font-semibold" dir="ltr" href="en.html"><span class="grid size-8 place-items-center rounded-xl bg-primary text-primary-foreground"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle size-4" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path></svg></span>Scalorus WA</a>
+<div class="flex items-center gap-2">
+<div class="flex rounded-full border p-0.5 text-xs font-medium bg-card"><a class="rounded-full px-3 py-1 transition text-muted-foreground" href="signup.html">עב</a><a class="rounded-full px-3 py-1 transition bg-primary text-primary-foreground" href="signup-en.html">EN</a></div>
+<a href="/app" class="btn-ghost hidden !px-4 !py-2 text-sm sm:inline-flex">Sign in</a>
+</div>
+</div>
+</header>
+<main id="signup" class="su-wrap"
+  data-err-password="The password needs at least 8 characters."
+  data-err-exists="An account with this email already exists. You can sign in instead."
+  data-err-rate="Too many attempts. Try again in a minute."
+  data-err-disabled="Sign-up is not available right now. Write to hello@scalorus.ai."
+  data-err-generic="Something went wrong. Please try again."
+  data-status-pending="Waiting for the card to be saved on the payment page…"
+  data-status-active="Card saved. Your account is active."
+  data-status-cancelled="The payment was cancelled. Write to hello@scalorus.ai.">
+<div class="su-steps"><span data-step="account" data-n="1">Account</span><span data-step="register" data-n="2">Details</span><span data-step="pay" data-n="3">Payment</span></div>
+
+<section id="step-account" class="su-step">
+<h1 class="su-title">Choose an account</h1>
+<p class="su-sub">One simple price. Cancel at the end of the 12 months.</p>
+<div class="su-accounts" role="radiogroup" aria-label="Account type">
+<div class="card-soft su-account" role="radio" tabindex="0" aria-checked="false" data-account="scalorus-wa">
+<p class="font-medium text-muted-foreground">Scalorus WA</p>
+<p class="su-price">$30<small> / month</small></p>
+<p class="text-sm text-muted-foreground">12 months · charged monthly · $360 in total</p>
+<ul><li>Full WhatsApp Business API setup</li><li>Smart reply bot and messaging</li><li>Dashboard and analytics</li><li>Ongoing support</li></ul>
+</div>
+<div class="card-soft su-account" role="radio" tabindex="0" aria-checked="false" data-account="custom">
+<p class="font-medium text-muted-foreground">Custom account</p>
+<p class="su-price">Get a quote</p>
+<p class="text-sm text-muted-foreground">Several numbers, special integrations or high volume.</p>
+<ul><li>Dedicated onboarding</li><li>Connected to your systems</li><li>Priced to your needs</li></ul>
+</div>
+</div>
+<div class="su-actions"><button id="account-next" class="btn-primary" type="button" disabled>Continue</button></div>
+</section>
+
+<section id="step-register" class="su-step">
+<h1 class="su-title">Your details</h1>
+<p class="su-sub">You will sign in to the dashboard with these.</p>
+<form id="register-form" class="card-soft su-form" autocomplete="on">
+<label>Name <input name="name" type="text" maxlength="120" autocomplete="name"></label>
+<label>Email <input name="email" type="email" required maxlength="254" autocomplete="email"></label>
+<label>Password <input name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password"></label>
+<p id="register-error" class="su-error" role="alert"></p>
+<div class="su-actions"><button id="register-back" class="btn-ghost" type="button">Back</button><button class="btn-primary" type="submit">Continue to payment</button></div>
+</form>
+<p class="su-note">The account is activated once a payment method is saved. Already registered? <a href="/app" class="text-primary">Sign in</a>.</p>
+</section>
+
+<section id="step-pay" class="su-step">
+<h1 class="su-title">Save a payment method</h1>
+<p class="su-sub">The first charge is today, then monthly for 12 months.</p>
+<div class="card-soft su-pay">
+<div class="su-summary"><span>Account: <strong id="pay-email"></strong></span><span>Charge: <strong id="pay-amount"></strong></span><span>Total: <strong id="pay-total"></strong></span></div>
+<iframe id="pay-frame" title="Payment page" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<p id="pay-status" class="su-status"><span class="dot"></span><span id="pay-status-text"></span></p>
+<div id="pay-pending" class="su-actions"><a id="pay-open" class="btn-ghost" target="_blank" rel="noopener noreferrer" href="#">Open the payment page in a new tab</a></div>
+<div id="pay-done" class="su-actions" hidden><a class="btn-primary" href="/app">Go to the dashboard</a></div>
+</div>
+</section>
+</main>
+<footer class="bg-ink text-ink-foreground">
+<div class="mx-auto max-w-5xl border-t border-ink-border px-4 py-8">
+<div class="flex flex-wrap items-center justify-between gap-4 text-xs text-ink-muted">
+<a class="flex items-center gap-2 font-display text-base font-semibold text-ink-foreground" dir="ltr" href="en.html">Scalorus WA</a>
+<a href="mailto:hello@scalorus.ai?subject=Scalorus%20WA" class="hover:text-ink-foreground">hello@scalorus.ai</a>
+<span>© 2026 Scalorus. All rights reserved.</span>
+</div>
+</div>
+</footer>
+</div>
+<script src="signup.js"></script>
+</body>
+</html>

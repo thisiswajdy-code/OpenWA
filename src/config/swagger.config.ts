@@ -31,6 +31,8 @@ export const PUBLIC_PATHS = [
   '/api/infra/health',
   '/api/auth/login',
   '/api/auth/login-options',
+  '/api/auth/register',
+  '/api/auth/register/{id}',
   '/api/ingress/{pluginId}/{instanceId}/{path}',
 ];
 

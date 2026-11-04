@@ -4,6 +4,7 @@ import { Eye, EyeOff, Languages } from 'lucide-react';
 import { CustomSelect } from '../components/CustomSelect';
 import { languageOptions, resolveSupportedLanguage, type SupportedLanguage } from '../i18n';
 import { API_BASE_URL } from '../services/api';
+import { publicAsset } from '../basePath';
 import './Login.css';
 
 /** How the user signed in; the app keeps it beside the key so logout knows whether to end a password session. */
@@ -161,7 +162,7 @@ export function Login({ onLogin }: LoginProps) {
     <div className="login-container">
       <div className="login-card">
         <div className="login-logo">
-          <img src="/scalorus-wa-logo.svg" alt="Scalorus WA" className="logo-icon" />
+          <img src={publicAsset('scalorus-wa-logo.svg')} alt="Scalorus WA" className="logo-icon" />
           <span className="version-info">
             {t('login.version', {
               version: __APP_VERSION__,

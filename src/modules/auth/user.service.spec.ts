@@ -15,6 +15,7 @@ function makeUser(overrides: Partial<User> = {}): User {
     role: ApiKeyRole.ADMIN,
     isActive: true,
     lastLoginAt: null,
+    paymentLinkId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

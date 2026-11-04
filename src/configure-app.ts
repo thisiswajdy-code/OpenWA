@@ -3,9 +3,16 @@ import { ModuleRef } from '@nestjs/core';
 import helmet from 'helmet';
 import { Request, Response, NextFunction, json, urlencoded } from 'express';
 import { randomBytes } from 'crypto';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import { extname, join } from 'path';
-import { DASHBOARD_DIST, dashboardServingEnabled, dashboardBuildPresent } from './app.module';
+import {
+  DASHBOARD_BASE_PATH,
+  DASHBOARD_DIST,
+  SITE_DIR,
+  dashboardServingEnabled,
+  dashboardBuildPresent,
+  sitePresent,
+} from './app.module';
 import {
   createInflightBodyBudget,
   parseBodyLimitBytes,
@@ -17,12 +24,19 @@ import { createLogger } from './common/services/logger.service';
 import { ShutdownService } from './common/services/shutdown.service';
 import { injectDashboardCspNonce } from './config/dashboard-csp';
 import { resolveCorsPolicy, isUpgradeInsecureRequestsEnabled, resolveBodyLimit } from './config/bootstrap-security';
+import { arvyOrigin } from './modules/auth/arvy-client';
 import { resolveRequestTimeoutMs } from './config/http-timeouts';
 import { parseTrustedProxies } from './common/utils/ip';
 
 /** Where the bundled dashboard documents come from, and whether to serve them at all. */
 export interface DashboardSource {
   distDir: string;
+  enabled: boolean;
+}
+
+/** Where the static site (homepage, sign-up) comes from, and whether it is served at `/`. */
+export interface SiteSource {
+  dir: string;
   enabled: boolean;
 }
 
@@ -34,6 +48,19 @@ export interface ConfigureAppOptions {
    * copy and the original would pass.
    */
   dashboard?: DashboardSource;
+  /** Same seam for the site, whose documents get a CSP of their own. */
+  site?: SiteSource;
+}
+
+/**
+ * Which request paths are site documents and assets: `/` and the files in the site directory,
+ * listed once at startup. Everything else (the dashboard under its prefix, the API) keeps the
+ * stricter dashboard policy.
+ */
+export function siteRequestMatcher(site: SiteSource): (path: string) => boolean {
+  if (!site.enabled || !existsSync(site.dir)) return () => false;
+  const files = new Set(readdirSync(site.dir).map(name => `/${name}`));
+  return (path: string) => path === '/' || files.has(path);
 }
 
 /** The request-body caps this applied, so the caller can log them. */
@@ -62,6 +89,8 @@ export function configureApp(app: INestApplication, options: ConfigureAppOptions
     distDir: DASHBOARD_DIST,
     enabled: dashboardServingEnabled && dashboardBuildPresent,
   };
+  const site: SiteSource = options.site ?? { dir: SITE_DIR, enabled: sitePresent };
+  const isSiteRequest = siteRequestMatcher(site);
 
   // Assign a request id to every inbound request (X-Request-ID), echo it on the response, and run
   // the whole downstream chain inside its scope so every log line + audit row carries it.
@@ -74,68 +103,87 @@ export function configureApp(app: INestApplication, options: ConfigureAppOptions
     next();
   });
 
-  // Enhanced Security Headers
-  app.use(
-    helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          // The dashboard bundles its fonts, so no third-party style or font origin is allowed. The Bull Board
-          // UI (/api/admin/queues) links IBM Plex from Google Fonts; that stylesheet is blocked and it falls
-          // back to system fonts.
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          scriptSrc: ["'self'", (_req, res) => `'nonce-${(res as Response).locals.cspNonce as string}'`],
-          // `blob:` is needed for the outgoing image-attachment preview, which the dashboard renders
-          // from a URL.createObjectURL(file) blob before the message is sent (Chats.tsx).
-          imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
-          // Chat media (voice notes, video) is served to the dashboard as data: URIs. Without an
-          // explicit media-src, <audio>/<video> fall back to default-src 'self' and are blocked.
-          // Mirror imgSrc so audio/video render the same way images already do.
-          mediaSrc: ["'self'", 'data:', 'blob:', 'https:'],
-          connectSrc: ["'self'"],
-          fontSrc: ["'self'"],
-          objectSrc: ["'none'"],
-          // Auto-upgrade HTTP→HTTPS in production, unless CSP_UPGRADE_INSECURE_REQUESTS opts out for an
-          // HTTP-only private-network deployment (otherwise the browser forces the dashboard to https). (#611)
-          upgradeInsecureRequests: isUpgradeInsecureRequestsEnabled(
-            process.env.CSP_UPGRADE_INSECURE_REQUESTS,
-            process.env.NODE_ENV,
-          )
-            ? []
-            : null,
-        },
+  // Enhanced Security Headers. The site documents (homepage, sign-up) get a policy of their own:
+  // they link Google Fonts and embed the payment page in an iframe, which the dashboard never does.
+  const upgradeInsecureRequests = isUpgradeInsecureRequestsEnabled(
+    process.env.CSP_UPGRADE_INSECURE_REQUESTS,
+    process.env.NODE_ENV,
+  )
+    ? []
+    : null;
+  const siteHelmet = helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'"],
+        // The sign-up page embeds the payment page the recurring-payment API links to.
+        frameSrc: ["'self'", arvyOrigin()],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests,
       },
-      hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true,
+    },
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    noSniff: true,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  });
+  const appHelmet = helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        // The dashboard bundles its fonts, so no third-party style or font origin is allowed. The Bull Board
+        // UI (/api/admin/queues) links IBM Plex from Google Fonts; that stylesheet is blocked and it falls
+        // back to system fonts.
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", (_req, res) => `'nonce-${(res as Response).locals.cspNonce as string}'`],
+        // `blob:` is needed for the outgoing image-attachment preview, which the dashboard renders
+        // from a URL.createObjectURL(file) blob before the message is sent (Chats.tsx).
+        imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+        // Chat media (voice notes, video) is served to the dashboard as data: URIs. Without an
+        // explicit media-src, <audio>/<video> fall back to default-src 'self' and are blocked.
+        // Mirror imgSrc so audio/video render the same way images already do.
+        mediaSrc: ["'self'", 'data:', 'blob:', 'https:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        // Auto-upgrade HTTP→HTTPS in production, unless CSP_UPGRADE_INSECURE_REQUESTS opts out for an
+        // HTTP-only private-network deployment (otherwise the browser forces the dashboard to https). (#611)
+        upgradeInsecureRequests,
       },
-      noSniff: true,
-      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-      // Disable for API usage
-      crossOriginResourcePolicy: { policy: 'cross-origin' },
-    }),
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    noSniff: true,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    // Disable for API usage
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  });
+  app.use((req: Request, res: Response, next: NextFunction) =>
+    (isSiteRequest(req.path) ? siteHelmet : appHelmet)(req, res, next),
   );
 
   // Serve SPA documents dynamically so the nonce embedded in this exact document matches its CSP
   // response header. A shared cookie is deliberately avoided: a second dashboard tab could overwrite
-  // it and make the first tab's srcdoc scripts fail CSP. Assets and Nest-owned routes fall through.
+  // it and make the first tab's srcdoc scripts fail CSP. Only paths under the dashboard prefix are
+  // SPA routes; its assets and everything outside the prefix (the site at `/`, the API) fall through.
   if (dashboard.enabled && existsSync(join(dashboard.distDir, 'index.html'))) {
     const dashboardIndex = readFileSync(join(dashboard.distDir, 'index.html'), 'utf8');
+    const assetsPrefix = `${DASHBOARD_BASE_PATH}/assets/`;
     app.use((req: Request, res: Response, next: NextFunction) => {
       // Lowercased because routing matches these prefixes case-insensitively.
       const path = req.path.toLowerCase();
-      const excluded =
-        path.startsWith('/api/') ||
-        path === '/api' ||
-        path.startsWith('/socket.io/') ||
-        path === '/socket.io' ||
-        path.startsWith('/mcp/') ||
-        path === '/mcp' ||
-        path.startsWith('/assets/');
+      const underDashboard = path === DASHBOARD_BASE_PATH || path.startsWith(`${DASHBOARD_BASE_PATH}/`);
       const documentRequest =
         req.method === 'GET' &&
-        !excluded &&
+        underDashboard &&
+        !path.startsWith(assetsPrefix) &&
         ((req.headers.accept ?? '').includes('text/html') || extname(req.path) === '');
       if (!documentRequest) return next();
 

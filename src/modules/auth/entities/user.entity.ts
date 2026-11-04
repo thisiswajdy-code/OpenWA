@@ -33,6 +33,10 @@ export class User {
   @Column({ type: 'datetime', nullable: true })
   lastLoginAt!: Date | null;
 
+  // The recurring payment link a self-service sign-up created for the user; NULL for admin-created users.
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  paymentLinkId!: string | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

@@ -179,7 +179,8 @@ cd Scalorus WA
 docker compose -f docker-compose.dev.yml up -d
 
 # Access (the dashboard is bundled into the API image and served on the same port)
-# Dashboard: http://localhost:2785
+# Homepage: http://localhost:2785
+# Dashboard: http://localhost:2785/app
 # API: http://localhost:2785/api
 # Swagger: http://localhost:2785/api/docs
 ```
@@ -215,7 +216,8 @@ npm ci
 npm run dev
 
 # Access (in dev the dashboard runs on the Vite server with hot reload)
-# Dashboard: http://localhost:2886
+# Dashboard: http://localhost:2886/app
+# Homepage: http://localhost:2785
 # API: http://localhost:2785/api
 # Swagger: http://localhost:2785/api/docs
 ```

@@ -767,9 +767,13 @@ How it fits together:
 - `npm run build:all` builds the API (`dist/`) **and** the dashboard (`dashboard/dist/`). The root
   `Dockerfile` does this in its builder stage and copies `dashboard/dist` into the runtime image.
 - `ServeStaticModule` is registered conditionally in `src/app.module.ts`: it only activates when
-  `dashboard/dist/index.html` exists, serves it with SPA fallback, and `exclude`s `/api` and
+  `dashboard/dist/index.html` exists, serves it **under `/app`** (Vite `base: '/app/'`, router
+  `basename`) with SPA fallback for paths beneath that prefix, and `exclude`s `/api` and
   `/socket.io` so those keep returning real API/WebSocket responses. Opt out with
   `SERVE_DASHBOARD=false`.
+- The static site in `site/` (the homepage in Hebrew and English and the sign-up pages) is served at
+  `/` by a second `ServeStaticModule`, with a CSP of its own that admits Google Fonts and the payment
+  page iframe. It is checked in, not built, and the image copies it next to `dashboard/dist`.
 - Run it directly with `npm run prod` (build + serve) or `node dist/main` against a prebuilt image.
 
 In development the build is absent, so serve-static stays inert and the Vite dev server (port

@@ -610,7 +610,7 @@ A key with a `userId` is a **login key**: a dashboard user signed in with email 
 
 ### 5.3.6 users
 
-Dashboard users: an email and password that sign in to the dashboard without pasting an API key. Lives on the **main** connection. The first user is seeded from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; the rest are managed under `/api/auth/users` (ADMIN).
+Dashboard users: an email and password that sign in to the dashboard without pasting an API key. Lives on the **main** connection. The first user is seeded from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; the rest are managed under `/api/auth/users` (ADMIN). A self-service sign-up (`POST /api/auth/register`) creates a user inactive with its `paymentLinkId`, and activates it once the payment service reports a saved card.
 
 ```sql
 CREATE TABLE users (
@@ -620,6 +620,7 @@ CREATE TABLE users (
     role VARCHAR(20) NOT NULL DEFAULT 'operator',  -- admin | operator | viewer; the login key carries it
     "isActive" BOOLEAN NOT NULL DEFAULT 1,         -- false refuses sign-in and deletes the user's login keys
     "lastLoginAt" DATETIME,
+    "paymentLinkId" VARCHAR(64),                   -- recurring payment link of a self-service sign-up; NULL otherwise
     "createdAt" DATETIME NOT NULL DEFAULT (datetime('now')),
     "updatedAt" DATETIME NOT NULL DEFAULT (datetime('now'))
 );
@@ -908,7 +909,8 @@ src/database/migrations-main/      # main connection (auth + audit, SQLite)
 ├── 1779900000000-CreateAuthAuditTables.ts   # creates api_keys + audit_logs
 ├── 1786600000000-AddApiKeyAllowedChats.ts   # adds api_keys.allowedChats
 ├── 1786610000000-DropSynchronizeIndexDuplicates.ts  # drops synchronize-named duplicate indexes
-└── 1791400000000-AddUsersAndLoginKeys.ts    # creates users, adds api_keys.userId (login keys)
+├── 1791400000000-AddUsersAndLoginKeys.ts    # creates users, adds api_keys.userId (login keys)
+└── 1792000000000-AddUserPaymentLink.ts      # adds users.paymentLinkId (self-service sign-up)
 
 src/database/migrations/           # data connection (pluggable)
 ├── 1770108659848-AddMessageStatus.ts

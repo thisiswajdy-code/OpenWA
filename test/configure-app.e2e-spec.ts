@@ -117,7 +117,7 @@ describe('production HTTP surface (configureApp)', () => {
   });
 
   it('serves a document whose nonce matches the one in its own CSP header', async () => {
-    const res = await request(app.getHttpServer()).get('/').set('Accept', 'text/html').expect(200);
+    const res = await request(app.getHttpServer()).get('/app').set('Accept', 'text/html').expect(200);
 
     const csp = res.headers['content-security-policy'];
     const fromHeader = /'nonce-([A-Za-z0-9_-]+)'/.exec(csp)?.[1];
@@ -131,7 +131,7 @@ describe('production HTTP surface (configureApp)', () => {
 
   it('gives each response its own nonce', async () => {
     const nonceOf = async (): Promise<string | undefined> => {
-      const res = await request(app.getHttpServer()).get('/').set('Accept', 'text/html').expect(200);
+      const res = await request(app.getHttpServer()).get('/app').set('Accept', 'text/html').expect(200);
       return /'nonce-([A-Za-z0-9_-]+)'/.exec(res.headers['content-security-policy'])?.[1];
     };
     // A shared nonce would let one document's value satisfy another's CSP, which is the whole
@@ -140,7 +140,7 @@ describe('production HTTP surface (configureApp)', () => {
   });
 
   it('allows styles and fonts only from its own origin', async () => {
-    const res = await request(app.getHttpServer()).get('/').set('Accept', 'text/html').expect(200);
+    const res = await request(app.getHttpServer()).get('/app').set('Accept', 'text/html').expect(200);
 
     const csp = res.headers['content-security-policy'];
     expect(csp).toMatch(/(?:^|;)font-src 'self'(?:;|$)/);

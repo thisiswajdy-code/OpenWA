@@ -1019,6 +1019,92 @@
         ]
       }
     },
+    "/api/auth/register": {
+      "post": {
+        "operationId": "SignupController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created, inactive until a card is saved on `paymentLink`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, or the body carries a field the DTO does not declare."
+          },
+          "409": {
+            "description": "A user with this email already exists."
+          },
+          "429": {
+            "description": "Too many sign-up attempts from this client IP."
+          },
+          "502": {
+            "description": "The payment service refused or did not answer; no user was kept."
+          },
+          "503": {
+            "description": "Sign-up is not enabled (`ARVY_API_TOKEN` unset)."
+          }
+        },
+        "summary": "Sign up: create an inactive dashboard user and its payment link",
+        "tags": [
+          "auth"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/register/{id}": {
+      "get": {
+        "operationId": "SignupController_status",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The sign-up and the current status of its payment link.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No sign-up with this id."
+          },
+          "502": {
+            "description": "The payment service did not answer."
+          }
+        },
+        "summary": "Payment status of a sign-up; activates the user once a card is saved",
+        "tags": [
+          "auth"
+        ],
+        "security": []
+      }
+    },
     "/api/sessions": {
       "post": {
         "operationId": "SessionController_create",
@@ -19170,6 +19256,102 @@
           "engineType",
           "scoped",
           "expiresAt"
+        ]
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Customer name, passed to the payment page.",
+            "maxLength": 120,
+            "example": "Dana"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address; the sign-in name. Stored lower-cased.",
+            "example": "dana@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for the dashboard. Never returned.",
+            "minLength": 8,
+            "maxLength": 128,
+            "example": "correct horse battery staple"
+          },
+          "locale": {
+            "type": "string",
+            "description": "Language of the payment page.",
+            "enum": [
+              "he",
+              "en",
+              "ar"
+            ],
+            "example": "he"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RegisterResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The user id; poll `GET /api/auth/register/:id` with it.",
+            "example": "0a941dac-a965-45e7-b318-74ae8be134f0"
+          },
+          "email": {
+            "type": "string",
+            "example": "dana@example.com"
+          },
+          "paymentLink": {
+            "type": "string",
+            "description": "The page where the customer saves a card; embed or open it.",
+            "example": "https://arvy.store/billing/setup/3f2b…"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Charge per period.",
+            "example": 30
+          },
+          "currencyCode": {
+            "type": "string",
+            "description": "Three-letter currency of `amount`.",
+            "example": "USD"
+          },
+          "chargeFrequency": {
+            "type": "string",
+            "example": "monthly"
+          },
+          "paymentsNumber": {
+            "type": "number",
+            "description": "Number of charges.",
+            "example": 12
+          },
+          "status": {
+            "type": "string",
+            "description": "Payment link status: pending_card until a card is saved, then active; completed after the last charge; cancelled.",
+            "example": "pending_card"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the user can sign in: true once a card was saved.",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "paymentLink",
+          "amount",
+          "currencyCode",
+          "chargeFrequency",
+          "paymentsNumber",
+          "status",
+          "active"
         ]
       },
       "CreateSessionDto": {

@@ -2,6 +2,7 @@ import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength 
 import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ApiKeyRole } from '../entities/api-key.entity';
+import { ToStrictBoolean } from '../../../common/utils/strict-boolean';
 
 /** Bounds shared by the DTOs and the boot-time ADMIN_PASSWORD check. */
 export const PASSWORD_MIN_LENGTH = 8;
@@ -121,6 +122,7 @@ export class UpdateUserDto {
     example: true,
   })
   @IsOptional()
+  @ToStrictBoolean()
   @IsBoolean()
   isActive?: boolean;
 }

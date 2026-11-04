@@ -12,16 +12,21 @@ import { AuthValidateController } from './auth-validate.controller';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserLoginController } from './user-login.controller';
+import { SignupController } from './signup.controller';
+import { SignupService } from './signup.service';
+import { ArvyClient } from './arvy-client';
 import { ApiKeyGuard } from './guards/api-key.guard';
 import { ProxyAwareThrottlerGuard } from '../../common/security/proxy-aware-throttler.guard';
 
 @Global()
 @Module({
   imports: [TypeOrmModule.forFeature([ApiKey, User], 'main')],
-  controllers: [AuthController, AuthValidateController, UserController, UserLoginController],
+  controllers: [AuthController, AuthValidateController, UserController, UserLoginController, SignupController],
   providers: [
     AuthService,
     UserService,
+    SignupService,
+    ArvyClient,
     ApiKeyUsageTracker,
     ChatScopeService,
     ActiveKeyIndex,
