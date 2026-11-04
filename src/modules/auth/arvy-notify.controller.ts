@@ -49,7 +49,10 @@ export class ArvyNotifyController {
     description: 'Received. `activated` says whether this call activated the user; other events are ignored.',
     type: ArvyNotifyResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'The body is not a notification.' })
+  @ApiResponse({
+    status: 400,
+    description: 'The body is neither a recurring-payment nor a one-time-link notification.',
+  })
   @ApiResponse({ status: 401, description: 'Missing or invalid `X-Arvy-Signature`.' })
   @ApiResponse({ status: 404, description: 'No sign-up matches the payment link or its reference.' })
   @ApiResponse({ status: 503, description: 'Notifications are not configured (`ARVY_SOURCE_SECRET` unset).' })
@@ -69,7 +72,7 @@ export class ArvyNotifyController {
     if (!notification) throw new BadRequestException('The body is not a payment notification');
 
     const { user, activated, ignored } = await this.signupService.activateFromNotification(notification);
-    if (activated && user) {
+    if (activated && user && notification.recurring_payment) {
       await this.auditService.logInfo(AuditAction.USER_UPDATED, {
         ipAddress: this.clientIp(req),
         method: req.method,

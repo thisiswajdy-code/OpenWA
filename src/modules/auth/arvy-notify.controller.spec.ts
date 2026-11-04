@@ -109,6 +109,22 @@ describe('ArvyNotifyController', () => {
     expect(auditService.logInfo).not.toHaveBeenCalled();
   });
 
+  it('acknowledges a signed one-time-link notification with 200 rather than refusing it', async () => {
+    signupService.activateFromNotification.mockResolvedValue({ user: null, activated: false, ignored: true });
+    const paid = JSON.stringify({
+      event: 'payment_link.paid',
+      source: { id: 1, name: 'Scalorus WA' },
+      payment_link: { id: 7, status: 'paid', reference: 'inv-17', amount: 250, currency_code: 'ILS' },
+    });
+    expect(await build(SECRET).notify(request(paid), sign(paid))).toEqual({
+      received: true,
+      event: 'payment_link.paid',
+      activated: false,
+      ignored: true,
+    });
+    expect(auditService.logInfo).not.toHaveBeenCalled();
+  });
+
   it('lets a 404 from the service through, so the payment service can resend later', async () => {
     signupService.activateFromNotification.mockRejectedValue(new NotFoundException('nope'));
     await expect(build(SECRET).notify(request(ACTIVE), sign(ACTIVE))).rejects.toBeInstanceOf(NotFoundException);

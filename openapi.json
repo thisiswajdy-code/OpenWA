@@ -1121,7 +1121,7 @@
             }
           },
           "400": {
-            "description": "The body is not a notification."
+            "description": "The body is neither a recurring-payment nor a one-time-link notification."
           },
           "401": {
             "description": "Missing or invalid `X-Arvy-Signature`."

@@ -11,7 +11,14 @@ import { User } from './entities/user.entity';
 import { ApiKeyRole } from './entities/api-key.entity';
 import { hashPassword } from './password-hash';
 import { RegisterDto } from './dto';
-import { ARVY_ACTIVE_EVENT, ArvyApiError, ArvyClient, type ArvyLink, type ArvyNotification } from './arvy-client';
+import {
+  ARVY_ACTIVE_EVENT,
+  ARVY_LANG_FOR_LOCALE,
+  ArvyApiError,
+  ArvyClient,
+  type ArvyLink,
+  type ArvyNotification,
+} from './arvy-client';
 import { createLogger } from '../../common/services/logger.service';
 
 /**
@@ -121,6 +128,8 @@ export class SignupService {
           reference,
           customer_email: dto.email,
           customer_name: dto.name,
+          // Both spellings of the card-page language; the API prefers `lang`.
+          lang: dto.locale ? ARVY_LANG_FOR_LOCALE[dto.locale] : undefined,
           locale: dto.locale,
         });
         this.priceIndex = i;
@@ -139,13 +148,13 @@ export class SignupService {
   /**
    * Apply Arvy's notification for the source: the payment it names became active, so its user is
    * activated. Found by the link id, or by the reference (the user id) when the id is unknown. Any
-   * other event is acknowledged and ignored.
+   * other event (a one-time link paid, say) is acknowledged and ignored.
    */
   async activateFromNotification(
     notification: ArvyNotification,
   ): Promise<{ user: User | null; activated: boolean; ignored: boolean }> {
-    if (notification.event !== ARVY_ACTIVE_EVENT) return { user: null, activated: false, ignored: true };
     const payment = notification.recurring_payment;
+    if (notification.event !== ARVY_ACTIVE_EVENT || !payment) return { user: null, activated: false, ignored: true };
     const user =
       (await this.userRepository.findOne({ where: { paymentLinkId: String(payment.id) } })) ??
       (payment.reference ? await this.userRepository.findOne({ where: { id: payment.reference } }) : null);

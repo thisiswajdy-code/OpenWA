@@ -12,13 +12,18 @@ import { constantTimeEqual } from '../../common/security/constantTimeEqual';
 export const ARVY_DEFAULT_API_URL = 'https://arvy.store/api/v1';
 /** The source Arvy notifies for this gateway, unless `ARVY_SOURCE_ID` says otherwise. */
 export const ARVY_DEFAULT_SOURCE_ID = 1;
-/** The one event the notify URL receives: the customer saved a card and billing is active. */
+/** The event a recurring link sends once: the customer saved a card and billing is active. */
 export const ARVY_ACTIVE_EVENT = 'recurring_payment.active';
+/** The event a one-time link sends when paid. This gateway creates none, but the source may carry some. */
+export const ARVY_PAID_EVENT = 'payment_link.paid';
 const TIMEOUT_MS = 15_000;
 
 export type ArvyLinkStatus = 'pending_card' | 'active' | 'completed' | 'cancelled';
 export type ArvyChargeFrequency = 'weekly' | 'monthly' | 'quarterly' | 'half-yearly' | 'yearly';
 export type ArvyLocale = 'he' | 'ar' | 'en';
+/** The card-page language as the API names it (`lang` wins over `locale` when both are sent). */
+export type ArvyLang = 'il' | 'us' | 'ar';
+export const ARVY_LANG_FOR_LOCALE: Record<ArvyLocale, ArvyLang> = { he: 'il', en: 'us', ar: 'ar' };
 
 export interface ArvyCreateLinkRequest {
   /** Charge per period, min 0.01. */
@@ -40,7 +45,9 @@ export interface ArvyCreateLinkRequest {
   /** Three letters; the API defaults to ILS. */
   currency_code?: string;
   vat_percent?: number;
-  /** Language of the card page. */
+  /** Language of the card page: `il` Hebrew (default), `us` English, `ar` Arabic. */
+  lang?: ArvyLang;
+  /** Older spelling of the same choice; `lang` wins when both are sent. */
   locale?: ArvyLocale;
 }
 
@@ -50,6 +57,8 @@ export interface ArvyLink {
   payment_link: string;
   amount: number;
   currency_code: string;
+  lang?: ArvyLang;
+  locale?: ArvyLocale;
   description: string;
   charge_frequency: ArvyChargeFrequency;
   sto_payments_number: number;
@@ -61,27 +70,48 @@ export interface ArvyLink {
   charges_completed: number;
 }
 
-/** The body Arvy POSTs to the source's notify URL when a recurring payment becomes active. */
+/** A recurring payment as a notification describes it. */
+export interface ArvyNotifiedRecurringPayment {
+  id: number;
+  status: ArvyLinkStatus;
+  reference: string | null;
+  amount: number;
+  currency_code: string;
+  description: string;
+  charge_frequency: ArvyChargeFrequency;
+  sto_payments_number: number;
+  first_charge_date: string;
+  customer_name: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+  card_last4?: string | null;
+  tranzila_sto_id?: string | null;
+}
+
+/** A one-time payment link as a `payment_link.paid` notification describes it. */
+export interface ArvyNotifiedPaymentLink {
+  id: number;
+  status: 'pending' | 'paid' | 'cancelled';
+  reference: string | null;
+  amount: number;
+  paid_amount: number | null;
+  currency_code: string;
+  description: string;
+  paid_at: string | null;
+  card_last4?: string | null;
+  tranzila_index?: string | null;
+}
+
+/**
+ * The body Arvy POSTs to the source's notify URL: `recurring_payment.active` carries
+ * `recurring_payment`, `payment_link.paid` carries `payment_link`. One source can send both.
+ */
 export interface ArvyNotification {
   event: string;
   sent_at?: string;
   source?: { id: number; name: string };
-  recurring_payment: {
-    id: number;
-    status: ArvyLinkStatus;
-    reference: string | null;
-    amount: number;
-    currency_code: string;
-    description: string;
-    charge_frequency: ArvyChargeFrequency;
-    sto_payments_number: number;
-    first_charge_date: string;
-    customer_name: string | null;
-    customer_email: string | null;
-    customer_phone: string | null;
-    card_last4?: string | null;
-    tranzila_sto_id?: string | null;
-  };
+  recurring_payment?: ArvyNotifiedRecurringPayment;
+  payment_link?: ArvyNotifiedPaymentLink;
 }
 
 /**
@@ -94,7 +124,17 @@ export function verifyArvySignature(rawBody: string | Buffer, header: string | u
   return constantTimeEqual(header.trim(), expected);
 }
 
-/** Shape-check a parsed notification body; the signature already proves it came from Arvy. */
+/** Whether `value` is a payment object with a numeric id and a string status. */
+function isNotifiedPayment(value: unknown): boolean {
+  if (typeof value !== 'object' || value === null) return false;
+  const { id, status } = value as { id?: unknown; status?: unknown };
+  return typeof id === 'number' && typeof status === 'string';
+}
+
+/**
+ * Shape-check a parsed notification body; the signature already proves it came from Arvy. A body
+ * is a notification when it names an event and carries a recurring payment or a one-time link.
+ */
 export function parseArvyNotification(raw: string): ArvyNotification | null {
   let body: unknown;
   try {
@@ -103,10 +143,13 @@ export function parseArvyNotification(raw: string): ArvyNotification | null {
     return null;
   }
   if (typeof body !== 'object' || body === null) return null;
-  const { event, recurring_payment: payment } = body as { event?: unknown; recurring_payment?: unknown };
-  if (typeof event !== 'string' || typeof payment !== 'object' || payment === null) return null;
-  const { id, status } = payment as { id?: unknown; status?: unknown };
-  if (typeof id !== 'number' || typeof status !== 'string') return null;
+  const { event, recurring_payment, payment_link } = body as {
+    event?: unknown;
+    recurring_payment?: unknown;
+    payment_link?: unknown;
+  };
+  if (typeof event !== 'string') return null;
+  if (!isNotifiedPayment(recurring_payment) && !isNotifiedPayment(payment_link)) return null;
   return body as ArvyNotification;
 }
 

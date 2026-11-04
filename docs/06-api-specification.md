@@ -5288,7 +5288,7 @@ Where a sign-up's payment stands. Reads the link from the payment service; the f
 
 #### POST /notify
 
-The notify URL registered with the payment service for this gateway's source (outside the `/api` prefix: `https://wa.scalorus.com/notify`). The service POSTs here **once**, when a sign-up's card is saved and the recurring payment becomes active, with `X-Arvy-Event: recurring_payment.active` and `X-Arvy-Signature: sha256=<hex HMAC-SHA256 of the raw body, keyed with the source secret>`. The user the payment belongs to (by link id, or by `reference`, which is the user id) is activated; any other event is acknowledged and ignored.
+The notify URL registered with the payment service for this gateway's source (outside the `/api` prefix: `https://wa.scalorus.com/notify`). The service POSTs here **once**, when a sign-up's card is saved and the recurring payment becomes active, with `X-Arvy-Event: recurring_payment.active` and `X-Arvy-Signature: sha256=<hex HMAC-SHA256 of the raw body, keyed with the source secret>`. The user the payment belongs to (by link id, or by `reference`, which is the user id) is activated; any other event, such as `payment_link.paid` for a one-time link on the same source, is acknowledged and ignored.
 
 **Auth:** public, but every body is verified against `ARVY_SOURCE_SECRET` over the exact bytes received before it is read.
 
@@ -5309,7 +5309,7 @@ The notify URL registered with the payment service for this gateway's source (ou
 { "received": true, "event": "recurring_payment.active", "activated": true, "ignored": false }
 ```
 
-**Errors:** `400` the body is not a notification · `401` missing or invalid signature · `404` no sign-up matches the payment · `503` notifications are not configured (`ARVY_SOURCE_SECRET` unset)
+**Errors:** `400` the body is neither a recurring-payment nor a one-time-link notification · `401` missing or invalid signature · `404` no sign-up matches the payment · `503` notifications are not configured (`ARVY_SOURCE_SECRET` unset)
 
 #### POST /api/auth/users
 

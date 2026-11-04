@@ -99,6 +99,7 @@ describe('SignupService.register', () => {
         reference: 'new-user',
         customer_email: dto.email,
         customer_name: 'Dana',
+        lang: 'il',
         locale: 'he',
         first_charge_date: todayInIsrael(),
       }),
@@ -242,6 +243,25 @@ describe('SignupService.activateFromNotification', () => {
     expect(repository.findOne).not.toHaveBeenCalled();
   });
 
+  it('acknowledges a one-time link paid on the same source without touching users', async () => {
+    const { service, repository } = makeService({}, [{ id: 'u1', email: dto.email, paymentLinkId: '42' }]);
+    const result = await service.activateFromNotification({
+      event: 'payment_link.paid',
+      payment_link: {
+        id: 7,
+        status: 'paid',
+        reference: 'inv-17',
+        amount: 250,
+        paid_amount: 250,
+        currency_code: 'ILS',
+        description: 'Logo design',
+        paid_at: '2026-11-04T15:40:58+00:00',
+      },
+    });
+    expect(result).toEqual({ user: null, activated: false, ignored: true });
+    expect(repository.findOne).not.toHaveBeenCalled();
+  });
+
   it('404s a payment no sign-up matches', async () => {
     const { service } = makeService({}, []);
     await expect(service.activateFromNotification(notification({ reference: null }))).rejects.toBeInstanceOf(
@@ -278,7 +298,9 @@ describe('Arvy notification signature', () => {
   });
 
   it('parses a notification only when it has an event and a payment with id and status', () => {
-    expect(parseArvyNotification(body)?.recurring_payment.id).toBe(42);
+    expect(parseArvyNotification(body)?.recurring_payment?.id).toBe(42);
+    const paid = '{"event":"payment_link.paid","payment_link":{"id":7,"status":"paid","reference":"inv-17"}}';
+    expect(parseArvyNotification(paid)?.payment_link?.id).toBe(7);
     expect(parseArvyNotification('not json')).toBeNull();
     expect(parseArvyNotification('[]')).toBeNull();
     expect(parseArvyNotification('{"event":"x"}')).toBeNull();
