@@ -11,6 +11,10 @@ import { createElement } from 'react';
 
 let sentKey: string | null = null;
 let reply: () => Response = okReply;
+// What GET /auth/login-options answers; null leaves it to `reply`, as a gateway that predates the route would.
+let loginOptions: { password: boolean } | null = null;
+// The last POST /auth/login body, so a test can see what the email form sent.
+let loginBody: unknown = undefined;
 
 function okReply(): Response {
   return new Response(JSON.stringify({ valid: true, role: 'admin' }), {
@@ -19,7 +23,14 @@ function okReply(): Response {
 }
 
 function installFetchStub(): void {
-  globalThis.fetch = ((_input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    if (url.endsWith('/auth/login-options') && loginOptions) {
+      return Promise.resolve(
+        new Response(JSON.stringify(loginOptions), { headers: { 'Content-Type': 'application/json' } }),
+      );
+    }
+    if (url.endsWith('/auth/login')) loginBody = JSON.parse(String(init?.body));
     sentKey = new Headers(init?.headers).get('X-API-Key');
     return Promise.resolve(reply());
   }) as typeof fetch;
@@ -43,6 +54,8 @@ before(async () => {
 afterEach(() => {
   sentKey = null;
   reply = okReply;
+  loginOptions = null;
+  loginBody = undefined;
   rtl.cleanup();
 });
 
@@ -103,4 +116,92 @@ test('the login form aligns to the document direction, which is set on <html>', 
   // would need a second element carrying `dir` inside the page and never matches.
   assert.deepEqual(css.match(/[^\s,{}][^,{}]*\s\[dir[^\]]*\][^{]*/g) ?? [], []);
   assert.match(css, /\.login-container \.login-form \{\s*text-align: start;\s*\}/);
+});
+
+// ---------------------------------------------------------------------------------------------------
+// Email and password sign-in. The form is the default only once the gateway says a user exists; it
+// exchanges the password for a login key and hands that key up exactly like a pasted one.
+// ---------------------------------------------------------------------------------------------------
+
+function loginReply(): Response {
+  return new Response(
+    JSON.stringify({ apiKey: 'owa_k1_login', role: 'operator', engineType: 'baileys', scoped: false }),
+    { headers: { 'Content-Type': 'application/json' } },
+  );
+}
+
+test('without a dashboard user the key form shows and offers no switch', async () => {
+  loginOptions = { password: false };
+  const { screen } = rtl;
+  rtl.render(createElement(Login, { onLogin: () => assert.fail('nothing was submitted') }));
+  await screen.findByLabelText('API Key');
+  // The options answer has landed by now (same microtask queue); the form stays on the key.
+  await rtl.waitFor(() => assert.equal(screen.queryByText('Sign in with email and password instead'), null));
+  assert.equal(screen.queryByLabelText('Email'), null);
+});
+
+test('with a dashboard user the email form is the default and signs in with the login key it receives', async () => {
+  loginOptions = { password: true };
+  reply = loginReply;
+  const { screen, fireEvent, waitFor } = rtl;
+  const logins: unknown[][] = [];
+  rtl.render(createElement(Login, { onLogin: (...args: unknown[]) => logins.push(args) }));
+
+  fireEvent.change(await screen.findByLabelText('Email'), { target: { value: ' Admin@Example.com ' } });
+  fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'correct horse battery staple' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+
+  await waitFor(() => assert.equal(logins.length, 1));
+  assert.deepEqual(loginBody, { email: 'Admin@Example.com', password: 'correct horse battery staple' });
+  assert.equal(sentKey, null, 'the password form sends no API key header');
+  assert.deepEqual(logins, [['owa_k1_login', 'operator', 'baileys', false, 'password']]);
+});
+
+test('a refused password shows the dashboard wording, not the gateway message, and a 429 names the throttle', async () => {
+  loginOptions = { password: true };
+  const { screen, fireEvent } = rtl;
+  rtl.render(createElement(Login, { onLogin: () => assert.fail('a refused sign-in signed in') }));
+  fireEvent.change(await screen.findByLabelText('Email'), { target: { value: 'admin@example.com' } });
+  fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'wrong' } });
+
+  reply = () =>
+    new Response(JSON.stringify({ statusCode: 401, message: 'Invalid email or password' }), { status: 401 });
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+  await rtl.waitFor(() =>
+    assert.equal(document.querySelector('.error-message')?.textContent, 'Invalid email or password'),
+  );
+
+  reply = () => new Response(JSON.stringify({ statusCode: 429, message: 'ThrottlerException' }), { status: 429 });
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+  await rtl.waitFor(() =>
+    assert.equal(
+      document.querySelector('.error-message')?.textContent,
+      'Too many sign-in attempts. Please wait a minute and try again.',
+    ),
+  );
+});
+
+test('the switch moves between the two forms and clears the error', async () => {
+  loginOptions = { password: true };
+  const { screen, fireEvent } = rtl;
+  const logins: unknown[][] = [];
+  rtl.render(createElement(Login, { onLogin: (...args: unknown[]) => logins.push(args) }));
+  await screen.findByLabelText('Email');
+
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+  assert.equal(document.querySelector('.error-message')?.textContent, 'Email is required');
+
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in with an API key instead' }));
+  assert.equal(document.querySelector('.error-message'), null);
+  fireEvent.change(screen.getByLabelText('API Key'), { target: { value: 'owa_k1_secret' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Connect' }));
+  await rtl.waitFor(() => assert.equal(logins.length, 1));
+  assert.deepEqual(logins, [['owa_k1_secret', 'admin', undefined, false, 'apiKey']]);
+
+  rtl.cleanup();
+  rtl.render(createElement(Login, { onLogin: () => undefined }));
+  await screen.findByLabelText('Email');
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in with an API key instead' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in with email and password instead' }));
+  assert.ok(screen.getByLabelText('Password'));
 });

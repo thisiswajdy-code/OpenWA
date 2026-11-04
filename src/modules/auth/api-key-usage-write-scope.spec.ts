@@ -39,6 +39,7 @@ function makeRow(overrides: Partial<ApiKey> = {}): ApiKey {
     expiresAt: null,
     lastUsedAt: null,
     usageCount: 5,
+    userId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

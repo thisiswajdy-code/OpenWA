@@ -96,6 +96,7 @@ async function bootstrap() {
     apiMasterKey: process.env.API_MASTER_KEY,
     allowDevApiKey: process.env.ALLOW_DEV_API_KEY,
     redisPassword: process.env.REDIS_PASSWORD,
+    adminPassword: process.env.ADMIN_PASSWORD,
   });
 
   // Advisory (not enforced): without API_KEY_PEPPER, stored API-key hashes use plain SHA-256. Enabling

@@ -62,6 +62,12 @@
                 "api_key_revoked",
                 "api_key_deleted",
                 "api_key_auth_failed",
+                "user_created",
+                "user_updated",
+                "user_deleted",
+                "user_login",
+                "user_login_failed",
+                "user_logout",
                 "rate_limit_exceeded",
                 "queue_board_mutated",
                 "session_created",
@@ -591,6 +597,423 @@
           }
         },
         "summary": "Validate an API key",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/users": {
+      "post": {
+        "operationId": "UserController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created. The password is never returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, or the body carries a field the DTO does not declare.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, unknown, revoked, or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key's role, session or chat scope, or IP allow-list does not allow this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A user with this email already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create a dashboard user (admin only)",
+        "tags": [
+          "auth"
+        ]
+      },
+      "get": {
+        "operationId": "UserController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All users, newest first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, unknown, revoked, or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key's role, session or chat scope, or IP allow-list does not allow this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List dashboard users (admin only)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/users/{id}": {
+      "get": {
+        "operationId": "UserController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, unknown, revoked, or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key's role, session or chat scope, or IP allow-list does not allow this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get a dashboard user (admin only)",
+        "tags": [
+          "auth"
+        ]
+      },
+      "put": {
+        "operationId": "UserController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, or the body carries a field the DTO does not declare.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, unknown, revoked, or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key's role, session or chat scope, or IP allow-list does not allow this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another user already has this email.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a dashboard user (admin only)",
+        "tags": [
+          "auth"
+        ]
+      },
+      "delete": {
+        "operationId": "UserController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted"
+          },
+          "401": {
+            "description": "The API key is missing, unknown, revoked, or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key's role, session or chat scope, or IP allow-list does not allow this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Delete a dashboard user and every login key it holds (admin only)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/login-options": {
+      "get": {
+        "operationId": "UserLoginController_loginOptions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Sign-in availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginOptionsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Which sign-in methods the dashboard can offer",
+        "tags": [
+          "auth"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "UserLoginController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signed in: the body carries a login API key that lasts until `expiresAt`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is malformed or carries a field the DTO does not declare."
+          },
+          "401": {
+            "description": "Unknown email, wrong password, or a deactivated user: always the same message."
+          },
+          "429": {
+            "description": "Too many sign-in attempts from this client IP."
+          }
+        },
+        "summary": "Sign in with email and password",
+        "tags": [
+          "auth"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "UserLoginController_logout",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "The login key presented is deleted. A key that is not a login key is left as it is."
+          },
+          "401": {
+            "description": "The API key is missing, unknown, revoked, or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key's role, session or chat scope, or IP allow-list does not allow this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "End a password sign-in by deleting its login key",
         "tags": [
           "auth"
         ]
@@ -18567,6 +18990,187 @@
         },
         "required": [
           "valid"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address; the sign-in name. Stored lower-cased.",
+            "example": "ops@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password. Never returned.",
+            "minLength": 8,
+            "maxLength": 128,
+            "example": "correct horse battery staple"
+          },
+          "role": {
+            "type": "string",
+            "description": "Role the login key will carry.",
+            "enum": [
+              "admin",
+              "operator",
+              "viewer"
+            ],
+            "default": "operator"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "0a941dac-a965-45e7-b318-74ae8be134f0"
+          },
+          "email": {
+            "type": "string",
+            "example": "ops@example.com"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "operator",
+              "viewer"
+            ]
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true
+          },
+          "lastLoginAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "The last successful sign-in; absent before the first."
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "New email address.",
+            "example": "ops@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "New password. Every login key the user holds is deleted, so they sign in again.",
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "role": {
+            "type": "string",
+            "description": "New role. Every login key the user holds is deleted, so the next sign-in carries it.",
+            "enum": [
+              "admin",
+              "operator",
+              "viewer"
+            ]
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "false refuses new sign-ins and deletes every login key the user holds.",
+            "example": true
+          }
+        }
+      },
+      "LoginOptionsResponseDto": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "boolean",
+            "description": "Whether at least one active dashboard user exists, so the email and password form is useful.",
+            "example": true
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address of a dashboard user.",
+            "example": "admin@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "The user password.",
+            "example": "correct horse battery staple"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "LoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "description": "A login API key for this sign-in, valid until `expiresAt`. Send it as `X-API-Key` exactly like any other key; `POST /api/auth/logout` deletes it. It is returned only here.",
+            "example": "owa_k1_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "operator",
+              "viewer"
+            ],
+            "description": "The user's role, which the login key carries."
+          },
+          "engineType": {
+            "type": "string",
+            "description": "Engine the process resolved at boot.",
+            "example": "baileys"
+          },
+          "scoped": {
+            "type": "boolean",
+            "description": "Always false: a login key is never restricted to selected sessions.",
+            "example": false
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When the login key stops authenticating.",
+            "example": "2026-11-04T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "apiKey",
+          "role",
+          "engineType",
+          "scoped",
+          "expiresAt"
         ]
       },
       "CreateSessionDto": {

@@ -19,7 +19,7 @@ OpenWA supports two database backends that can be selected at deployment time:
 | **SQLite**     | Development, personal bot, low-resource VPS | 1-5      | ❌                 |
 | **PostgreSQL** | Production, multi-session, high volume      | 5+       | ✅                 |
 
-The PostgreSQL row covers the data database only. The main database (`api_keys`, `audit_logs`) is
+The PostgreSQL row covers the data database only. The main database (`api_keys`, `users`, `audit_logs`) is
 always a SQLite file on each node, and running more than one replica is not supported yet; see
 [13 - Horizontal Scaling Guide](./13-horizontal-scaling.md).
 
@@ -593,6 +593,7 @@ CREATE TABLE api_keys (
     "expiresAt" DATETIME,
     "lastUsedAt" DATETIME,
     "usageCount" INTEGER NOT NULL DEFAULT 0,
+    "userId" VARCHAR(36),                          -- the dashboard user a password sign-in minted this key for; null = created via the API or seeded
     "createdAt" DATETIME NOT NULL DEFAULT (datetime('now')),
     "updatedAt" DATETIME NOT NULL DEFAULT (datetime('now'))
 );
@@ -602,6 +603,29 @@ CREATE UNIQUE INDEX "IDX_api_keys_keyHash" ON api_keys("keyHash");
 
 > [!NOTE]
 > Access control is **role-based** (`admin` / `operator` / `viewer`), optionally scoped by `allowedIps`, `allowedSessions` and `allowedChats`. There is no granular `permissions` string array — see [04 - Security Design](./04-security-design.md) for what each role can do.
+
+A key with a `userId` is a **login key**: a dashboard user signed in with email and password (`POST /api/auth/login`) and received it for the sign-in, with the user's role, no scope, and an expiry (`LOGIN_SESSION_TTL_HOURS`, a day by default). It authenticates like any other key, but it is not a credential an admin manages: `GET /api/auth/api-keys` leaves it out, the last-admin guard never counts it as a surviving admin, and it is deleted by `POST /api/auth/logout`, when its user's password, role or active flag changes, when its user is deleted, and (once expired) on the next sign-in by anyone.
+
+---
+
+### 5.3.6 users
+
+Dashboard users: an email and password that sign in to the dashboard without pasting an API key. Lives on the **main** connection. The first user is seeded from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; the rest are managed under `/api/auth/users` (ADMIN).
+
+```sql
+CREATE TABLE users (
+    id VARCHAR PRIMARY KEY,
+    email VARCHAR(254) NOT NULL,                   -- UNIQUE index; stored lower-cased
+    "passwordHash" VARCHAR(255) NOT NULL,          -- self-describing scrypt string (scrypt$N$r$p$salt$hash)
+    role VARCHAR(20) NOT NULL DEFAULT 'operator',  -- admin | operator | viewer; the login key carries it
+    "isActive" BOOLEAN NOT NULL DEFAULT 1,         -- false refuses sign-in and deletes the user's login keys
+    "lastLoginAt" DATETIME,
+    "createdAt" DATETIME NOT NULL DEFAULT (datetime('now')),
+    "updatedAt" DATETIME NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE UNIQUE INDEX "IDX_users_email" ON users(email);
+```
 
 ---
 
@@ -883,7 +907,8 @@ Migrations are hand-authored and idempotent (`IF NOT EXISTS`) so they are safe t
 src/database/migrations-main/      # main connection (auth + audit, SQLite)
 ├── 1779900000000-CreateAuthAuditTables.ts   # creates api_keys + audit_logs
 ├── 1786600000000-AddApiKeyAllowedChats.ts   # adds api_keys.allowedChats
-└── 1786610000000-DropSynchronizeIndexDuplicates.ts  # drops synchronize-named duplicate indexes
+├── 1786610000000-DropSynchronizeIndexDuplicates.ts  # drops synchronize-named duplicate indexes
+└── 1791400000000-AddUsersAndLoginKeys.ts    # creates users, adds api_keys.userId (login keys)
 
 src/database/migrations/           # data connection (pluggable)
 ├── 1770108659848-AddMessageStatus.ts

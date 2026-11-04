@@ -51,7 +51,9 @@
     "refresh": "רענון",
     "errorGeneric": "אירעה שגיאה",
     "unknownError": "שגיאה לא ידועה",
-    "retry": "נסה שוב"
+    "retry": "נסה שוב",
+    "showPassword": "הצגת סיסמה",
+    "hidePassword": "הסתרת סיסמה"
   },
   "theme": {
     "light": "בהיר",
@@ -358,7 +360,18 @@
     "help": "צריך עזרה?",
     "viewDocs": "לצפייה בתיעוד",
     "footer": "נבנה באהבה על ידי Yudhi Armyndharis וקהילת OpenWA",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "אימייל",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "הזינו סיסמה",
+    "emailRequired": "יש להזין אימייל",
+    "passwordRequired": "יש להזין סיסמה",
+    "invalidCredentials": "אימייל או סיסמה שגויים",
+    "tooManyAttempts": "יותר מדי ניסיונות התחברות. המתינו דקה ונסו שוב.",
+    "signIn": "התחברות",
+    "signingIn": "מתחבר...",
+    "useApiKey": "התחברות עם מפתח API במקום",
+    "usePassword": "התחברות עם אימייל וסיסמה במקום"
   },
   "dashboard": {
     "title": "דאשבורד",

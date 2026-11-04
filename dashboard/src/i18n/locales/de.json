@@ -47,7 +47,9 @@
     "refresh": "Aktualisieren",
     "errorGeneric": "Ein Fehler ist aufgetreten",
     "unknownError": "Unbekannter Fehler",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen"
   },
   "theme": {
     "light": "Hell",
@@ -347,7 +349,18 @@
     "help": "Brauchst du Hilfe?",
     "viewDocs": "Dokumentation ansehen",
     "footer": "Mit ❤️ erstellt von Yudhi Armyndharis und der OpenWA-Community",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "E-Mail",
+    "emailPlaceholder": "du@example.com",
+    "passwordPlaceholder": "Passwort eingeben",
+    "emailRequired": "E-Mail ist erforderlich",
+    "passwordRequired": "Passwort ist erforderlich",
+    "invalidCredentials": "Ungültige E-Mail oder ungültiges Passwort",
+    "tooManyAttempts": "Zu viele Anmeldeversuche. Bitte warte eine Minute und versuche es erneut.",
+    "signIn": "Anmelden",
+    "signingIn": "Anmeldung läuft...",
+    "useApiKey": "Stattdessen mit einem API-Schlüssel anmelden",
+    "usePassword": "Stattdessen mit E-Mail und Passwort anmelden"
   },
   "dashboard": {
     "title": "Dashboard",

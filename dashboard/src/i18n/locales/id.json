@@ -47,7 +47,9 @@
     "refresh": "Muat ulang",
     "errorGeneric": "Terjadi kesalahan",
     "unknownError": "Kesalahan tidak diketahui",
-    "retry": "Coba lagi"
+    "retry": "Coba lagi",
+    "showPassword": "Tampilkan kata sandi",
+    "hidePassword": "Sembunyikan kata sandi"
   },
   "theme": {
     "light": "Terang",
@@ -347,7 +349,18 @@
     "help": "Butuh bantuan?",
     "viewDocs": "Lihat Dokumentasi",
     "footer": "Dibuat dengan ❤️ oleh Yudhi Armyndharis dan Komunitas OpenWA",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "Email",
+    "emailPlaceholder": "anda@example.com",
+    "passwordPlaceholder": "Masukkan kata sandi",
+    "emailRequired": "Email wajib diisi",
+    "passwordRequired": "Kata sandi wajib diisi",
+    "invalidCredentials": "Email atau kata sandi tidak valid",
+    "tooManyAttempts": "Terlalu banyak percobaan masuk. Tunggu satu menit lalu coba lagi.",
+    "signIn": "Masuk",
+    "signingIn": "Sedang masuk...",
+    "useApiKey": "Masuk dengan kunci API saja",
+    "usePassword": "Masuk dengan email dan kata sandi saja"
   },
   "dashboard": {
     "title": "Dasbor",

@@ -47,7 +47,9 @@
     "refresh": "重新整理",
     "errorGeneric": "發生錯誤",
     "unknownError": "未知錯誤",
-    "retry": "重試"
+    "retry": "重試",
+    "showPassword": "顯示密碼",
+    "hidePassword": "隱藏密碼"
   },
   "theme": {
     "light": "淺色",
@@ -347,7 +349,18 @@
     "help": "需要協助？",
     "viewDocs": "查看文件",
     "footer": "由 Yudhi Armyndharis 及 OpenWA 社群用 ❤️ 打造",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "電郵",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "請輸入密碼",
+    "emailRequired": "請輸入電郵",
+    "passwordRequired": "請輸入密碼",
+    "invalidCredentials": "電郵或密碼錯誤",
+    "tooManyAttempts": "登入嘗試次數過多，請稍候一分鐘後再試。",
+    "signIn": "登入",
+    "signingIn": "正在登入...",
+    "useApiKey": "改用 API 金鑰登入",
+    "usePassword": "改用電郵及密碼登入"
   },
   "dashboard": {
     "title": "控制面板",

@@ -5188,6 +5188,131 @@ The key is read from the `X-API-Key` header, not the body; send an empty body. T
 
 > Implemented by `AuthValidateController` (`@Controller('auth')`), sharing the same `/api/auth` base.
 
+#### Dashboard users and password sign-in
+
+A dashboard user is an email and password that signs in to the dashboard without pasting an API key. A user is not a credential the API accepts: signing in exchanges the password for a **login key**, an ordinary API key owned by the user (`api_keys.userId`) with the user's role, no IP, session or chat scope, and an expiry (`LOGIN_SESSION_TTL_HOURS`, a day by default, clamped to 1–720). Every surface that authenticates a key works unchanged with it. A login key is left out of `GET /api/auth/api-keys`, never counts as a surviving admin for the last-admin guard, and is deleted by logout, by a change to its user's password, role or active flag, with its user, or (once expired) on the next sign-in. The first user is seeded at boot from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; in production a placeholder or a password under 12 characters refuses the boot like a weak `API_MASTER_KEY`. Successful and refused sign-ins are audited as `user_login` / `user_login_failed` (the latter bounded per client IP, like an unresolved key), logout as `user_logout`, and user lifecycle as `user_created` / `user_updated` / `user_deleted`.
+
+#### GET /api/auth/login-options
+
+Which sign-in methods the dashboard can offer: `password` is true when at least one active user exists, so the login page shows the email form only on an install that can use it.
+
+**Auth:** public
+
+**Response** `200`
+
+```json
+{ "password": true }
+```
+
+#### POST /api/auth/login
+
+Sign in with email and password and receive a login key.
+
+**Auth:** public. Rate-limited per client IP more tightly than the rest of the API: 5 attempts a minute, 20 a quarter hour, 100 an hour (`429` beyond).
+
+**Request body**
+
+```json
+{ "email": "admin@example.com", "password": "correct horse battery staple" }
+```
+
+`email` is trimmed and lower-cased before lookup.
+
+**Response** `200`
+
+```json
+{
+  "apiKey": "owa_k1_…",
+  "role": "admin",
+  "engineType": "baileys",
+  "scoped": false,
+  "expiresAt": "2026-11-04T10:00:00.000Z"
+}
+```
+
+`apiKey` is returned only here; send it as `X-API-Key` like any other key. `scoped` is always false.
+
+**Errors:** `400` malformed body or an undeclared field · `401` `"Invalid email or password"` for an unknown email, a wrong password and a deactivated user alike (an unknown address still costs a hash, so timing does not tell them apart) · `429` too many attempts from this client IP
+
+#### POST /api/auth/logout
+
+Delete the login key the request presents. A key that is not a login key (no owner) is left as it is, so a logout can never destroy a credential created through the API.
+
+**Auth:** API key (any role, unscoped). `@HttpCode(204)` — no response body.
+
+**Errors:** `401` missing/invalid key · `403` the key is session-scoped or restricted with `allowedChats`
+
+#### POST /api/auth/users
+
+Create a dashboard user.
+
+**Auth:** API key (ADMIN, no session or chat scope — fenced like key management, since a user signs in to a credential with the user's role)
+
+**Request body**
+
+```json
+{ "email": "ops@example.com", "password": "correct horse battery staple", "role": "operator" }
+```
+
+`password` is 8–128 characters; `role` defaults to `operator`.
+
+**Response** `201`
+
+```json
+{
+  "id": "0a941dac-a965-45e7-b318-74ae8be134f0",
+  "email": "ops@example.com",
+  "role": "operator",
+  "isActive": true,
+  "createdAt": "2026-11-03T10:00:00.000Z",
+  "updatedAt": "2026-11-03T10:00:00.000Z"
+}
+```
+
+The password is never returned. `lastLoginAt` appears after the first sign-in.
+
+**Errors:** `400` validation failed or an undeclared field · `401` missing/invalid key · `403` role below ADMIN, or the key is scoped · `409` a user with this email already exists
+
+#### GET /api/auth/users
+
+List dashboard users, newest first.
+
+**Auth:** API key (ADMIN, unscoped)
+
+**Response** `200` — an array of the user object above.
+
+**Errors:** `401` missing/invalid key · `403` role below ADMIN, or the key is scoped
+
+#### GET /api/auth/users/:id
+
+Get one dashboard user.
+
+**Auth:** API key (ADMIN, unscoped)
+
+**Response** `200` — the user object above.
+
+**Errors:** `401` missing/invalid key · `403` role below ADMIN, or the key is scoped · `404` `"User with id '<id>' not found"`
+
+#### PUT /api/auth/users/:id
+
+Update a dashboard user. Every field is optional: `email`, `password`, `role`, `isActive`. A new password, a different role or `isActive: false` deletes every login key the user holds, so a session minted under the old credential or role loses it at once; a rename keeps them.
+
+**Auth:** API key (ADMIN, unscoped)
+
+**Response** `200` — the updated user object.
+
+**Errors:** `400` validation failed or an undeclared field · `401` missing/invalid key · `403` role below ADMIN, or the key is scoped · `404` no user with this id · `409` another user already has this email
+
+#### DELETE /api/auth/users/:id
+
+Delete a dashboard user and every login key it holds.
+
+**Auth:** API key (ADMIN, unscoped). `@HttpCode(204)` — no response body.
+
+**Errors:** `401` missing/invalid key · `403` role below ADMIN, or the key is scoped · `404` no user with this id
+
+> Implemented by `UserLoginController` (`@Controller('auth')`) and `UserController` (`@Controller('auth/users')`).
+
 ### 6.4.10 System (Health, Metrics, Stats, Settings, Audit)
 
 System endpoints expose operational status, Prometheus metrics, aggregate statistics, runtime settings, and the audit log. Health and metrics use non-standard auth (public / Bearer token); stats, settings and audit use the API key, with several routes gated to `ADMIN`.

@@ -210,7 +210,16 @@ export interface SecretCheckEnv {
   allowDevApiKey?: string;
   /** REDIS_PASSWORD — optional; passwordless private-network Redis is supported, so only a known placeholder is rejected. */
   redisPassword?: string;
+  /** ADMIN_PASSWORD — optional; seeds the first dashboard user's password, an ADMIN credential like API_MASTER_KEY. */
+  adminPassword?: string;
 }
+
+/**
+ * Minimum length for an explicit ADMIN_PASSWORD in production. The DTOs accept 8 for a password an
+ * admin sets for someone else; the one seeded from the environment signs in as ADMIN and is typed
+ * by nobody, so it can afford more. A value below it is refused the same way as a short API_MASTER_KEY.
+ */
+const MIN_PROD_ADMIN_PASSWORD_LENGTH = 12;
 
 /**
  * Refuse to boot in production when a required secret is empty, a known default/
@@ -268,6 +277,16 @@ export function assertNoDefaultSecretsInProduction(env: SecretCheckEnv): void {
       problems.push('API_MASTER_KEY');
     } else if (masterKey.length < MIN_PROD_MASTER_KEY_LENGTH) {
       problems.push(`API_MASTER_KEY (below the ${MIN_PROD_MASTER_KEY_LENGTH}-character minimum)`);
+    }
+  }
+  // ADMIN_PASSWORD is optional, but like API_MASTER_KEY it seeds an ADMIN credential when set, so a
+  // placeholder or a short value is refused the same way. Unset stays allowed: no user is seeded.
+  if (env.adminPassword) {
+    const adminPassword = env.adminPassword.trim();
+    if (FORBIDDEN_PROD_SECRETS.has(adminPassword.toLowerCase())) {
+      problems.push('ADMIN_PASSWORD');
+    } else if (adminPassword.length < MIN_PROD_ADMIN_PASSWORD_LENGTH) {
+      problems.push(`ADMIN_PASSWORD (below the ${MIN_PROD_ADMIN_PASSWORD_LENGTH}-character minimum)`);
     }
   }
   // Redis auth is optional (passwordless private-network Redis is a supported deployment), so unlike

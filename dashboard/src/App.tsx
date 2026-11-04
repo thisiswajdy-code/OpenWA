@@ -10,6 +10,7 @@ import { RoleProvider } from './components/RoleProvider';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { API_BASE_URL } from './services/api';
 import { clearActorState, isUserRole, resolveStartupValidation } from './utils/authLifecycle';
+import type { LoginMethod } from './pages/Login';
 import './App.css';
 
 const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
@@ -46,9 +47,17 @@ function AppContent() {
   const [, setApiKey] = useState(savedKey || '');
   const { setRole, role, setEngineType, setScoped, scoped } = useRole();
 
-  const handleLogin = (key: string, validatedRole?: string, engineType?: string, scoped = false) => {
+  const handleLogin = (
+    key: string,
+    validatedRole?: string,
+    engineType?: string,
+    scoped = false,
+    method: LoginMethod = 'apiKey',
+  ) => {
     setApiKey(key);
     sessionStorage.setItem('openwa_api_key', key);
+    // Kept beside the key so logout knows whether it holds a login key to end on the gateway.
+    sessionStorage.setItem('openwa_login_method', method);
 
     // The login page's validate response already carried the role, so no second /auth/validate
     // round-trip is needed here. An absent or unrecognized role falls back to viewer, the
@@ -61,12 +70,20 @@ function AppContent() {
   };
 
   const handleLogout = useCallback(() => {
+    // A password sign-in holds a login key the gateway minted for it: ask the gateway to delete it, so
+    // the key does not keep working until its expiry. Best-effort and not awaited — the dashboard is
+    // signed out either way, and a pasted API key is left alone (it is not the dashboard's to end).
+    const key = sessionStorage.getItem('openwa_api_key');
+    if (key && sessionStorage.getItem('openwa_login_method') === 'password') {
+      fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST', headers: { 'X-API-Key': key } }).catch(() => undefined);
+    }
     setApiKey('');
     setIsAuthenticated(false);
     setRole(null);
     setEngineType(null);
     setScoped(false);
     sessionStorage.removeItem('openwa_api_key');
+    sessionStorage.removeItem('openwa_login_method');
     // Wipe the React Query cache too: it is keyed by resource, not actor, so without a full
     // clear a logout → login in the same tab with a different key/scope shows the previous
     // actor's sessions/messages/apiKeys/audit rows.

@@ -47,7 +47,9 @@
     "refresh": "Yenile",
     "errorGeneric": "Bir hata oluştu",
     "unknownError": "Bilinmeyen hata",
-    "retry": "Yeniden Dene"
+    "retry": "Yeniden Dene",
+    "showPassword": "Parolayı göster",
+    "hidePassword": "Parolayı gizle"
   },
   "theme": {
     "light": "Açık",
@@ -347,7 +349,18 @@
     "help": "Yardıma mı ihtiyacınız var?",
     "viewDocs": "Dokümantasyonu Görüntüle",
     "footer": "Yudhi Armyndharis ve OpenWA Topluluğu tarafından ❤️ ile yapılmıştır",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "E-posta",
+    "emailPlaceholder": "sen@example.com",
+    "passwordPlaceholder": "Parolanızı girin",
+    "emailRequired": "E-posta gerekli",
+    "passwordRequired": "Parola gerekli",
+    "invalidCredentials": "Geçersiz e-posta veya parola",
+    "tooManyAttempts": "Çok fazla giriş denemesi. Lütfen bir dakika bekleyip tekrar deneyin.",
+    "signIn": "Giriş yap",
+    "signingIn": "Giriş yapılıyor...",
+    "useApiKey": "Bunun yerine API anahtarıyla giriş yap",
+    "usePassword": "Bunun yerine e-posta ve parolayla giriş yap"
   },
   "dashboard": {
     "title": "Kontrol Paneli",

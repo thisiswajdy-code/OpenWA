@@ -49,7 +49,9 @@
     "unknownError": "Error desconocido",
     "showApiKey": "Mostrar clave API",
     "hideApiKey": "Ocultar clave API",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
   },
   "theme": {
     "light": "Claro",
@@ -352,7 +354,18 @@
     "help": "¿Necesitas ayuda?",
     "viewDocs": "Ver documentación",
     "footer": "Hecho con ❤️ por Yudhi Armyndharis y la comunidad OpenWA",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@example.com",
+    "passwordPlaceholder": "Introduce tu contraseña",
+    "emailRequired": "El correo electrónico es obligatorio",
+    "passwordRequired": "La contraseña es obligatoria",
+    "invalidCredentials": "Correo electrónico o contraseña no válidos",
+    "tooManyAttempts": "Demasiados intentos de inicio de sesión. Espera un minuto e inténtalo de nuevo.",
+    "signIn": "Iniciar sesión",
+    "signingIn": "Iniciando sesión...",
+    "useApiKey": "Iniciar sesión con una clave API en su lugar",
+    "usePassword": "Iniciar sesión con correo y contraseña en su lugar"
   },
   "dashboard": {
     "title": "Panel",

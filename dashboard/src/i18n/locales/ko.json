@@ -47,7 +47,9 @@
     "refresh": "새로고침",
     "errorGeneric": "오류가 발생했습니다",
     "unknownError": "알 수 없는 오류",
-    "retry": "다시 시도"
+    "retry": "다시 시도",
+    "showPassword": "비밀번호 표시",
+    "hidePassword": "비밀번호 숨기기"
   },
   "theme": {
     "light": "라이트",
@@ -347,7 +349,18 @@
     "help": "도움이 필요하신가요?",
     "viewDocs": "문서 보기",
     "footer": "Yudhi Armyndharis와 OpenWA 커뮤니티가 ❤️로 만들었습니다",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "이메일",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "비밀번호를 입력하세요",
+    "emailRequired": "이메일을 입력해야 합니다",
+    "passwordRequired": "비밀번호를 입력해야 합니다",
+    "invalidCredentials": "이메일 또는 비밀번호가 올바르지 않습니다",
+    "tooManyAttempts": "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+    "signIn": "로그인",
+    "signingIn": "로그인 중...",
+    "useApiKey": "대신 API 키로 로그인",
+    "usePassword": "대신 이메일과 비밀번호로 로그인"
   },
   "dashboard": {
     "title": "대시보드",
