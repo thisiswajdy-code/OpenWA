@@ -26,7 +26,6 @@
 .su-error:empty { display: none; }
 .su-note { font-size: 0.8rem; color: var(--muted-foreground); text-align: center; margin-top: 1rem; }
 .su-pay { padding: 1.5rem; }
-.su-pay iframe { width: 100%; height: 720px; border: 0; border-radius: calc(var(--radius) - 2px); background: var(--card); }
 .su-summary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1rem; font-size: 0.9rem; margin-bottom: 1rem; }
 .su-status { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.9rem; color: var(--muted-foreground); }
 .su-status .dot { width: 0.6rem; height: 0.6rem; border-radius: 999px; background: var(--gold); animation: pulse 2s infinite; }

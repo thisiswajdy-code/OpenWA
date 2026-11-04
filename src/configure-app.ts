@@ -104,7 +104,8 @@ export function configureApp(app: INestApplication, options: ConfigureAppOptions
   });
 
   // Enhanced Security Headers. The site documents (homepage, sign-up) get a policy of their own:
-  // they link Google Fonts and embed the payment page in an iframe, which the dashboard never does.
+  // they link Google Fonts, which the dashboard never does. (frame-src still admits the payment
+  // origin, so the payment page can be embedded again if it ever allows framing.)
   const upgradeInsecureRequests = isUpgradeInsecureRequestsEnabled(
     process.env.CSP_UPGRADE_INSECURE_REQUESTS,
     process.env.NODE_ENV,

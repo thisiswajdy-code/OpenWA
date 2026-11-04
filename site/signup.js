@@ -97,7 +97,8 @@
     }
   });
 
-  // Step 3: the payment page in an iframe, polled until the card is saved and the user is active.
+  // Step 3: the payment page opens in a new tab (it refuses to be framed by another site), and this
+  // page polls until the card is saved and the user is active.
   var pollTimer = null;
   function money(amount, currency) {
     try {
@@ -110,8 +111,6 @@
   }
   function startPayment(signup) {
     show('pay');
-    var frame = document.getElementById('pay-frame');
-    if (frame.src !== signup.paymentLink) frame.src = signup.paymentLink;
     document.getElementById('pay-open').href = signup.paymentLink;
     document.getElementById('pay-email').textContent = signup.email;
     document.getElementById('pay-amount').textContent =
@@ -139,11 +138,13 @@
     var label = document.getElementById('pay-status-text');
     var done = document.getElementById('pay-done');
     var pending = document.getElementById('pay-pending');
+    var hint = document.getElementById('pay-hint');
     if (active) {
       line.classList.add('done');
       label.textContent = text('status-active');
       done.hidden = false;
       pending.hidden = true;
+      hint.hidden = true;
       sessionStorage.removeItem(STORE);
       return;
     }
