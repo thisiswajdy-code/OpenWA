@@ -291,7 +291,7 @@ describe('every JSON request body publishes an object schema', () => {
  * route rejects is worse than no example at all: the first request against a new endpoint answers
  * `400`, and the schema that caused it says nothing about why. `CreateWebhookDto.secret` offered a
  * 15-character example under a 16-character floor, which is exactly how it was found
- * ([#1491](https://github.com/rmyndharis/OpenWA/issues/1491)).
+ * (#1491).
  *
  * Only length is checked here. It is the constraint a hand-written example actually drifts past, and
  * it needs no validator: the bound and the example sit in the same schema object. The sweep covers

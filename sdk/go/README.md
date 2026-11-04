@@ -1,16 +1,16 @@
-# OpenWA Go SDK
+# Scalorus WA Go SDK
 
-This document describes SDK 0.6.0. Send idempotency, webhook failure redrive, message-window filters, poll choices, last-message types, and the `event.response` webhook event name require OpenWA 0.25.0 or later.
+This document describes SDK 0.6.0. Send idempotency, webhook failure redrive, message-window filters, poll choices, last-message types, and the `event.response` webhook event name require Scalorus WA 0.25.0 or later.
 
-Idiomatic Go client for the [OpenWA](https://github.com/rmyndharis/OpenWA) WhatsApp
+Idiomatic Go client for the [Scalorus WA](https://github.com/thisiswajdy-code/OpenWA) WhatsApp
 API Gateway. Stdlib-only (no dependencies), context-first, with typed errors and
 an injectable transport pipeline.
 
-OpenWA is an independent project, not affiliated with or endorsed by WhatsApp or
+Scalorus WA is an independent project, not affiliated with or endorsed by WhatsApp or
 Meta.
 
 ```bash
-go get github.com/rmyndharis/OpenWA/sdk/go
+go get github.com/thisiswajdy-code/OpenWA/sdk/go
 ```
 
 Requires Go 1.22+.
@@ -24,7 +24,7 @@ import (
 	"context"
 	"log"
 
-	openwa "github.com/rmyndharis/OpenWA/sdk/go"
+	openwa "github.com/thisiswajdy-code/OpenWA/sdk/go"
 )
 
 func main() {
@@ -48,7 +48,7 @@ func main() {
 	// then wait for status "ready". An unlinked session answers the send with 409.
 	res, err := client.Messages.SendText(ctx, session.ID, openwa.SendTextRequest{
 		ChatID: "628123456789@c.us",
-		Text:   "Hello from the OpenWA Go SDK!",
+		Text:   "Hello from the Scalorus WA Go SDK!",
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -257,7 +257,7 @@ The tag must carry the module's directory prefix, because the module lives in a
 subdirectory rather than at the repository root:
 
 ```bash
-# Correct — `sdk/go/` prefix, matching `module github.com/rmyndharis/OpenWA/sdk/go`
+# Correct — `sdk/go/` prefix, matching `module github.com/thisiswajdy-code/OpenWA/sdk/go`
 git tag sdk/go/v0.6.0 && git push origin sdk/go/v0.6.0
 ```
 
@@ -280,7 +280,7 @@ Cutting a release:
 
 ## Send idempotency
 
-The example below requires SDK 0.6.0 or later and OpenWA 0.25.0 or later. SDK 0.5.1 does not expose this per-send key argument.
+The example below requires SDK 0.6.0 or later and Scalorus WA 0.25.0 or later. SDK 0.5.1 does not expose this per-send key argument.
 
 Supply a unique caller-owned key for one logical send and reuse it when retrying that same call. Keys contain 1-255 visible ASCII characters; unrelated calls must use different keys. The SDK forwards the key without changing its retry policy or generating one automatically. On the twelve routes below `net/http` may still send a keyed request once more after a dropped keep-alive connection; the gateway deduplicates it, so the call returns the first answer or a `409` `IDEMPOTENCY_KEY_IN_PROGRESS` to retry later with the same key.
 

@@ -15,7 +15,7 @@ import { WorkerSearchRegistry, WorkerSearchHandler } from './worker-search-regis
  * boundary. Plugin code can `require('fs' | 'net' | 'child_process')` and reach the host's files and
  * sockets directly — `parentPort` is NOT the worker's only channel out, and the capability permission
  * model gates only the `ctx.*` verbs, not raw Node access. Load only plugin code you trust as much as
- * OpenWA itself. OS-level containment of the OpenWA process limits what the process can do to the host,
+ * Scalorus WA itself. OS-level containment of the Scalorus WA process limits what the process can do to the host,
  * not what a plugin inside it can reach; run a plugin you do not fully trust in a separate container or
  * VM against the API instead (see docs/30).
  */

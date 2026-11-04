@@ -27,7 +27,7 @@ public contract — Integration SDK v1** — because the contract, not any singl
 
 ## 25.2 Design principle: one new primitive, everything else a clone
 
-The overriding goal is to preserve the sandboxed-worker safety invariants _by construction_. OpenWA
+The overriding goal is to preserve the sandboxed-worker safety invariants _by construction_. Scalorus WA
 plugins reach the host through a capability-gated worker bridge; the worker is fault containment, not a
 security boundary against a malicious plugin (see [30 - Plugin Sandboxing](./30-plugin-sandboxing.md)).
 Every host↔worker message is a serializable POJO across a `structuredClone` boundary; host-initiated
@@ -36,7 +36,7 @@ the delivery); permissions are manifest-static and cannot be widened by configur
 enforced host-side.
 
 Rather than invent new machinery that would have to re-earn those properties, the Integration Fabric is
-**~90% a faithful clone of seams OpenWA already ships**:
+**~90% a faithful clone of seams Scalorus WA already ships**:
 
 | Concern                                                   | Cloned from                         |
 | --------------------------------------------------------- | ----------------------------------- |
@@ -61,7 +61,7 @@ flowchart LR
     WA[WhatsApp engine] -- message.received hook --> Core
     Provider[External provider] -- POST /api/ingress/:plugin/:instance/:route --> Core
 
-    subgraph Core["OpenWA host (core)"]
+    subgraph Core["Scalorus WA host (core)"]
         Ingress[Ingress controller<br/>verify → dedup → persist → enqueue]
         Queue[(ingress-queue<br/>BullMQ / Redis)]
         Processor[Ingress processor]
@@ -167,7 +167,7 @@ Four tables live on the data connection, each created by a hand-authored dual-di
 
 ## 25.6 Security model
 
-- **Authentication inversion.** A provider webhook cannot carry an OpenWA API key, so ingress is public to
+- **Authentication inversion.** A provider webhook cannot carry an Scalorus WA API key, so ingress is public to
   the API-key guard but validates a **per-instance HMAC (or shared secret)** over the **raw** request
   bytes with a constant-time comparison. The raw body is preserved by a verify callback on the body parser
   because a re-serialized payload is not byte-identical to what the provider signed. The route is exempt from

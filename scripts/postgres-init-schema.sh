@@ -1,5 +1,5 @@
 #!/bin/bash
-# OpenWA — built-in PostgreSQL schema init.
+# Scalorus WA — built-in PostgreSQL schema init.
 #
 # Mounted at /docker-entrypoint-initdb.d/01-create-schema.sh by docker-compose.yml, so the
 # official postgres image runs it ONCE on first initialization (before any app migration).

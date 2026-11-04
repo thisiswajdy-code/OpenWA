@@ -598,8 +598,8 @@ Add a new one only when the condition is engine-agnostic and recurs; a one-off s
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/rmyndharis/OpenWA.git
-cd OpenWA
+git clone https://github.com/thisiswajdy-code/OpenWA.git
+cd Scalorus WA
 
 # 2. Install the locked dependencies (also installs dashboard dependencies)
 npm ci
@@ -628,7 +628,7 @@ docker compose --profile postgres up -d
 docker compose --profile full up -d
 ```
 
-A profile only starts the extra containers. Point OpenWA at them first, from Dashboard >
+A profile only starts the extra containers. Point Scalorus WA at them first, from Dashboard >
 Infrastructure or with the `.env` variables listed under Production Deployment in the README;
 otherwise it stays on SQLite and local storage. The dashboard's built-in storage option creates its
 own `openwa-minio` container, so do not also start the `minio` or `full` profile for it. The same goes
@@ -673,7 +673,7 @@ was already started without them, run `docker rm -f openwa-minio` before you ena
 
 ### Environment Variables
 
-OpenWA supports multiple infrastructure configurations. Choose based on your needs:
+Scalorus WA supports multiple infrastructure configurations. Choose based on your needs:
 
 #### Minimal Profile (Development / Single Session)
 
@@ -702,7 +702,7 @@ LOG_LEVEL=debug
 # REDIS_ENABLED=false
 # QUEUE_ENABLED=false
 
-# Optional: seed a known admin key. If omitted, OpenWA generates a random key and writes data/.api-key.
+# Optional: seed a known admin key. If omitted, Scalorus WA generates a random key and writes data/.api-key.
 API_MASTER_KEY=
 
 # Session

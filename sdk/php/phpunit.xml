@@ -11,7 +11,7 @@
          failOnRisky="true"
          failOnWarning="true">
     <testsuites>
-        <testsuite name="OpenWA PHP SDK">
+        <testsuite name="Scalorus WA PHP SDK">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

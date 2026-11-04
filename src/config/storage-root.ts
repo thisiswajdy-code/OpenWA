@@ -68,7 +68,7 @@ export function resolveStorageRoot(options: StorageRootOptions): string {
   if (FOSSIL_STORAGE_ROOTS.has(configured) && isWritable(DEFAULT_STORAGE_ROOT)) {
     options.logger?.warn(
       `STORAGE_LOCAL_PATH='${configured}' is not writable and is a known-bad value written by a bug in ` +
-        `OpenWA v0.2.0–v0.7.3 (#472); falling back to '${DEFAULT_STORAGE_ROOT}'. Remove the STORAGE_LOCAL_PATH ` +
+        `Scalorus WA v0.2.0–v0.7.3 (#472); falling back to '${DEFAULT_STORAGE_ROOT}'. Remove the STORAGE_LOCAL_PATH ` +
         `line from data/.env.generated to silence this warning. Any media previously written to ` +
         `'${configured}' was outside the data volume and is not recoverable.`,
     );

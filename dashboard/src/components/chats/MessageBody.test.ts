@@ -1,4 +1,4 @@
-// Render test for the fix on rmyndharis/OpenWA#1676: a resolved @mention's push name is
+// Render test for the fix on thisiswajdy-code/OpenWA#1676: a resolved @mention's push name is
 // attacker-controlled (any WhatsApp user sets their own), and linkify-react auto-links a bare word
 // with no scheme, so a participant named "localhost" must not become a clickable link. The name is
 // wrapped in messageFormatter.ts's MENTION_OPEN/MENTION_CLOSE sentinels and rendered as its own

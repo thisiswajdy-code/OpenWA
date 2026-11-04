@@ -1,8 +1,8 @@
 # @rmyndharis/openwa
 
-This document describes SDK 0.6.0. Send idempotency, webhook failure redrive, message-window filters, poll choices, last-message types, and the `event.response` webhook event name require OpenWA 0.25.0 or later.
+This document describes SDK 0.6.0. Send idempotency, webhook failure redrive, message-window filters, poll choices, last-message types, and the `event.response` webhook event name require Scalorus WA 0.25.0 or later.
 
-Official JavaScript/TypeScript SDK for [OpenWA](https://github.com/rmyndharis/OpenWA), the open-source WhatsApp API Gateway. OpenWA is an independent project, not affiliated with or endorsed by WhatsApp or Meta.
+Official JavaScript/TypeScript SDK for [Scalorus WA](https://github.com/thisiswajdy-code/OpenWA), the open-source WhatsApp API Gateway. Scalorus WA is an independent project, not affiliated with or endorsed by WhatsApp or Meta.
 
 Ships dual CJS + ESM builds with bundled type declarations.
 
@@ -33,7 +33,7 @@ await client.sessions.start(session.id);
 // then wait for status 'ready'. An unlinked session answers the send with 409.
 const result = await client.messages.sendText(session.id, {
   chatId: '628123456789@c.us',
-  text: 'Hello from the OpenWA SDK!',
+  text: 'Hello from the Scalorus WA SDK!',
 });
 console.log(result.messageId);
 ```
@@ -108,7 +108,7 @@ package settings for `@rmyndharis/openwa` and add a Trusted Publisher:
 
 - Provider: **GitHub Actions**
 - Organization: `rmyndharis`
-- Repository: `OpenWA`
+- Repository: `Scalorus WA`
 - Workflow filename: `js-sdk-release.yml` (the extension is part of the value)
 
 There are no repository secrets to add. Until the trusted publisher exists npm
@@ -135,7 +135,7 @@ MIT
 
 ## Send idempotency
 
-The example below requires SDK 0.6.0 or later and OpenWA 0.25.0 or later. SDK 0.5.1 does not expose this per-send key argument.
+The example below requires SDK 0.6.0 or later and Scalorus WA 0.25.0 or later. SDK 0.5.1 does not expose this per-send key argument.
 
 Supply a unique caller-owned key for one logical send and reuse it when retrying that same call. Keys contain 1-255 visible ASCII characters; unrelated calls must use different keys. The SDK forwards the key without changing its retry policy or generating one automatically.
 

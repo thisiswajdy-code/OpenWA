@@ -128,7 +128,7 @@ export class PluginLoaderService implements OnModuleInit, OnApplicationBootstrap
   private readonly lastSandboxHookError = new Map<string, { event: string; error: string; at: Date }>();
   private readonly pluginsDir: string;
   /**
-   * The package dir OpenWA defaulted to before it moved under <dataDir>. Scanned as a compatibility
+   * The package dir Scalorus WA defaulted to before it moved under <dataDir>. Scanned as a compatibility
    * fallback so a host that installed plugins there keeps loading them; null when PLUGINS_DIR names a
    * directory explicitly, and null for a ConfigService that carries no app config (unit tests).
    */

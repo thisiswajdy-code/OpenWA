@@ -73,7 +73,7 @@ describe('UpdateWebhookDto secret entropy', () => {
  * The example Swagger renders is the body most readers send first, so the floor above has to hold for
  * it too. It did not: the published example was 15 characters, and pasting it back through "Try it
  * out" answered `400` naming a `minLength` the schema never declared, which reads as the API dropping
- * the field rather than refusing it ([#1491](https://github.com/rmyndharis/OpenWA/issues/1491)).
+ * the field rather than refusing it (#1491).
  *
  * Read straight off the decorator rather than restating the value, so an example edited in the DTO is
  * still the one under test.

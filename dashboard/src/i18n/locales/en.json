@@ -6,7 +6,7 @@
     }
   },
   "common": {
-    "appName": "OpenWA",
+    "appName": "Scalorus WA",
     "updateAvailable": "v{{version}} available",
     "loading": "Loading...",
     "cancel": "Cancel",
@@ -348,7 +348,6 @@
     "connectionError": "Unable to connect to server. Please try again.",
     "help": "Need help?",
     "viewDocs": "View Documentation",
-    "footer": "Made with ❤️ by Yudhi Armyndharis and the OpenWA Community",
     "version": "v{{version}} · {{date}}",
     "email": "Email",
     "emailPlaceholder": "you@example.com",
@@ -1055,7 +1054,7 @@
     "zeroMessages": "Zero Messages Sent",
     "noSession": {
       "title": "No active WhatsApp session connected.",
-      "desc": "To check phone numbers, OpenWA requires at least one authenticated session.",
+      "desc": "To check phone numbers, Scalorus WA requires at least one authenticated session.",
       "goToSessions": "Go to Sessions"
     },
     "tabs": {
@@ -1175,7 +1174,7 @@
       "postgres": "PostgreSQL",
       "postgresDesc": "Production-ready database",
       "useBuiltIn": "Use Built-in PostgreSQL Container",
-      "builtInDesc": "OpenWA will manage a PostgreSQL container for you",
+      "builtInDesc": "Scalorus WA will manage a PostgreSQL container for you",
       "dbName": "Database Name",
       "schema": "Schema",
       "schemaDesc": "PostgreSQL schema (ignored for SQLite). Default 'public'. The schema must already exist.",
@@ -1210,7 +1209,7 @@
       "enable": "Enable Redis",
       "enableDesc": "Used for caching, BullMQ queues, rate-limit counters, and multi-node WebSocket fan-out",
       "useBuiltIn": "Use Built-in Redis Container",
-      "builtInDesc": "OpenWA will manage a Redis container for you",
+      "builtInDesc": "Scalorus WA will manage a Redis container for you",
       "queueTitle": "Enable BullMQ Queue System",
       "queueDesc": "Use message queues for reliable message and webhook delivery",
       "statsTitle": "Queue Statistics",
@@ -1233,7 +1232,7 @@
       "s3": "Amazon S3",
       "s3Desc": "Cloud storage (S3 compatible)",
       "useBuiltIn": "Use Built-in MinIO Container",
-      "builtInDesc": "OpenWA will manage a MinIO (S3-compatible) container for you",
+      "builtInDesc": "Scalorus WA will manage a MinIO (S3-compatible) container for you",
       "storagePath": "Storage Path",
       "bucket": "Bucket Name",
       "region": "Region",
@@ -1264,7 +1263,7 @@
       "importFailed": "Couldn't import data",
       "importOk": "Data imported",
       "importConfirm": "Importing will REPLACE all current data with the backup ({{rows}} rows). This cannot be undone. Continue?",
-      "invalidFile": "That file isn't a valid OpenWA data backup.",
+      "invalidFile": "That file isn't a valid Scalorus WA data backup.",
       "importTooLarge": "Backup is too large for the request limit. Increase BODY_SIZE_LIMIT on the server and try again."
     },
     "restart": {
@@ -1318,7 +1317,7 @@
     "uninstallConfirm": "Uninstall \"{{name}}\"? This deletes its files.",
     "empty": {
       "title": "No plugins installed",
-      "description": "Install a plugin to extend what OpenWA can do."
+      "description": "Install a plugin to extend what Scalorus WA can do."
     },
     "config": {
       "title": "Configure {{name}}",
@@ -1341,7 +1340,7 @@
       "trustWarning": "Plugins run with the gateway's full process privileges — the sandbox contains crashes, not malicious code. Install only plugins you trust.",
       "choose": "Choose a .zip file…",
       "tooLarge": "The file exceeds the 5 MB limit.",
-      "catalogHint": "Install directly from the OpenWA plugin catalog. The .zip is fetched server-side through the SSRF guard, then validated and sandboxed.",
+      "catalogHint": "Install directly from the Scalorus WA plugin catalog. The .zip is fetched server-side through the SSRF guard, then validated and sandboxed.",
       "catalogTeaser": "Looking for plugins?",
       "catalogTeaserSuffix": "browses the official marketplace.",
       "tabCatalog": "Catalog",

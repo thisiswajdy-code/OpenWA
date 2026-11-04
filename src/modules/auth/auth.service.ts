@@ -127,7 +127,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('');
     this.logger.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     this.logger.log('');
-    this.logger.log('  🟢 Welcome to OpenWA - WhatsApp API Gateway');
+    this.logger.log('  🟢 Welcome to Scalorus WA - WhatsApp API Gateway');
     this.logger.log('');
     this.logger.log(`  📊 Dashboard: ${dashboardUrl}`);
     // Swagger is off by default under NODE_ENV=production, where the URL would answer 404.

@@ -35,7 +35,7 @@ export const DEFAULT_DATA_DIR = './data';
 export const DEFAULT_PLUGINS_DIR = path.join(DEFAULT_DATA_DIR, 'plugins');
 
 /**
- * The plugin package dir OpenWA ≤ 0.12.1 defaulted to. A host that ran on that default has working
+ * The plugin package dir Scalorus WA ≤ 0.12.1 defaulted to. A host that ran on that default has working
  * plugin code sitting here, so the loader still scans it (and says so, loudly) when PLUGINS_DIR is
  * unset — see PluginLoaderService.onModuleInit.
  */
@@ -195,8 +195,8 @@ export default () => ({
     // migrations never target different databases. Distinct sqlite-vs-pg defaults.
     name: process.env.DATABASE_NAME || 'openwa',
     // PostgreSQL schema (used when type is postgres). Default 'public' preserves the historical
-    // behavior; set POSTGRES_SCHEMA to place OpenWA's tables + the TypeORM migration ledger in a
-    // dedicated schema (e.g. a managed-Postgres project schema, or to isolate OpenWA from other
+    // behavior; set POSTGRES_SCHEMA to place Scalorus WA's tables + the TypeORM migration ledger in a
+    // dedicated schema (e.g. a managed-Postgres project schema, or to isolate Scalorus WA from other
     // apps sharing the database). The schema must already exist — a missing one fails fast at
     // migration time rather than silently falling back to public. SQLite ignores this.
     schema: process.env.POSTGRES_SCHEMA || 'public',

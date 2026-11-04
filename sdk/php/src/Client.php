@@ -25,7 +25,7 @@ use OpenWA\Resources\TemplatesResource;
 use OpenWA\Resources\WebhooksResource;
 
 /**
- * OpenWA PHP SDK — client core.
+ * Scalorus WA PHP SDK — client core.
  *
  * The single entry point. It owns an {@see HttpExecutor} (which wraps a Guzzle
  * client with an injectable handler) and exposes domain resources as
@@ -46,7 +46,7 @@ use OpenWA\Resources\WebhooksResource;
  * // then wait for status 'ready'. An unlinked session answers the send with 409.
  * $result = $client->messages->sendText($session['id'], [
  *     'chatId' => '628123456789@c.us',
- *     'text'   => 'Hello from the OpenWA PHP SDK!',
+ *     'text'   => 'Hello from the Scalorus WA PHP SDK!',
  * ]);
  * echo $result['messageId'];
  * ```
@@ -91,18 +91,18 @@ class Client
     public function __construct(#[\SensitiveParameter] array $config)
     {
         if (empty($config['baseUrl'])) {
-            throw new OpenWAException('OpenWA Client: baseUrl is required');
+            throw new OpenWAException('Scalorus WA Client: baseUrl is required');
         }
         // A key read from a secret file usually ends in a newline, which the HTTP layer refuses with an error
         // that quotes the whole key. Trim it, and refuse a control or non-ASCII character left inside: the
         // gateway takes any printable ASCII, a space included, and the other clients send it as it is.
         $apiKey = is_string($config['apiKey'] ?? null) ? trim($config['apiKey']) : ($config['apiKey'] ?? '');
         if (empty($apiKey)) {
-            throw new OpenWAException('OpenWA Client: apiKey is required');
+            throw new OpenWAException('Scalorus WA Client: apiKey is required');
         }
         if (!is_string($apiKey) || preg_match('/\A[\x20-\x7e]+\z/', $apiKey) !== 1) {
             throw new OpenWAException(
-                'OpenWA Client: apiKey contains a control or non-ASCII character; check for a stray newline'
+                'Scalorus WA Client: apiKey contains a control or non-ASCII character; check for a stray newline'
             );
         }
 
@@ -157,7 +157,7 @@ class Client
             $host = \strtolower(\trim($host, '[]'));
             if (!\in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
                 \error_log(
-                    "OpenWA Client: baseUrl uses an insecure http:// URL (host: {$host}). "
+                    "Scalorus WA Client: baseUrl uses an insecure http:// URL (host: {$host}). "
                     . 'The API key will be sent in cleartext. Use https:// in production.'
                 );
             }

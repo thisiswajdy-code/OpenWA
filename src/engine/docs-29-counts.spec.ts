@@ -157,14 +157,14 @@ describe('docs/29 counts match the capability matrix', () => {
       twelve: 12,
       thirteen: 13,
     };
-    const spelled = doc.match(/OpenWA ships (\w+) exact, self-disabling source transforms/);
+    const spelled = doc.match(/Scalorus WA ships (\w+) exact, self-disabling source transforms/);
     const wrongProse: string[] = [];
     if (!spelled) wrongProse.push('29.3 opening: phrasing no longer found in the document');
     else if (WORDS[spelled[1]] !== expected.total) {
       wrongProse.push(`29.3 opening: says ${spelled[1]}, scripts/ has ${expected.total}`);
     }
     // docs/12's missing-patch entry restates the same total in words.
-    const faq = read('docs', '12-troubleshooting-faq.md').match(/OpenWA applies (\w+) exact source transforms/);
+    const faq = read('docs', '12-troubleshooting-faq.md').match(/Scalorus WA applies (\w+) exact source transforms/);
     if (!faq) wrongProse.push('docs/12 missing-patch cause: phrasing no longer found in the document');
     else if (WORDS[faq[1]] !== expected.total) {
       wrongProse.push(`docs/12 missing-patch cause: says ${faq[1]}, scripts/ has ${expected.total}`);
@@ -178,8 +178,12 @@ describe('docs/29 counts match the capability matrix', () => {
         re: /engine-specific \(\d+ on wwjs,\s*(\d+) on Baileys\)/,
         want: expected.baileys,
       },
-      { label: 'mermaid wwjs node', re: /whatsapp-web\.js [\d.]+<br\/>\+ (\d+) OpenWA patch/, want: expected.wwjs },
-      { label: 'mermaid baileys node', re: /baileys [\w.-]+<br\/>\+ (\d+) OpenWA patch/, want: expected.baileys },
+      {
+        label: 'mermaid wwjs node',
+        re: /whatsapp-web\.js [\d.]+<br\/>\+ (\d+) Scalorus WA patch/,
+        want: expected.wwjs,
+      },
+      { label: 'mermaid baileys node', re: /baileys [\w.-]+<br\/>\+ (\d+) Scalorus WA patch/, want: expected.baileys },
       { label: '29.8 total', re: /- \*\*(\d+)\*\* install-time patches/, want: expected.total },
       { label: '29.8 split', re: /install-time patches \((\d+) whatsapp-web\.js/, want: expected.wwjs },
       {

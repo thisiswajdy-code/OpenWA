@@ -5,7 +5,7 @@ import { isEnvPinned, isOsProvidedEnv } from '../../config/env-precedence';
 import { readGeneratedEnv } from '../infra/generated-env';
 
 /**
- * The only Docker profiles OpenWA manages (and may start/stop). Used to bound teardown so a
+ * The only Docker profiles Scalorus WA manages (and may start/stop). Used to bound teardown so a
  * caller-supplied profile name can never reach stopManagedService for an unrelated container.
  */
 export const MANAGED_DOCKER_PROFILES: readonly string[] = ['postgres', 'redis', 'minio'];
@@ -188,7 +188,7 @@ export class DockerService implements OnModuleInit {
       );
       return containers
         .filter(c => {
-          // Filter by OpenWA labels or name prefix
+          // Filter by Scalorus WA labels or name prefix
           const labels = c.Labels || {};
           return labels['com.openwa.service'] || c.Names?.some(n => n.startsWith('/openwa-'));
         })
@@ -549,7 +549,7 @@ export class DockerService implements OnModuleInit {
     if (!pinned || !running || running === pinned) return;
     this.logger.warn(
       `Container ${name} runs image ${running}, but this release pins ${pinned}. Remove it with ` +
-        `\`docker rm -f ${name}\` (its named data volume is kept) and restart OpenWA or re-enable the ` +
+        `\`docker rm -f ${name}\` (its named data volume is kept) and restart Scalorus WA or re-enable the ` +
         `service so it is recreated from the pin.` +
         (profile === 'postgres' ? ' A PostgreSQL major version change needs a data migration first.' : ''),
     );

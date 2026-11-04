@@ -45,7 +45,7 @@ CVE-2026-19534
 # builds). That exposure is accepted for the release: the alternative is moving arm64 off the
 # Debian package to Chrome for Testing, which publishes linux-arm64 builds from 153 on. Re-measure
 # with
-# `trivy image --severity CRITICAL,HIGH --platform linux/arm64 ghcr.io/rmyndharis/openwa:<tag>`
+# `trivy image --severity CRITICAL,HIGH --platform linux/arm64 ghcr.io/thisiswajdy-code/openwa:<tag>`
 # when deciding whether the number still fits. The eleven chromium CVEs this file used to accept
 # (between CVE-2026-76033 and CVE-2026-76047) were fixed in 151.0.7922.169, and bookworm-security has
 # shipped newer chromium builds since.

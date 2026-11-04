@@ -4,7 +4,7 @@
 
 ```mermaid
 timeline
-    title OpenWA Release Timeline
+    title Scalorus WA Release Timeline
 
     section v0.0.1 - MVP
         Month 1-3 : Foundation & Engine
@@ -280,7 +280,7 @@ flowchart TB
 
 ```
 v0.0.1 Release Package:
-├── Docker image (ghcr.io/rmyndharis/openwa:0.0.1)
+├── Docker image (ghcr.io/thisiswajdy-code/openwa:0.0.1)
 ├── docker-compose.yml
 ├── Basic API documentation (Swagger)
 ├── README with quick start
@@ -390,7 +390,7 @@ gantt
 
 ```
 v0.0.2 Release Package:
-├── Docker image (ghcr.io/rmyndharis/openwa:0.0.2)
+├── Docker image (ghcr.io/thisiswajdy-code/openwa:0.0.2)
 ├── docker-compose.yml (with PostgreSQL & Redis)
 ├── Web Dashboard
 ├── API authentication (API keys)
@@ -495,7 +495,7 @@ gantt
 
 ```
 v0.1.0 Release Package:
-├── Docker image (ghcr.io/rmyndharis/openwa:0.1.0)
+├── Docker image (ghcr.io/thisiswajdy-code/openwa:0.1.0)
 ├── docker-compose.yml (production ready)
 ├── Full-featured Web Dashboard
 ├── Complete API documentation (Swagger)
@@ -574,17 +574,17 @@ vars are removed. Ships with a migration guide.
 Delivered additively whenever ready, per SemVer (not gated to one version). Prometheus metrics shipped
 in `0.2.2` and the five client SDKs across `0.7.3`–`0.8.19`; the rest remain open.
 
-| Feature                | Priority | Status                                             | Description                     |
-| ---------------------- | -------- | -------------------------------------------------- | ------------------------------- |
-| JavaScript/Node.js SDK | P1       | ✅ Shipped (`@rmyndharis/openwa`)                  | Official client library         |
-| Python SDK             | P2       | ✅ Shipped (`rmyndharis-openwa`)                   | Python client library           |
-| PHP SDK                | P2       | ✅ Shipped (`rmyndharis/openwa`)                   | PHP client library              |
-| Java SDK               | P2       | ✅ Shipped (`com.rmyndharis:openwa`)               | Java client library             |
-| Go SDK                 | P2       | ✅ Shipped (`github.com/rmyndharis/OpenWA/sdk/go`) | Go client library               |
-| Postman Collection     | P1       | ◐ cURL collection (doc 07); Postman export TBD     | Ready-to-use API collection     |
-| Docs Site              | P1       | ☐ Open                                             | Documentation website           |
-| Video Tutorials        | P2       | ☐ Open                                             | Getting started video series    |
-| Example Projects       | P1       | ◐ A few under `docs/examples/`                     | Real-world integration examples |
+| Feature                | Priority | Status                                                   | Description                     |
+| ---------------------- | -------- | -------------------------------------------------------- | ------------------------------- |
+| JavaScript/Node.js SDK | P1       | ✅ Shipped (`@rmyndharis/openwa`)                        | Official client library         |
+| Python SDK             | P2       | ✅ Shipped (`rmyndharis-openwa`)                         | Python client library           |
+| PHP SDK                | P2       | ✅ Shipped (`rmyndharis/openwa`)                         | PHP client library              |
+| Java SDK               | P2       | ✅ Shipped (`com.rmyndharis:openwa`)                     | Java client library             |
+| Go SDK                 | P2       | ✅ Shipped (`github.com/thisiswajdy-code/OpenWA/sdk/go`) | Go client library               |
+| Postman Collection     | P1       | ◐ cURL collection (doc 07); Postman export TBD           | Ready-to-use API collection     |
+| Docs Site              | P1       | ☐ Open                                                   | Documentation website           |
+| Video Tutorials        | P2       | ☐ Open                                                   | Getting started video series    |
+| Example Projects       | P1       | ◐ A few under `docs/examples/`                           | Real-world integration examples |
 
 **Performance & Observability**
 
@@ -792,8 +792,7 @@ the change being released:
 ```bash
 gh run list --workflow=release.yml --limit 1
 gh release view v<version>
-docker buildx imagetools inspect ghcr.io/rmyndharis/openwa:<version>
-docker buildx imagetools inspect docker.io/rmyndharis/openwa:latest
+docker buildx imagetools inspect ghcr.io/thisiswajdy-code/openwa:<version>
 ```
 
 Do the registry checks logged **out**. A promotion can look green while the tags are unreachable to
@@ -802,7 +801,7 @@ v0.10.5 published its GitHub Release.
 
 Upgrading a Compose deployment that builds from source is `git pull && docker compose up -d --build`:
 the bundled `docker-compose.yml` **builds** the API service rather than pulling it, so
-`docker compose pull` is a no-op for OpenWA itself. A deployment whose `docker-compose.override.yml`
+`docker compose pull` is a no-op for Scalorus WA itself. A deployment whose `docker-compose.override.yml`
 sets a published image (see the README) upgrades with `git pull` followed by
 `docker compose pull openwa-api && docker compose up -d --no-build` instead; `--build` there would
 build from source and tag the result with the published image name.

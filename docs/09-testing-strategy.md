@@ -2,7 +2,7 @@
 
 ## 9.1 Current Status
 
-OpenWA now has an active Jest test suite covering the backend core, engine adapters, security helpers,
+Scalorus WA now has an active Jest test suite covering the backend core, engine adapters, security helpers,
 database migrations, plugin hooks, and smoke-level e2e boot paths. This document describes the current
 test layout and the expected testing workflow for contributors.
 

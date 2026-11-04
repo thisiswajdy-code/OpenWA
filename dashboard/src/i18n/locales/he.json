@@ -6,7 +6,7 @@
     }
   },
   "common": {
-    "appName": "OpenWA",
+    "appName": "Scalorus WA",
     "updateAvailable": "גרסה v{{version}} זמינה",
     "loading": "טוען...",
     "cancel": "ביטול",
@@ -359,7 +359,6 @@
     "connectionError": "לא ניתן להתחבר לשרת. יש לנסות שוב.",
     "help": "צריך עזרה?",
     "viewDocs": "לצפייה בתיעוד",
-    "footer": "נבנה באהבה על ידי Yudhi Armyndharis וקהילת OpenWA",
     "version": "v{{version}} · {{date}}",
     "email": "אימייל",
     "emailPlaceholder": "you@example.com",
@@ -1068,7 +1067,7 @@
     "zeroMessages": "ללא שליחת הודעות",
     "noSession": {
       "title": "אין Session של WhatsApp מחובר ופעיל.",
-      "desc": "כדי לבדוק מספרי טלפון, OpenWA דורש לפחות Session אחד מאומת.",
+      "desc": "כדי לבדוק מספרי טלפון, Scalorus WA דורש לפחות Session אחד מאומת.",
       "goToSessions": "מעבר אל Sessions"
     },
     "tabs": {
@@ -1194,7 +1193,7 @@
       "postgres": "PostgreSQL",
       "postgresDesc": "מסד נתונים מוכן לייצור",
       "useBuiltIn": "שימוש בקונטיינר PostgreSQL מובנה",
-      "builtInDesc": "OpenWA ינהל עבורך קונטיינר PostgreSQL",
+      "builtInDesc": "Scalorus WA ינהל עבורך קונטיינר PostgreSQL",
       "dbName": "שם מסד הנתונים",
       "schema": "סכמה",
       "schemaDesc": "סכמת PostgreSQL (לא חלה על SQLite). ברירת מחדל 'public'. הסכמה חייבת להיות קיימת מראש.",
@@ -1229,7 +1228,7 @@
       "enable": "הפעלת Redis",
       "enableDesc": "משמש למטמון, לתורי BullMQ, למוני הגבלת קצב ולהפצת WebSocket בין צמתים מרובים",
       "useBuiltIn": "שימוש בקונטיינר Redis מובנה",
-      "builtInDesc": "OpenWA ינהל עבורך קונטיינר Redis",
+      "builtInDesc": "Scalorus WA ינהל עבורך קונטיינר Redis",
       "queueTitle": "הפעלת מערכת התורים BullMQ",
       "queueDesc": "שימוש בתורי הודעות לאספקה אמינה של הודעות ו-Webhooks",
       "statsTitle": "סטטיסטיקות תור",
@@ -1251,7 +1250,7 @@
       "s3": "Amazon S3",
       "s3Desc": "אחסון ענן (תואם S3)",
       "useBuiltIn": "שימוש בקונטיינר MinIO מובנה",
-      "builtInDesc": "OpenWA ינהל עבורך קונטיינר MinIO (תואם S3)",
+      "builtInDesc": "Scalorus WA ינהל עבורך קונטיינר MinIO (תואם S3)",
       "storagePath": "נתיב אחסון",
       "bucket": "שם Bucket",
       "region": "אזור (Region)",
@@ -1303,7 +1302,7 @@
       "importFailed": "לא ניתן לייבא את הנתונים",
       "importOk": "הנתונים יובאו",
       "importConfirm": "הייבוא יחליף את כל הנתונים הנוכחיים בגיבוי ({{rows}} שורות). לא ניתן לבטל פעולה זו. להמשיך?",
-      "invalidFile": "הקובץ הזה אינו גיבוי נתונים תקין של OpenWA.",
+      "invalidFile": "הקובץ הזה אינו גיבוי נתונים תקין של Scalorus WA.",
       "importTooLarge": "הגיבוי גדול מדי עבור מגבלת הבקשה. הגדילו את BODY_SIZE_LIMIT בשרת ונסו שוב."
     },
     "statusLoadError": "לא ניתן לטעון את מצב התשתית הנוכחי. רעננו כדי לנסות שוב.",
@@ -1337,7 +1336,7 @@
     "uninstallConfirm": "להסיר את \"{{name}}\"? פעולה זו תמחק את הקבצים שלו.",
     "empty": {
       "title": "לא נמצאו תוספים",
-      "description": "ניתן להתקין תוספים כדי להרחיב את היכולות של OpenWA"
+      "description": "ניתן להתקין תוספים כדי להרחיב את היכולות של Scalorus WA"
     },
     "config": {
       "title": "הגדרת {{name}}",
@@ -1360,7 +1359,7 @@
       "trustWarning": "תוספים רצים עם הרשאות התהליך המלאות של השער — ארגז החול מכיל קריסות, לא קוד זדוני. התקינו רק תוספים שאתם סומכים עליהם.",
       "choose": "בחירת קובץ ‎.zip‎…",
       "tooLarge": "הקובץ חורג מהמגבלה של ‎5 MB‎.",
-      "catalogHint": "התקינו ישירות מקטלוג התוספים של OpenWA. קובץ ה-.zip נשלף מהשרת דרך מגן ה-SSRF, מאומת ומורץ בארגז חול.",
+      "catalogHint": "התקינו ישירות מקטלוג התוספים של Scalorus WA. קובץ ה-.zip נשלף מהשרת דרך מגן ה-SSRF, מאומת ומורץ בארגז חול.",
       "catalogTeaser": "מחפשים תוספים?",
       "catalogTeaserSuffix": "סוקר את החנות הרשמית.",
       "tabCatalog": "קטלוג",

@@ -1,6 +1,6 @@
 apiVersion: v2
 name: openwa
-description: OpenWA — WhatsApp API. Single-instance StatefulSet (see values.yaml replicaCount warning).
+description: Scalorus WA — WhatsApp API. Single-instance StatefulSet (see values.yaml replicaCount warning).
 type: application
 version: 0.1.23
 appVersion: '0.25.0'
@@ -8,6 +8,6 @@ keywords:
   - whatsapp
   - openwa
   - api
-home: https://github.com/rmyndharis/OpenWA
+home: https://github.com/thisiswajdy-code/OpenWA
 sources:
-  - https://github.com/rmyndharis/OpenWA
+  - https://github.com/thisiswajdy-code/OpenWA

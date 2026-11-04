@@ -15,7 +15,7 @@ Delivery acknowledgment. Each adapter maps its native ack code to one neutral st
 
 ### Adapter
 
-An interface implementation that provides a specific capability. In OpenWA, adapters are used for:
+An interface implementation that provides a specific capability. In Scalorus WA, adapters are used for:
 
 - **Database Adapter**: SQLite, PostgreSQL
 - **Storage Adapter**: Local, S3
@@ -24,7 +24,7 @@ An interface implementation that provides a specific capability. In OpenWA, adap
 
 ### API Key
 
-Authentication token to access the OpenWA API. Sent via the `X-API-Key` header.
+Authentication token to access the Scalorus WA API. Sent via the `X-API-Key` header.
 
 ### Auth State
 
@@ -34,7 +34,7 @@ WhatsApp Web session authentication data. On the whatsapp-web.js engine it is a 
 
 ### Baileys
 
-Node.js library for WhatsApp Web that uses WebSocket directly without a browser (no Chromium required). Available as a selectable engine in OpenWA via `ENGINE_TYPE=baileys`.
+Node.js library for WhatsApp Web that uses WebSocket directly without a browser (no Chromium required). Available as a selectable engine in Scalorus WA via `ENGINE_TYPE=baileys`.
 
 ### Broadcast
 
@@ -42,7 +42,7 @@ Sending the same message to multiple recipients. On WhatsApp, this differs from 
 
 ### BullMQ
 
-A Redis-based Node.js job queue library (`bullmq`, wired in through `@nestjs/bullmq`). It backs the two queues OpenWA runs:
+A Redis-based Node.js job queue library (`bullmq`, wired in through `@nestjs/bullmq`). It backs the two queues Scalorus WA runs:
 
 - `webhook-queue`: webhook delivery, with retry and a dead-letter row on final failure
 - `ingress-queue`: inbound integration deliveries dispatched to plugins, with retry and a dead-letter row on final failure
@@ -59,7 +59,7 @@ Unique identifier for a WhatsApp chat:
 
 ### Chrome/Chromium
 
-Browser used by Puppeteer to run WhatsApp Web. OpenWA uses headless Chromium.
+Browser used by Puppeteer to run WhatsApp Web. Scalorus WA uses headless Chromium.
 
 ### Compose
 
@@ -69,21 +69,21 @@ Docker Compose - a tool to define and run multi-container Docker applications.
 
 ### Dashboard
 
-Web interface to manage OpenWA without using the API directly. Built with React and Vite, using TanStack Query for data fetching and plain CSS for styling.
+Web interface to manage Scalorus WA without using the API directly. Built with React and Vite, using TanStack Query for data fetching and plain CSS for styling.
 
 ### Dead Letter Queue (DLQ)
 
-The durable record of deliveries abandoned after every retry; an outbound-webhook row with `attempts: 0` was instead shed, oversize, failed preflight or refused at shutdown, and a later successful delivery of the event removes its row. In OpenWA it is a **database table**, not a Redis queue: `webhook_delivery_failures` for outbound webhooks and `integration_delivery_failures` for plugin ingress. Both support an ADMIN redrive: plugin ingress with `POST /api/integration/instances/:pluginId/:instanceId/redrive`, and outbound webhooks with `POST /api/webhooks/delivery-failures/redrive`, which replays only terminal rows recorded while `WEBHOOK_FAILURE_PAYLOAD_RETENTION_HOURS` > 0 (default 0 keeps no event data) and still inside that window. While `WEBHOOK_RECONCILE_INTERVAL_MS` > 0 the gateway also replays a shed or shutdown-refused delivery from its outbox on its own; with the sweep off such an event is not replayed, but turning the sweep back on replays it while its outbox record is pending. Neither path covers a delivery that was over the size cap or failed preflight, a shed or shutdown-refused one the sweep dropped because its webhook was removed, disabled or unsubscribed, nor an exhausted one recorded without event data or past its retention window: the provider or your own tooling must re-send that event.
+The durable record of deliveries abandoned after every retry; an outbound-webhook row with `attempts: 0` was instead shed, oversize, failed preflight or refused at shutdown, and a later successful delivery of the event removes its row. In Scalorus WA it is a **database table**, not a Redis queue: `webhook_delivery_failures` for outbound webhooks and `integration_delivery_failures` for plugin ingress. Both support an ADMIN redrive: plugin ingress with `POST /api/integration/instances/:pluginId/:instanceId/redrive`, and outbound webhooks with `POST /api/webhooks/delivery-failures/redrive`, which replays only terminal rows recorded while `WEBHOOK_FAILURE_PAYLOAD_RETENTION_HOURS` > 0 (default 0 keeps no event data) and still inside that window. While `WEBHOOK_RECONCILE_INTERVAL_MS` > 0 the gateway also replays a shed or shutdown-refused delivery from its outbox on its own; with the sweep off such an event is not replayed, but turning the sweep back on replays it while its outbox record is pending. Neither path covers a delivery that was over the size cap or failed preflight, a shed or shutdown-refused one the sweep dropped because its webhook was removed, disabled or unsubscribed, nor an exhausted one recorded without event data or past its retention window: the provider or your own tooling must re-send that event.
 
 ### Docker
 
-Containerization platform for packaging and deploying applications. OpenWA is distributed as a Docker image.
+Containerization platform for packaging and deploying applications. Scalorus WA is distributed as a Docker image.
 
 ## E
 
 ### Engine
 
-Component that handles communication with WhatsApp Web. OpenWA supports pluggable engines selected via the `ENGINE_TYPE` environment variable: `whatsapp-web.js` (default, Chromium/Puppeteer-based) or `baileys` (browser-free, WebSocket-based).
+Component that handles communication with WhatsApp Web. Scalorus WA supports pluggable engines selected via the `ENGINE_TYPE` environment variable: `whatsapp-web.js` (default, Chromium/Puppeteer-based) or `baileys` (browser-free, WebSocket-based).
 
 ### Event
 
@@ -109,7 +109,7 @@ Unique identifier for a WhatsApp group. Format: `120363123456789@g.us`.
 
 ### GHCR
 
-GitHub Container Registry - registry for storing Docker images. The OpenWA image is available at `ghcr.io/rmyndharis/openwa` (and, mirrored per release, at `docker.io/rmyndharis/openwa`).
+GitHub Container Registry - registry for storing Docker images. The Scalorus WA image is available at `ghcr.io/thisiswajdy-code/openwa`.
 
 ## H
 
@@ -135,17 +135,17 @@ Data stored in RAM. Fast but non-persistent — lost on restart. Independent of 
 
 ### JID (Jabber ID)
 
-WhatsApp's id format, inherited from XMPP; the user-facing "Chat ID" is a JID. The same entity can be addressed in more than one dialect: `<phone>@c.us` (whatsapp-web.js, and OpenWA's neutral form), `<phone>@s.whatsapp.net` (Baileys' raw form for the same user), `<id>@g.us` (a group), or `<lid>@lid` (a LID, a privacy id). WhatsApp also issues Meta-hosted dialects of the first and last of these (`@hosted`, `@hosted.lid`); they name the same account and normalize to the same neutral form. OpenWA normalizes engine ids to a single neutral dialect at the engine boundary - see _System Architecture > WhatsApp Identity Contract_.
+WhatsApp's id format, inherited from XMPP; the user-facing "Chat ID" is a JID. The same entity can be addressed in more than one dialect: `<phone>@c.us` (whatsapp-web.js, and Scalorus WA's neutral form), `<phone>@s.whatsapp.net` (Baileys' raw form for the same user), `<id>@g.us` (a group), or `<lid>@lid` (a LID, a privacy id). WhatsApp also issues Meta-hosted dialects of the first and last of these (`@hosted`, `@hosted.lid`); they name the same account and normalize to the same neutral form. Scalorus WA normalizes engine ids to a single neutral dialect at the engine boundary - see _System Architecture > WhatsApp Identity Contract_.
 
 ### Job Queue
 
-Queueing system for asynchronous task processing. OpenWA registers exactly two queues — `webhook-queue` and `ingress-queue` — both optional (`QUEUE_ENABLED`). There is no scheduled or delayed sending: outbound messages are dispatched inline by the request that asks for them.
+Queueing system for asynchronous task processing. Scalorus WA registers exactly two queues — `webhook-queue` and `ingress-queue` — both optional (`QUEUE_ENABLED`). There is no scheduled or delayed sending: outbound messages are dispatched inline by the request that asks for them.
 
 ## L
 
 ### LID (Linked ID)
 
-A WhatsApp **privacy identifier** (`<number>@lid`) that addresses a user without exposing their phone number - increasingly used in groups and communities. Its number is **not** a phone number; a separate `lid -> phone` mapping (supplied by WhatsApp via history sync / contacts) resolves it when known. OpenWA keeps an unresolved LID as-is rather than guessing a phone. See _System Architecture > WhatsApp Identity Contract_.
+A WhatsApp **privacy identifier** (`<number>@lid`) that addresses a user without exposing their phone number - increasingly used in groups and communities. Its number is **not** a phone number; a separate `lid -> phone` mapping (supplied by WhatsApp via history sync / contacts) resolves it when known. Scalorus WA keeps an unresolved LID as-is rather than guessing a phone. See _System Architecture > WhatsApp Identity Contract_.
 
 ### Linked Device
 
@@ -159,7 +159,7 @@ Icon library used in the dashboard. A fork of Feather Icons with more icons.
 
 ### Message Queue
 
-Not a component of OpenWA. Outbound sends are synchronous; the only queues are `webhook-queue` (outbound webhook delivery) and `ingress-queue` (inbound plugin events) — see _Job Queue_. Bulk sending paces itself with a per-message delay rather than a queue.
+Not a component of Scalorus WA. Outbound sends are synchronous; the only queues are `webhook-queue` (outbound webhook delivery) and `ingress-queue` (inbound plugin events) — see _Job Queue_. Bulk sending paces itself with a per-message delay rather than a queue.
 
 ### Middleware
 
@@ -171,25 +171,25 @@ Object storage server compatible with the S3 API. Can be used as a self-hosted a
 
 ### Multi-session
 
-Ability to run multiple WhatsApp sessions within a single OpenWA instance.
+Ability to run multiple WhatsApp sessions within a single Scalorus WA instance.
 
 ## N
 
 ### NestJS
 
-Node.js framework for building server-side applications. The OpenWA backend is built with NestJS.
+Node.js framework for building server-side applications. The Scalorus WA backend is built with NestJS.
 
 ### Node.js
 
-JavaScript runtime used to run OpenWA. Recommended version: Node.js 22 LTS.
+JavaScript runtime used to run Scalorus WA. Recommended version: Node.js 22 LTS.
 
 ## O
 
 ### ORM (Object-Relational Mapping)
 
-Library that maps objects in code to database tables. OpenWA uses TypeORM.
+Library that maps objects in code to database tables. Scalorus WA uses TypeORM.
 
-### OpenWA
+### Scalorus WA
 
 Open-source WhatsApp API gateway. This project.
 
@@ -201,7 +201,7 @@ Data sent in an HTTP request body or webhook delivery.
 
 ### Plugin
 
-Extension that can be added to OpenWA to add functionality without modifying the core codebase.
+Extension that can be added to Scalorus WA to add functionality without modifying the core codebase.
 
 ### PostgreSQL
 
@@ -241,7 +241,7 @@ In-memory data store used for:
 
 ### REST API
 
-Architectural style for APIs used by OpenWA. Uses HTTP methods (GET, POST, PUT, DELETE).
+Architectural style for APIs used by Scalorus WA. Uses HTTP methods (GET, POST, PUT, DELETE).
 
 ### Retry
 
@@ -251,7 +251,7 @@ Mechanism to retry failed operations, e.g., webhook delivery.
 
 ### S3 (Simple Storage Service)
 
-AWS object storage service. OpenWA supports S3-compatible storage for media files.
+AWS object storage service. Scalorus WA supports S3-compatible storage for media files.
 
 ### Session
 
@@ -267,7 +267,7 @@ Design pattern that allows selecting an algorithm/implementation at runtime. Use
 
 ### Swagger
 
-API documentation tool. OpenWA provides Swagger UI at `/api/docs`.
+API documentation tool. Scalorus WA provides Swagger UI at `/api/docs`.
 
 ## T
 
@@ -281,7 +281,7 @@ ORM for TypeScript/JavaScript that supports multiple databases.
 
 ### TypeScript
 
-Typed superset of JavaScript used for OpenWA development.
+Typed superset of JavaScript used for Scalorus WA development.
 
 ## V
 
@@ -291,13 +291,13 @@ Build tool and dev server for frontend. Used for the dashboard.
 
 ### Volume (Docker)
 
-Persistent storage for Docker containers. OpenWA data is stored in volumes.
+Persistent storage for Docker containers. Scalorus WA data is stored in volumes.
 
 ## W
 
 ### WAHA
 
-WhatsApp HTTP API - a similar project that inspired OpenWA. OpenWA is built as an open-source alternative.
+WhatsApp HTTP API - a similar project that inspired Scalorus WA. Scalorus WA is built as an open-source alternative.
 
 ### WAL (Write-Ahead Logging)
 
@@ -316,7 +316,7 @@ Protocol for real-time bidirectional communication. Used for:
 
 ### whatsapp-web.js
 
-Default engine library used by OpenWA to interact with WhatsApp Web. Uses Puppeteer to control a headless Chromium browser. Selected via `ENGINE_TYPE=whatsapp-web.js` (or by omitting the env var).
+Default engine library used by Scalorus WA to interact with WhatsApp Web. Uses Puppeteer to control a headless Chromium browser. Selected via `ENGINE_TYPE=whatsapp-web.js` (or by omitting the env var).
 
 ---
 

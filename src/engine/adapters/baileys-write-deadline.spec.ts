@@ -9,7 +9,7 @@ import { EngineTransportError } from '../../common/errors/engine-transport.error
  * or never answered — and `query()` catches its own timeout and resolves rather than throwing.
  *
  * There is no value left to inspect, so these pin the only thing that can separate the two: a
- * deadline OpenWA owns. One case per call site, because a missed wrapper is invisible otherwise.
+ * deadline Scalorus WA owns. One case per call site, because a missed wrapper is invisible otherwise.
  */
 
 const never = (): Promise<never> => new Promise<never>(() => undefined);

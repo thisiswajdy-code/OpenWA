@@ -6,7 +6,7 @@
     }
   },
   "common": {
-    "appName": "OpenWA",
+    "appName": "Scalorus WA",
     "updateAvailable": "v{{version}} mevcut",
     "loading": "Yükleniyor...",
     "cancel": "İptal",
@@ -348,7 +348,6 @@
     "connectionError": "Sunucuya bağlanılamadı. Lütfen tekrar deneyin.",
     "help": "Yardıma mı ihtiyacınız var?",
     "viewDocs": "Dokümantasyonu Görüntüle",
-    "footer": "Yudhi Armyndharis ve OpenWA Topluluğu tarafından ❤️ ile yapılmıştır",
     "version": "v{{version}} · {{date}}",
     "email": "E-posta",
     "emailPlaceholder": "sen@example.com",
@@ -1055,7 +1054,7 @@
     "zeroMessages": "Mesaj Gönderilmez",
     "noSession": {
       "title": "Bağlı WhatsApp oturumu yok.",
-      "desc": "Telefon numaralarını kontrol etmek için OpenWA, kimliği doğrulanmış en az bir oturum gerektirir.",
+      "desc": "Telefon numaralarını kontrol etmek için Scalorus WA, kimliği doğrulanmış en az bir oturum gerektirir.",
       "goToSessions": "Oturumlara Git"
     },
     "tabs": {
@@ -1175,7 +1174,7 @@
       "postgres": "PostgreSQL",
       "postgresDesc": "Prodüksiyona hazır veritabanı",
       "useBuiltIn": "Dahili PostgreSQL Konteynerini Kullan",
-      "builtInDesc": "OpenWA sizin için bir PostgreSQL konteynerini yönetecektir",
+      "builtInDesc": "Scalorus WA sizin için bir PostgreSQL konteynerini yönetecektir",
       "dbName": "Veritabanı Adı",
       "schema": "Şema (Schema)",
       "schemaDesc": "PostgreSQL şeması (SQLite için yok sayılır). Varsayılan 'public'. Şema zaten mevcut olmalıdır.",
@@ -1210,7 +1209,7 @@
       "enable": "Redis'i Etkinleştir",
       "enableDesc": "Önbelleğe alma, BullMQ kuyrukları, hız sınırı sayaçları ve çok düğümlü WebSocket dağıtımı için kullanılır",
       "useBuiltIn": "Dahili Redis Konteynerini Kullan",
-      "builtInDesc": "OpenWA sizin için bir Redis konteynerini yönetecektir",
+      "builtInDesc": "Scalorus WA sizin için bir Redis konteynerini yönetecektir",
       "queueTitle": "BullMQ Kuyruk Sistemini Etkinleştir",
       "queueDesc": "Güvenilir mesaj ve webhook iletimi için mesaj kuyruklarını kullanın",
       "statsTitle": "Kuyruk İstatistikleri",
@@ -1233,7 +1232,7 @@
       "s3": "Amazon S3",
       "s3Desc": "Bulut depolama (S3 uyumlu)",
       "useBuiltIn": "Dahili MinIO Konteynerini Kullan",
-      "builtInDesc": "OpenWA sizin için bir MinIO (S3 uyumlu) konteynerini yönetecektir",
+      "builtInDesc": "Scalorus WA sizin için bir MinIO (S3 uyumlu) konteynerini yönetecektir",
       "storagePath": "Depolama Yolu",
       "bucket": "Kova (Bucket) Adı",
       "region": "Bölge (Region)",
@@ -1264,7 +1263,7 @@
       "importFailed": "Veriler içe aktarılamadı",
       "importOk": "Veriler içe aktarıldı",
       "importConfirm": "İçe aktarma işlemi mevcut tüm verileri yedekle ({{rows}} satır) DEĞİŞTİRECEKTİR. Bu işlem geri alınamaz. Devam edilsin mi?",
-      "invalidFile": "Bu dosya geçerli bir OpenWA veri yedeği değil.",
+      "invalidFile": "Bu dosya geçerli bir Scalorus WA veri yedeği değil.",
       "importTooLarge": "Yedekleme, istek sınırı için çok büyük. Sunucudaki BODY_SIZE_LIMIT değerini artırın ve tekrar deneyin."
     },
     "restart": {
@@ -1318,7 +1317,7 @@
     "uninstallConfirm": "\"{{name}}\" kaldırılsın mı? Bu işlem dosyalarını silecektir.",
     "empty": {
       "title": "Yüklü eklenti yok",
-      "description": "OpenWA'nın yapabileceklerini genişletmek için bir eklenti yükleyin."
+      "description": "Scalorus WA'nın yapabileceklerini genişletmek için bir eklenti yükleyin."
     },
     "config": {
       "title": "{{name}} Yapılandır",
@@ -1341,7 +1340,7 @@
       "trustWarning": "Eklentiler, ağ geçidinin tüm süreç yetkileriyle çalışır — yalıtılmış alan (sandbox) çökmeleri kontrol altına alır, kötü amaçlı kodu değil. Yalnızca güvendiğiniz eklentileri yükleyin.",
       "choose": "Bir .zip dosyası seçin…",
       "tooLarge": "Dosya 5 MB sınırını aşıyor.",
-      "catalogHint": "Doğrudan OpenWA eklenti kataloğundan yükleyin. .zip dosyası SSRF koruması üzerinden sunucu tarafında çekilir, ardından doğrulanır ve korumalı alana alınır.",
+      "catalogHint": "Doğrudan Scalorus WA eklenti kataloğundan yükleyin. .zip dosyası SSRF koruması üzerinden sunucu tarafında çekilir, ardından doğrulanır ve korumalı alana alınır.",
       "catalogTeaser": "Eklenti mi arıyorsunuz?",
       "catalogTeaserSuffix": "resmi pazar yerine göz atın.",
       "tabCatalog": "Katalog",

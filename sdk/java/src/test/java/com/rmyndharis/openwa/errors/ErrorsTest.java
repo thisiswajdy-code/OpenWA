@@ -63,7 +63,7 @@ class ErrorsTest {
         OpenWAApiError e = OpenWAApiError.fromResponse(404, "", body, "GET /api/sessions/x");
         assertTrue(e.getMessage().contains("Session x not found"));
         assertFalse(e.getMessage().contains("404  "), "must not emit a double space when statusText is blank");
-        assertTrue(e.getMessage().startsWith("OpenWA API 404 — GET /api/sessions/x"));
+        assertTrue(e.getMessage().startsWith("Scalorus WA API 404 — GET /api/sessions/x"));
     }
 
     @Test
@@ -78,6 +78,6 @@ class ErrorsTest {
     @Test
     void bodylessErrorHasCleanMessage() {
         OpenWAApiError e = OpenWAApiError.fromResponse(502, "", "", "GET /api/x");
-        assertEquals("OpenWA API 502 — GET /api/x", e.getMessage());
+        assertEquals("Scalorus WA API 502 — GET /api/x", e.getMessage());
     }
 }

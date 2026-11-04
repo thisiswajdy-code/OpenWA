@@ -2,7 +2,7 @@
 
 ## 14.1 Overview
 
-This document provides a comprehensive guide for migrating OpenWA, including:
+This document provides a comprehensive guide for migrating Scalorus WA, including:
 
 - Database migration (SQLite → PostgreSQL)
 - Version upgrades within the 0.x line
@@ -91,7 +91,7 @@ flowchart TD
 
 ### API-Based Migration (Recommended for v0.2+)
 
-OpenWA v0.2+ includes built-in migration API endpoints that leverage the **Dual-Database Architecture**:
+Scalorus WA v0.2+ includes built-in migration API endpoints that leverage the **Dual-Database Architecture**:
 
 ```bash
 # Step 1: Export all Data DB tables
@@ -157,7 +157,7 @@ curl -X POST 'http://localhost:2785/api/infra/import-data' \
 > [!NOTE]
 > **Dual-Database Architecture**
 >
-> OpenWA separates databases:
+> Scalorus WA separates databases:
 >
 > - **Main DB** (SQLite): API keys, audit logs - never migrated, always local
 > - **Data DB** (Pluggable): Sessions, webhooks, messages - this is what gets migrated
@@ -225,7 +225,7 @@ curl -X POST 'http://localhost:2785/api/infra/import-data' \
 
 ### Storage Migration (Local ↔ S3/MinIO)
 
-OpenWA v0.2+ supports migrating media files between storage backends:
+Scalorus WA v0.2+ supports migrating media files between storage backends:
 
 On an S3/MinIO backend, confirm `GET /api/infra/status` reports `storage.s3Available: true` before the
 export (S3 to Local) and before the import (Local to S3). Until the bucket has been reachable once since
@@ -303,19 +303,19 @@ The built-in storage (the compose `minio` profile and the dashboard's built-in o
 `pgsty/silo`, a maintained MinIO fork, on the same `openwa_minio-data` volume. An `openwa-minio`
 container created from the older `minio/minio` image keeps running it until it is recreated: on the
 compose route run `docker compose --profile minio pull minio && docker compose --profile minio up -d minio`;
-for the dashboard built-in run `docker rm -f openwa-minio`, then restart OpenWA or re-save the
+for the dashboard built-in run `docker rm -f openwa-minio`, then restart Scalorus WA or re-save the
 built-in storage. The recreated dashboard built-in container publishes no host ports: the older one
-published the S3 API and console on `127.0.0.1:9000` and `127.0.0.1:9001`, and OpenWA reaches the new
+published the S3 API and console on `127.0.0.1:9000` and `127.0.0.1:9001`, and Scalorus WA reaches the new
 one over the Docker network alone. For host access to either, run storage through the compose `minio`
 profile, which still publishes both on loopback. The compose `minio` service no longer starts without `S3_ACCESS_KEY_ID` and
 `S3_SECRET_ACCESS_KEY` in the `.env` next to `docker-compose.yml`: a container that ran with neither
-set used `minioadmin`/`minioadmin`, so set them to the pair OpenWA uses before recreating it. If
-OpenWA uses the dashboard built-in storage, drop the `minio`/`full` profile and take the dashboard
+set used `minioadmin`/`minioadmin`, so set them to the pair Scalorus WA uses before recreating it. If
+Scalorus WA uses the dashboard built-in storage, drop the `minio`/`full` profile and take the dashboard
 route instead. The volume and its media are kept either way.
 
 ### Redis Migration (Cache)
 
-Redis in OpenWA holds only **ephemeral** state: TTL-based cache entries, BullMQ jobs (see below), and — when `REDIS_ENABLED` — the rate-limit hit counters. No request reads the cache, so there is nothing to migrate.
+Redis in Scalorus WA holds only **ephemeral** state: TTL-based cache entries, BullMQ jobs (see below), and — when `REDIS_ENABLED` — the rate-limit hit counters. No request reads the cache, so there is nothing to migrate.
 
 **No migration API needed** - just change configuration:
 
@@ -404,11 +404,11 @@ docker compose up -d
 > `src/modules/infra/export-tables.ts` as of this release; a table added later is skipped silently.
 >
 > It uses the standalone `sqlite3` npm package, which is no longer part of
-> OpenWA's dependencies (the app itself uses `better-sqlite3`). Install it ad hoc before running:
+> Scalorus WA's dependencies (the app itself uses `better-sqlite3`). Install it ad hoc before running:
 > `npm install --no-save sqlite3`.
 >
 > The `SQLITE_PATH` / `DATABASE_URL` variables below are inputs to this standalone script only —
-> they are **not** OpenWA configuration. The application itself reads `DATABASE_TYPE` plus
+> they are **not** Scalorus WA configuration. The application itself reads `DATABASE_TYPE` plus
 > `DATABASE_NAME` / `DATABASE_HOST` / `DATABASE_PORT` / `DATABASE_USERNAME` / `DATABASE_PASSWORD`
 > (see `src/config/configuration.ts`).
 
@@ -605,13 +605,13 @@ API-based migration above there. What follows moves `docker-compose.dev.yml` (wh
 command. On a bare-metal install, stop and start the process where it says `docker compose`.
 
 ```bash
-# Step 1: Stop OpenWA
+# Step 1: Stop Scalorus WA
 docker compose down
 
 # Step 2: Backup current data (both databases + session auth + media)
 ./scripts/backup.sh
 
-# Step 3: Point OpenWA at PostgreSQL in the project's .env. docker-compose.dev.yml forwards these
+# Step 3: Point Scalorus WA at PostgreSQL in the project's .env. docker-compose.dev.yml forwards these
 #         keys to the app, and a bare-metal start reads the file itself. DATABASE_HOST is the
 #         address the APP connects to, so never localhost for a container.
 #   DATABASE_TYPE=postgres
@@ -622,7 +622,7 @@ docker compose down
 #   DATABASE_PASSWORD=<strong password>
 #   DATABASE_SYNCHRONIZE=false   # docker-compose.dev.yml defaults it to true
 
-# Step 4: Start OpenWA once so its migrations create the schema the script writes into, then stop it
+# Step 4: Start Scalorus WA once so its migrations create the schema the script writes into, then stop it
 docker compose up -d
 curl http://localhost:2785/api/health   # repeat until it answers
 docker compose down
@@ -766,7 +766,7 @@ curl -X POST 'http://new-server:2785/api/infra/import-data' \
 
 # 2. Move the engine auth state with both instances stopped. The import preserves session ids, so
 #    the directories transfer as they are, with no rename.
-#    OLD_DIR/NEW_DIR are each host's OpenWA working directory; SESSION_DATA_PATH defaults to
+#    OLD_DIR/NEW_DIR are each host's Scalorus WA working directory; SESSION_DATA_PATH defaults to
 #    ./data/sessions and BAILEYS_AUTH_DIR to ./data/baileys, relative to it. The production
 #    docker-compose.yml keeps /app/data in the named volume `openwa_openwa-data` rather than on the
 #    host, so on that layout copy through the container (`docker cp`) instead of a host path.
@@ -781,7 +781,7 @@ fresh QR code.
 
 ### Upgrade Matrix
 
-OpenWA is pre-1.0 — every release to date is on the `0.x` line. Under the project's SemVer 0.x policy a
+Scalorus WA is pre-1.0 — every release to date is on the `0.x` line. Under the project's SemVer 0.x policy a
 breaking change, or anything the CHANGELOG files under **Upgrade notes (behavior changes)**, bumps the
 **minor** (`0.10.x` → `0.11.0`) and everything else is a patch, so a minor bump is the
 one that warrants reading the release notes closely. The rule holds from `0.24.0`: earlier patches did not
@@ -836,7 +836,7 @@ docker compose down
 # 3. Move to the new version
 #    The repo's compose file BUILDS the API image from source:
 git pull && docker compose up -d --build
-#    Deployments pinned to a published image instead (ghcr.io/rmyndharis/openwa:<version>)
+#    Deployments pinned to a published image instead (ghcr.io/thisiswajdy-code/openwa:<version>)
 #    bump the tag and bring the compose file up to the release (git pull for the repo checkout),
 #    then: docker compose pull openwa-api && docker compose up -d --no-build
 
@@ -894,7 +894,7 @@ skips: check `pg_index.indisvalid` and drop the invalid index before building it
 | `0.25.0` | On SQLite, `GET /api/search` leaves `score` out of the hits of a key restricted to sessions or chats, because it is computed over the whole index; the hits stay in relevance order                                                                                                                                            | Read `hit.score` as optional                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `0.25.0` | `PUT /api/infra/config` answers `400` for a database or Redis port outside 1-65535, a negative or fractional pool size and a local storage path the app cannot create or write                                                                                                                                                 | Fix the value in the request; it used to be stored and the next boot refused it                                                                                                                                                                                                                                                                                                                                                                                                |
 | `0.25.0` | Boot fails on a `PORT` with surrounding whitespace and on a `WEBHOOK_SHUTDOWN_DRAIN_MS` that is not a non-negative integer (for example `30s`)                                                                                                                                                                                 | Remove the padding or the unit                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `0.25.0` | New Baileys pairings show `Ubuntu` as the linked-device name                                                                                                                                                                                                                                                                   | Set `BAILEYS_BROWSER_NAME=OpenWA` to keep the old name; linked sessions are unaffected                                                                                                                                                                                                                                                                                                                                                                                         |
+| `0.25.0` | New Baileys pairings show `Ubuntu` as the linked-device name                                                                                                                                                                                                                                                                   | Set `BAILEYS_BROWSER_NAME=Scalorus WA` to keep the old name; linked sessions are unaffected                                                                                                                                                                                                                                                                                                                                                                                    |
 | `0.25.0` | `backup.sh` and `restore.sh` exit with status 2 on an unparsable or unreadable `./.env` or `.env.generated`, read the default SQLite paths under `OPENWA_DATA_DIR`, and with `DATABASE_SSL=true` verify the PostgreSQL certificate as the app does                                                                             | Fix the line or the permissions, or pass the key in the environment; trust a private CA through `NODE_EXTRA_CA_CERTS` or `PGSSLROOTCERT`                                                                                                                                                                                                                                                                                                                                       |
 | `0.25.0` | With `DATABASE_SSL=true` the PostgreSQL certificate is verified against `DATABASE_HOST` even when it is an IP address                                                                                                                                                                                                          | Use the certificate's DNS name as the host or add the IP to its subject alternative names; `DATABASE_SSL_REJECT_UNAUTHORIZED=false` remains the escape hatch                                                                                                                                                                                                                                                                                                                   |
 | `0.25.0` | The first boot builds three indexes on `messages` without `CONCURRENTLY` (about 240 MB per million messages; on PostgreSQL writes wait), and the startup probe of the Helm chart or of the docs/13 StatefulSet restarts a pod whose boot outlasts about 295 s                                                                  | On a large table run the migrations first (section 14.5), or raise `startupProbe.failureThreshold`                                                                                                                                                                                                                                                                                                                                                                             |
@@ -1368,7 +1368,7 @@ async function fullImport(options: ImportOptions): Promise<void> {
 
 **Cause:** a deployment previously bootstrapped with `DATABASE_SYNCHRONIZE=true` on PostgreSQL has native `uuid` `id`/FK columns (TypeORM derives them from `@PrimaryGeneratedColumn('uuid')`), while the migration chain assumes `varchar`. The two are incompatible, and migrations run unconditionally on the Postgres data connection (`migrationsRun: true`), so boot cannot complete (issue #690).
 
-**Fix (automatic for most deployments):** OpenWA ships a guard migration (`NormalizeSynchronizeUuidColumns`, ordered before the first collision) that converts the affected `uuid` columns to `varchar` on the next boot. For small-to-medium databases this is transparent — upgrade and restart.
+**Fix (automatic for most deployments):** Scalorus WA ships a guard migration (`NormalizeSynchronizeUuidColumns`, ordered before the first collision) that converts the affected `uuid` columns to `varchar` on the next boot. For small-to-medium databases this is transparent — upgrade and restart.
 
 **Large-database maintenance window:** the conversion rewrites `messages` and `message_batches` in full under an exclusive lock. If either table is large (millions of rows) and your orchestrator's liveness/readiness grace is tight, run the migration against the stopped app during a planned window:
 

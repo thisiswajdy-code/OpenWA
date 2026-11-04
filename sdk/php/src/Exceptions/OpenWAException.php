@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenWA\Exceptions;
 
 /**
- * Base class for every error thrown by the OpenWA SDK.
+ * Base class for every error thrown by the Scalorus WA SDK.
  */
 class OpenWAException extends \Exception
 {

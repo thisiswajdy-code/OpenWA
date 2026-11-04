@@ -1,7 +1,7 @@
 /**
- * Typed error hierarchy for the OpenWA SDK.
+ * Typed error hierarchy for the Scalorus WA SDK.
  *
- * The OpenWA API returns NestJS-default errors of the shape:
+ * The Scalorus WA API returns NestJS-default errors of the shape:
  *   `{ statusCode: number, message: string | string[], error?: string }`
  * `error` is absent whenever the exception carried no explicit message, so it is never required to
  * recognise the envelope. This module maps that to a typed, ergonomic error tree so callers can
@@ -56,7 +56,7 @@ export class OpenWAApiError extends OpenWAError {
   /** Build an {@link OpenWAApiError} from a fetch Response, awaiting its body. */
   static async fromResponse(res: Response, context: string): Promise<OpenWAApiError> {
     // An opaque unfollowed redirect (we set `redirect: 'manual'`) surfaces as status 0, not a 3xx.
-    // Give it a clear message instead of "OpenWA API 0": the redirect was deliberately not followed
+    // Give it a clear message instead of "Scalorus WA API 0": the redirect was deliberately not followed
     // so the API key is never re-sent to the redirect target.
     if (res.status === 0) {
       return new OpenWAApiError(
@@ -81,7 +81,7 @@ export class OpenWAApiError extends OpenWAError {
     }
     const env = isNestEnvelope(body) ? body : undefined;
     const messageText = describeMessage(env?.message ?? body ?? res.statusText);
-    const message = `OpenWA API ${res.status} ${res.statusText} — ${context}: ${messageText}`;
+    const message = `Scalorus WA API ${res.status} ${res.statusText} — ${context}: ${messageText}`;
     return new OpenWAApiError(message, res.status, body, env?.error, res.headers);
   }
 }

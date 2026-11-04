@@ -353,7 +353,7 @@ describe('DockerService.listContainers', () => {
     expect(await new DockerService().listContainers()).toEqual([]);
   });
 
-  it('maps only OpenWA containers (label or /openwa- name) to ContainerInfo', async () => {
+  it('maps only Scalorus WA containers (label or /openwa- name) to ContainerInfo', async () => {
     const service = makeService(
       jest.fn().mockResolvedValue([
         {

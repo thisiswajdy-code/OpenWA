@@ -1,4 +1,4 @@
-"""Wire type definitions for the OpenWA API.
+"""Wire type definitions for the Scalorus WA API.
 
 Hybrid codegen strategy: this module is the single source of truth for wire
 types — the part most prone to drift with the backend. It is structured so it

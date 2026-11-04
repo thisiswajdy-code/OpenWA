@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rmyndharis-openwa"
 version = "0.6.0"
-description = "Official Python SDK for OpenWA, the open-source WhatsApp API Gateway (not affiliated with WhatsApp or Meta)"
+description = "Official Python SDK for Scalorus WA, the open-source WhatsApp API Gateway (not affiliated with WhatsApp or Meta)"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.9"
 authors = [
-    { name = "OpenWA Contributors" }
+    { name = "Scalorus WA Contributors" }
 ]
 keywords = ["whatsapp", "api", "sdk", "openwa", "gateway"]
 
@@ -28,8 +28,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rmyndharis/OpenWA"
-Repository = "https://github.com/rmyndharis/OpenWA"
+Homepage = "https://github.com/thisiswajdy-code/OpenWA"
+Repository = "https://github.com/thisiswajdy-code/OpenWA"
 
 [tool.setuptools.packages.find]
 include = ["openwa*"]

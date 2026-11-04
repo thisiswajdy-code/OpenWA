@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# OpenWA restore.
+# Scalorus WA restore.
 #
 # Restores the always-SQLite auth/audit database, a SQLite data store, engine authentication, local
 # media, installed plugins, and bootstrap configuration from an archive produced by scripts/backup.sh.
@@ -35,7 +35,7 @@
 #                     each target outside it); needed when a parent is read-only, as in the
 #                     shipped container
 #
-# Stop the OpenWA app before restoring. A snapshot of the current data dir, and of every target
+# Stop the Scalorus WA app before restoring. A snapshot of the current data dir, and of every target
 # outside it, is taken before anything is written so a bad restore can be undone.
 #
 set -euo pipefail

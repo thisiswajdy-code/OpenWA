@@ -9,8 +9,8 @@ import { engineCapabilityMatrix } from './engine-capability-matrix';
  * (check-upstream-surface.mjs vs the snapshot). What nothing watched was the two columns a human
  * fills in by hand:
  *
- *   - 29.5.1/29.5.2 "OpenWA exposure" — which library symbol the adapters actually use.
- *   - 29.5.4 "OpenWA" — which library events the adapters actually subscribe to.
+ *   - 29.5.1/29.5.2 "Scalorus WA exposure" — which library symbol the adapters actually use.
+ *   - 29.5.4 "Scalorus WA" — which library events the adapters actually subscribe to.
  *
  * Both drifted: symbols marked ✅/⚙️ that appear only inside a comment, and events marked ✅ with no
  * listener at all. Those are exactly the marks a reader triaging backlog work trusts most, so they

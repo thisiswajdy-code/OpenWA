@@ -8,7 +8,7 @@ import { type WwebjsMessaging } from './wwebjs-messaging';
 import { EngineTransportError } from '../../common/errors/engine-transport.error';
 
 /**
- * Chat pin/unpin — the second of the §29.5.3 "supported by BOTH libraries, missing only in OpenWA"
+ * Chat pin/unpin — the second of the §29.5.3 "supported by BOTH libraries, missing only in Scalorus WA"
  * backlog. Chat-level, distinct from `pinMessage`, which pins a message inside a chat.
  *
  * The whole difficulty is the return value, and it is the same trap `archiveChat` already carries:

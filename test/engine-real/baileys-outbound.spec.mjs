@@ -173,7 +173,7 @@ test('an unanswered or rejected phone query is a transport failure before sendin
   }
 });
 
-test('a stalled phone query stops at the OpenWA deadline', async t => {
+test('a stalled phone query stops at the Scalorus WA deadline', async t => {
   t.mock.timers.enable({ apis: ['setTimeout'] });
   const { messaging, sock } = build(t, { budget: 20 });
   sock.onWhatsApp.mock.mockImplementation(() => new Promise(noop));

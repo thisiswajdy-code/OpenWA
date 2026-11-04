@@ -17,7 +17,7 @@ export function warnIfInsecureHttpUrl(url: string, label: string): string {
     if ((parsed.protocol === 'http:' || parsed.protocol === 'ws:') && !isLocalhostHost(parsed.hostname)) {
       const scheme = parsed.protocol.slice(0, -1);
       console.warn(
-        `[OpenWA] ${label} uses an insecure ${scheme}:// URL (host: ${parsed.hostname}). ` +
+        `[Scalorus WA] ${label} uses an insecure ${scheme}:// URL (host: ${parsed.hostname}). ` +
           `API keys are sent in cleartext over ${scheme}. Use https:// or wss:// in production.`,
       );
     }

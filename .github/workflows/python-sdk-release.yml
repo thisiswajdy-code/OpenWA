@@ -8,7 +8,7 @@ name: Python SDK Release
 #
 # One-time setup on pypi.org (see sdk/python/README.md -> Releasing), required BEFORE the first tag:
 # project settings -> Publishing -> add a GitHub trusted publisher with owner `rmyndharis`,
-# repository `OpenWA`, and workflow `python-sdk-release.yml`.
+# repository `Scalorus WA`, and workflow `python-sdk-release.yml`.
 #
 # The SDK version is the pyproject.toml version on a dedicated tag (e.g. py-sdk-v0.2.0), NOT the
 # monorepo v* app tags.

@@ -1,10 +1,10 @@
 # 18 - SDK Design
 
-> This document describes SDK 0.6.0. Send idempotency, webhook failure redrive, message-window filters, poll choices, last-message types, and the `event.response` webhook event name require OpenWA 0.25.0 or later.
+> This document describes SDK 0.6.0. Send idempotency, webhook failure redrive, message-window filters, poll choices, last-message types, and the `event.response` webhook event name require Scalorus WA 0.25.0 or later.
 
 ## 18.1 Overview
 
-OpenWA ships five official, hand-written client libraries for the REST API. They are not generated from an OpenAPI spec — each is written directly against the real API surface (paths, request DTOs, response shapes) and **unit-tested with a mocked HTTP transport that asserts on the exact request path, method, and body**, so drift in what an SDK _sends_ is caught at test time rather than in production. That mechanism says nothing about what an SDK expects _back_; see §18.6 for how response shapes are held to the contract.
+Scalorus WA ships five official, hand-written client libraries for the REST API. They are not generated from an OpenAPI spec — each is written directly against the real API surface (paths, request DTOs, response shapes) and **unit-tested with a mocked HTTP transport that asserts on the exact request path, method, and body**, so drift in what an SDK _sends_ is caught at test time rather than in production. That mechanism says nothing about what an SDK expects _back_; see §18.6 for how response shapes are held to the contract.
 
 | Language                | Package                                                                                | Install                              | Notes                                                                            |
 | ----------------------- | -------------------------------------------------------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------- |
@@ -12,7 +12,7 @@ OpenWA ships five official, hand-written client libraries for the REST API. They
 | Python                  | [`rmyndharis-openwa`](https://pypi.org/project/rmyndharis-openwa/)                     | `pip install rmyndharis-openwa`      | Synchronous (httpx), PEP 561 typed, Python 3.9+                                  |
 | PHP                     | [`rmyndharis/openwa`](https://packagist.org/packages/rmyndharis/openwa)                | `composer require rmyndharis/openwa` | Synchronous (Guzzle 7), PSR-4, PHP 8.1+                                          |
 | Java                    | [`com.rmyndharis:openwa`](https://central.sonatype.com/artifact/com.rmyndharis/openwa) | Maven Central                        | Sync, `java.net.http`. See [`sdk/java/README.md`](../sdk/java/README.md).        |
-| Go                      | [`github.com/rmyndharis/OpenWA/sdk/go`](../sdk/go)                                     | `go get`                             | Stdlib-only, no third-party deps. See [`sdk/go/README.md`](../sdk/go/README.md). |
+| Go                      | [`github.com/thisiswajdy-code/OpenWA/sdk/go`](../sdk/go)                               | `go get`                             | Stdlib-only, no third-party deps. See [`sdk/go/README.md`](../sdk/go/README.md). |
 
 > The import names differ from the dist names where the ecosystem requires it. Python installs `rmyndharis-openwa` but imports `openwa`; the client class is `OpenWAClient` in JS/Python and `OpenWA\Client` in PHP.
 
@@ -91,7 +91,7 @@ async function main() {
   // Send a text message.
   const result = await client.messages.sendText(session.id, {
     chatId: '628123456789@c.us',
-    text: 'Hello from the OpenWA SDK!',
+    text: 'Hello from the Scalorus WA SDK!',
   });
 
   console.log(result.messageId); // -> the WhatsApp message id
@@ -114,7 +114,7 @@ The constructor takes a single `OpenWAClientOptions` object. `baseUrl` and `apiK
 
 | Option           | Type                     | Required | Default            | Description                                                                                                                                                                                                                     |
 | ---------------- | ------------------------ | -------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baseUrl`        | `string`                 | yes      | —                  | Base URL of the OpenWA API, e.g. `http://localhost:2785`. A trailing slash is trimmed; a path prefix (e.g. `https://host/v1`) is preserved.                                                                                     |
+| `baseUrl`        | `string`                 | yes      | —                  | Base URL of the Scalorus WA API, e.g. `http://localhost:2785`. A trailing slash is trimmed; a path prefix (e.g. `https://host/v1`) is preserved.                                                                                |
 | `apiKey`         | `string`                 | yes      | —                  | API key sent as the `X-API-Key` header on every request. Surrounding whitespace is trimmed; a control or non-Latin-1 character is refused when the client is built.                                                             |
 | `timeoutMs`      | `number`                 | no       | `30000`            | Per-request timeout in milliseconds; `0` or `Infinity` turns it off, and a value that is not a non-negative number throws a `TypeError`. Overridable per call via `RequestOptions.timeoutMs` on the raw `request()` method.     |
 | `defaultHeaders` | `Record<string, string>` | no       | `{}`               | Headers merged onto every request. The `Content-Type: application/json` and `X-API-Key` headers always take precedence. A value with a control or non-Latin-1 character is refused when the client is built, naming the header. |
@@ -462,7 +462,7 @@ client.sessions.start(session["id"])
 # Send a text message
 result = client.messages.send_text(session["id"], {
     "chatId": "628123456789@c.us",
-    "text": "Hello from the OpenWA Python SDK!",
+    "text": "Hello from the Scalorus WA Python SDK!",
 })
 print(result["messageId"])
 
@@ -794,7 +794,7 @@ except OpenWAApiError as e:
 
 ## 18.4 PHP SDK
 
-The PHP SDK is a hand-written, synchronous client built on Guzzle 7. It mirrors the full user-facing API surface: every resource method maps to one REST endpoint, request/response payloads are plain associative arrays, and non-2xx responses are translated into a typed `OpenWA*Exception` hierarchy.
+The PHP SDK is a hand-written, synchronous client built on Guzzle 7. It mirrors the full user-facing API surface: every resource method maps to one REST endpoint, request/response payloads are plain associative arrays, and non-2xx responses are translated into a typed `Scalorus WA*Exception` hierarchy.
 
 ### Installation
 
@@ -830,7 +830,7 @@ $client->sessions->start($session['id']);
 // then wait for status 'ready'. An unlinked session answers the send with 409.
 $result = $client->messages->sendText($session['id'], [
     'chatId' => '628123456789@c.us',
-    'text'   => 'Hello from the OpenWA PHP SDK!',
+    'text'   => 'Hello from the Scalorus WA PHP SDK!',
 ]);
 
 echo $result['messageId'];
@@ -1146,7 +1146,7 @@ try {
 
 ## 18.5 n8n Community Node
 
-OpenWA's n8n integration is **not** part of these SDK packages. It is a separate community node maintained in its own repository, which speaks the same REST + webhook contract documented in [API Specification](./06-api-specification.md):
+Scalorus WA's n8n integration is **not** part of these SDK packages. It is a separate community node maintained in its own repository, which speaks the same REST + webhook contract documented in [API Specification](./06-api-specification.md):
 
 - An **action/HTTP** path that calls the REST endpoints (e.g. `POST /api/sessions/:id/messages/send-text`) with the `X-API-Key` header.
 - A **trigger** path that registers a webhook (the `webhooks` resource) and receives inbound events, verifying the `X-OpenWA-Signature` HMAC.
@@ -1159,13 +1159,13 @@ For installation and node-by-node configuration, see the dedicated [n8n Integrat
 
 The five SDKs are versioned **independently of the gateway** and of each other, each following SemVer. An SDK version does **not** track the gateway version — check the registry for the current one rather than inferring it from the gateway's. Pin the SDK version your code is tested against and treat a major SDK bump as potentially breaking.
 
-| SDK                   | Registry             | Package                               |
-| --------------------- | -------------------- | ------------------------------------- |
-| JavaScript/TypeScript | npm                  | `@rmyndharis/openwa`                  |
-| Python                | PyPI                 | `rmyndharis-openwa`                   |
-| PHP                   | Packagist            | `rmyndharis/openwa`                   |
-| Java                  | Maven Central        | `com.rmyndharis:openwa`               |
-| Go                    | (none — module path) | `github.com/rmyndharis/OpenWA/sdk/go` |
+| SDK                   | Registry             | Package                                     |
+| --------------------- | -------------------- | ------------------------------------------- |
+| JavaScript/TypeScript | npm                  | `@rmyndharis/openwa`                        |
+| Python                | PyPI                 | `rmyndharis-openwa`                         |
+| PHP                   | Packagist            | `rmyndharis/openwa`                         |
+| Java                  | Maven Central        | `com.rmyndharis:openwa`                     |
+| Go                    | (none — module path) | `github.com/thisiswajdy-code/OpenWA/sdk/go` |
 
 ### Contract-drift protection
 

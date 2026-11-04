@@ -66,7 +66,7 @@ export class PluginPackageScanner {
     private readonly pluginStorage: PluginStorageService,
     private readonly pluginsDir: string,
     /**
-     * The package dir OpenWA defaulted to before it moved under <dataDir>, scanned as a compatibility
+     * The package dir Scalorus WA defaulted to before it moved under <dataDir>, scanned as a compatibility
      * fallback; null when PLUGINS_DIR names a directory explicitly.
      */
     private readonly legacyPluginsDir: string | null,

@@ -1,6 +1,6 @@
 # Security Policy
 
-OpenWA is a self-hosted WhatsApp API gateway. It handles API-key authentication,
+Scalorus WA is a self-hosted WhatsApp API gateway. It handles API-key authentication,
 WhatsApp session credentials, message data, and — optionally — access to the Docker
 socket. Security matters here, and we appreciate responsible disclosure.
 
@@ -21,8 +21,7 @@ lines receive no backports — please upgrade older deployments.
 Report it privately through either channel:
 
 - **GitHub Security Advisories** (preferred) — open a private report at
-  <https://github.com/rmyndharis/OpenWA/security/advisories/new>
-- **Email** — yudhi@rmyndharis.com
+  <https://github.com/thisiswajdy-code/OpenWA/security/advisories/new>
 
 Please include, where possible:
 
@@ -38,13 +37,13 @@ Please include, where possible:
 
 ## Hardening notes for operators
 
-OpenWA already ships several hardening measures: API-key auth with roles
+Scalorus WA already ships several hardening measures: API-key auth with roles
 (ADMIN / OPERATOR / VIEWER), optional outbound webhook SSRF protection, a production
 CORS policy (wildcard origins refused in production), request body-size limits, a
 non-root application container, path-containment checks on storage import/export,
 and a Docker socket-proxy as the sole gateway to the Docker daemon.
 
-When exposing OpenWA, please review the security-relevant configuration documented in
+When exposing Scalorus WA, please review the security-relevant configuration documented in
 the README and `docs/` — in particular `CORS_ORIGINS`, `ALLOW_DEV_API_KEY`,
 `ENABLE_SWAGGER`, `WEBHOOK_SSRF_PROTECT`, `BODY_SIZE_LIMIT`, and the Docker proxy setup.
 Never expose the dashboard/API to the public internet with the development API key
@@ -62,7 +61,7 @@ new value. The Helm chart does not set `ENABLE_SWAGGER`.
 
 ### Plugins are full host trust — by design
 
-Installing or enabling a plugin is executing third-party code on the host that runs OpenWA.
+Installing or enabling a plugin is executing third-party code on the host that runs Scalorus WA.
 This is inherent to what a plugin IS here: the sandbox (a `worker_threads` isolate with a
 capped heap, an allowlisted environment, a deny-by-default network manifest for
 `ctx.net.fetch`, and a capability router with per-call timeouts) contains a buggy or
@@ -81,8 +80,8 @@ The compensating gates on the install path:
 - the package manifest is strictly validated and symlink traps are detected at unpack.
 
 If you operate a fleet of plugins you do not fully trust, do not install them into the
-OpenWA process — run them in a separate container/VM with an OS-level sandbox and reach
-OpenWA over the API like any other client.
+Scalorus WA process — run them in a separate container/VM with an OS-level sandbox and reach
+Scalorus WA over the API like any other client.
 
 ### Docker socket proxy — scope and residual risk
 
@@ -107,7 +106,7 @@ Mitigations in place: the proxy is unreachable except from `openwa-api` (dedicat
 `internal: true` network; any plugin loaded into `openwa-api` shares that reach), the
 orchestration endpoints require an ADMIN-role API key, both teardown and start are
 constrained to the three managed profiles (`postgres`, `redis`, `minio`) — non-managed
-names are dropped before reaching `DockerService` — and OpenWA itself never issues
+names are dropped before reaching `DockerService` — and Scalorus WA itself never issues
 deletes (profile teardown is stop-only). If you do not use the built-in datastore
 orchestration (Dashboard → Infrastructure built-in toggles), disable the proxy entirely —
 see the `docker-proxy` comments in `docker-compose.yml`; `DockerService` then reports

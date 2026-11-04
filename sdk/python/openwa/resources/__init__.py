@@ -1,4 +1,4 @@
-"""Resource modules for the OpenWA Python SDK.
+"""Resource modules for the Scalorus WA Python SDK.
 
 Each module defines a small ``_*Resource`` class whose methods map 1:1 to an
 API path group. They are constructed by :class:`openwa.client.OpenWAClient`.

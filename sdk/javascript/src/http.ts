@@ -1,5 +1,5 @@
 /**
- * Injectable HTTP transport for the OpenWA SDK.
+ * Injectable HTTP transport for the Scalorus WA SDK.
  *
  * The client never calls `globalThis.fetch` directly. Instead it accepts a
  * `FetchLike` implementation (defaulting to the global `fetch`). This makes the
@@ -32,7 +32,7 @@ export interface RequestOptions {
 }
 
 export interface ClientConfig {
-  /** Base URL of the OpenWA API, e.g. `http://localhost:2785`. */
+  /** Base URL of the Scalorus WA API, e.g. `http://localhost:2785`. */
   baseUrl: string;
   /** API key sent as `X-API-Key`. */
   apiKey: string;
@@ -80,7 +80,7 @@ export function buildUrl(baseUrl: string, path: string, query?: object): string 
 }
 
 /**
- * Perform a single request against the OpenWA API and return the parsed JSON
+ * Perform a single request against the Scalorus WA API and return the parsed JSON
  * body (or `null` for 204). Throws a typed {@link OpenWAApiError} subclass on
  * non-2xx, or {@link OpenWATimeoutError} on timeout.
  */
@@ -143,7 +143,7 @@ export function toTimeoutMs(value: unknown): number {
   const ms = typeof value === 'string' && value.trim() === '' ? NaN : Number(value);
   if (Number.isNaN(ms) || ms < 0) {
     throw new TypeError(
-      `OpenWA: timeoutMs must be a non-negative number of milliseconds, got ${JSON.stringify(value)}`,
+      `Scalorus WA: timeoutMs must be a non-negative number of milliseconds, got ${JSON.stringify(value)}`,
     );
   }
   return ms;
@@ -163,10 +163,10 @@ async function send<T>(
   // The path is appended to the base URL, so one without a leading `/` could move the host
   // (`.example.net/x`, `@example.net/x`) and send the API key there.
   if (!options.path.startsWith('/')) {
-    throw new TypeError(`OpenWA: path must begin with "/": ${JSON.stringify(options.path)}`);
+    throw new TypeError(`Scalorus WA: path must begin with "/": ${JSON.stringify(options.path)}`);
   }
   if (options.path.includes(BLANK_SEGMENT)) {
-    throw new TypeError(`OpenWA: empty or dot path segment in ${JSON.stringify(options.path)}`);
+    throw new TypeError(`Scalorus WA: empty or dot path segment in ${JSON.stringify(options.path)}`);
   }
   const url = buildUrl(config.baseUrl, options.path, options.query);
   // fetch resolves `.` and `..` segments before sending, so such a segment would reach the parent
@@ -181,7 +181,7 @@ async function send<T>(
   for (const segment of pathOnly.split(/[/\\]/).slice(1)) {
     const dots = segment.replace(/%2e/gi, '.');
     if (dots === '.' || dots === '..') {
-      throw new TypeError(`OpenWA: dot path segment in ${JSON.stringify(options.path)}`);
+      throw new TypeError(`Scalorus WA: dot path segment in ${JSON.stringify(options.path)}`);
     }
   }
   const timeoutMs = toTimeoutMs(options.timeoutMs ?? config.timeoutMs);
@@ -252,7 +252,7 @@ export function warnIfInsecureHttpUrl(url: string, label = 'baseUrl'): void {
     const parsed = new URL(url);
     if (parsed.protocol === 'http:' && !LOCALHOST_HOSTS.has(parsed.hostname.toLowerCase())) {
       console.warn(
-        `[OpenWA SDK] ${label} uses an insecure http:// URL (host: ${parsed.hostname}). ` +
+        `[Scalorus WA SDK] ${label} uses an insecure http:// URL (host: ${parsed.hostname}). ` +
           'The API key will be sent in cleartext. Use https:// in production.',
       );
     }

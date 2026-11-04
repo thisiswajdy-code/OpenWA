@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a problem with OpenWA
+description: Report a problem with Scalorus WA
 title: "[Bug]: "
 labels: ["bug"]
 body:
@@ -10,7 +10,7 @@ body:
         version, deployment, and logs make a huge difference for triage.
 
         ⚠️ **Do not report security vulnerabilities here.** See
-        [SECURITY.md](https://github.com/rmyndharis/OpenWA/blob/main/SECURITY.md).
+        [SECURITY.md](https://github.com/thisiswajdy-code/OpenWA/blob/main/SECURITY.md).
   - type: checkboxes
     attributes:
       label: Pre-flight
@@ -22,7 +22,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: OpenWA version
+      label: Scalorus WA version
       description: e.g. 0.2.1 (shown on the dashboard Login screen) or a commit SHA
       placeholder: "0.2.1"
     validations:

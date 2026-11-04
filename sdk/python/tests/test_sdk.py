@@ -1,4 +1,4 @@
-"""Unit tests for the OpenWA Python SDK — assert exact paths and bodies."""
+"""Unit tests for the Scalorus WA Python SDK — assert exact paths and bodies."""
 
 from __future__ import annotations
 

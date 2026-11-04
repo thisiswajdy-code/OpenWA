@@ -14,10 +14,10 @@ import type { IWhatsAppEngine } from '../src/engine/interfaces/whatsapp-engine.i
 
 /**
  * A group invite code is a transferable join capability, not read data: whoever holds the link
- * joins the group on WhatsApp with no OpenWA credential at all, and that membership survives
+ * joins the group on WhatsApp with no Scalorus WA credential at all, and that membership survives
  * revoking the key that fetched the code. These tests pin the invite-code GET at the OPERATOR
  * role through the real HTTP stack, mirroring the QR endpoint: the reads whose payload is a
- * credential for a system outside OpenWA's authority are not VIEWER surface.
+ * credential for a system outside Scalorus WA's authority are not VIEWER surface.
  *
  * The engine is a stub registered in the live EngineRegistry (the message-send e2e harness), so
  * the 403 asserts the guard refusal itself while the 200s prove the pass-through path: a

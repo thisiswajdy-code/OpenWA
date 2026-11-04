@@ -7,7 +7,7 @@ import { type WwebjsEngineHost } from './wwebjs-host';
 import { EngineTransportError } from '../../common/errors/engine-transport.error';
 
 /**
- * Create-call-link — the third of the §29.5.3 "supported by BOTH libraries, missing only in OpenWA"
+ * Create-call-link — the third of the §29.5.3 "supported by BOTH libraries, missing only in Scalorus WA"
  * backlog, and the first where both engines hand back a value rather than a void.
  *
  * They hand back DIFFERENT values, which is the whole design problem. whatsapp-web.js resolves the

@@ -10,7 +10,7 @@ name: JavaScript SDK Release
 #
 # One-time setup on npmjs.com (see sdk/javascript/README.md -> Releasing), required BEFORE the first
 # tag: package settings -> Trusted Publisher -> GitHub Actions, with organization `rmyndharis`,
-# repository `OpenWA`, and workflow filename `js-sdk-release.yml`. Until that exists npm rejects the
+# repository `Scalorus WA`, and workflow filename `js-sdk-release.yml`. Until that exists npm rejects the
 # publish; the guard below fails first with a pointer rather than letting it surface as a raw 404.
 #
 # The SDK version is the package.json version on a dedicated tag (e.g. js-sdk-v0.2.0), NOT the

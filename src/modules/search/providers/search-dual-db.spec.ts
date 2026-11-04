@@ -6,7 +6,7 @@ import { AddMessagesFts1782400000000 } from '../../../database/migrations/178240
 import { BuiltInFtsProvider } from './builtin-fts.provider';
 
 /**
- * Dual-DB switching + import/export round-trip safety (Task 12). OpenWA's `data` DB is SQLite-or-
+ * Dual-DB switching + import/export round-trip safety (Task 12). Scalorus WA's `data` DB is SQLite-or-
  * Postgres and switchable; export/import performs `repo.clear()` + re-insert. DB-level sync (SQLite
  * FTS5 triggers / PG generated `body_ts` column) must keep the index correct across that clear+re-
  * insert — no stale or duplicate FTS rows. This is the SQLite runtime proof; the Postgres round-trip

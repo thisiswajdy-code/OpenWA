@@ -1,5 +1,5 @@
 {
-  "name": "OpenWA to Discord via Webhook",
+  "name": "Scalorus WA to Discord via Webhook",
   "nodes": [
     {
       "parameters": {
@@ -8,10 +8,10 @@
         "responseMode": "onReceived",
         "options": {}
       },
-      "name": "OpenWA Webhook",
+      "name": "Scalorus WA Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
-      "position": [ 250, 300 ]
+      "position": [250, 300]
     },
     {
       "parameters": {
@@ -25,11 +25,11 @@
       "name": "Post to Discord",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [ 450, 300 ]
+      "position": [450, 300]
     }
   ],
   "connections": {
-    "OpenWA Webhook": {
+    "Scalorus WA Webhook": {
       "main": [
         [
           {

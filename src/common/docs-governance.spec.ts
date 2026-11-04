@@ -141,7 +141,7 @@ describe('governance docs match the repository', () => {
   it('keeps the runbook published-image upgrade from building after a failed pull', () => {
     const note = between(read('docs/11-operational-runbooks.md'), '> If you deploy the published image', '\n\n');
     expect(note).toContain('`docker compose pull openwa-api`');
-    expect(note).toContain('`docker image inspect ghcr.io/rmyndharis/openwa:<tag>`');
+    expect(note).toContain('`docker image inspect ghcr.io/thisiswajdy-code/openwa:<tag>`');
     expect(note).toContain('`docker compose up -d --no-build`');
   });
 
@@ -184,12 +184,12 @@ describe('governance docs match the repository', () => {
     ];
     for (const description of descriptions) {
       expect(description).toMatch(
-        /^Official .+ SDK for OpenWA, the open-source WhatsApp API Gateway \(not affiliated with WhatsApp or Meta\)$/,
+        /^Official .+ SDK for Scalorus WA, the open-source WhatsApp API Gateway \(not affiliated with WhatsApp or Meta\)$/,
       );
     }
     // Go has no registry manifest: pkg.go.dev shows the package comment's first sentence instead.
     expect(read('sdk/go/client.go')).toMatch(
-      /^\/\/ Package openwa is the official Go client for OpenWA, the open-source WhatsApp API Gateway \(not\n\/\/ affiliated with WhatsApp or Meta\)\./,
+      /^\/\/ Package openwa is the official Go client for Scalorus WA, the open-source WhatsApp API Gateway \(not\n\/\/ affiliated with WhatsApp or Meta\)\./,
     );
   });
 

@@ -1,20 +1,20 @@
 # n8n Appointment Booking Workflow
 
-This example shows how to use OpenWA and n8n to collect appointment requests over WhatsApp, check availability in an external system, and send a confirmation or alternative time slots.
+This example shows how to use Scalorus WA and n8n to collect appointment requests over WhatsApp, check availability in an external system, and send a confirmation or alternative time slots.
 
 The workflow is intentionally generic. The availability source can be Google Calendar, Cal.com, a CRM, a database, or any HTTP API that returns available slots.
 
 ## Flow
 
 ```
-[OpenWA Trigger]
+[Scalorus WA Trigger]
       │
       └── Events: message.received
               │
               ▼
 [IF: booking intent?]
       │
-      ├── false → [OpenWA: Send Text]
+      ├── false → [Scalorus WA: Send Text]
       │             "Thanks for your message. A team member will reply soon."
       │
       └── true
@@ -25,19 +25,19 @@ The workflow is intentionally generic. The availability source can be Google Cal
               ▼
 [Availability Source]
       │
-      ├── available → [Create Booking] → [OpenWA: Send Text confirmation]
+      ├── available → [Create Booking] → [Scalorus WA: Send Text confirmation]
       │
-      └── unavailable → [OpenWA: Send Text with alternative slots]
+      └── unavailable → [Scalorus WA: Send Text with alternative slots]
 ```
 
 ## Trigger
 
-Use the **OpenWA Trigger** node.
+Use the **Scalorus WA Trigger** node.
 
-| Field   | Value                         |
-| ------- | ----------------------------- |
-| Event   | `message.received`            |
-| Session | Your connected OpenWA session |
+| Field   | Value                              |
+| ------- | ---------------------------------- |
+| Event   | `message.received`                 |
+| Session | Your connected Scalorus WA session |
 
 The incoming message body is available at:
 
@@ -95,7 +95,7 @@ The availability step should return whether the requested slot is available and,
 
 ## Confirmation Message
 
-When the requested slot is available, create the booking in your scheduling source and send a confirmation with the **OpenWA: Send Text** node.
+When the requested slot is available, create the booking in your scheduling source and send a confirmation with the **Scalorus WA: Send Text** node.
 
 | Field     | Value                                           |
 | --------- | ----------------------------------------------- |
@@ -116,7 +116,7 @@ Reply CANCEL if you need to cancel or change it.
 
 ## Alternative Slots Message
 
-When the requested slot is not available, send available alternatives instead of failing silently. Use the same Chat ID expression, `{{ $('Normalize request').item.json.chatId }}`, on this **OpenWA: Send Text** node.
+When the requested slot is not available, send available alternatives instead of failing silently. Use the same Chat ID expression, `{{ $('Normalize request').item.json.chatId }}`, on this **Scalorus WA: Send Text** node.
 
 Example text:
 
@@ -139,9 +139,9 @@ Reply with 1 or 2 to confirm one of these options.
 
 ## Minimal Node Checklist
 
-- OpenWA Trigger: receives `message.received` events.
+- Scalorus WA Trigger: receives `message.received` events.
 - IF: detects booking intent.
 - Set: normalizes `chatId`, message body, requested date/time, and service.
 - Availability node: checks the calendar, API, database, or spreadsheet.
 - Booking node: creates the appointment only when a slot is available.
-- OpenWA Send Text: sends confirmation, alternatives, or clarification.
+- Scalorus WA Send Text: sends confirmation, alternatives, or clarification.

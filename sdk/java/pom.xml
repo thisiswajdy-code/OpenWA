@@ -9,9 +9,9 @@
   <version>0.6.0</version>
   <packaging>jar</packaging>
 
-  <name>OpenWA Java SDK</name>
-  <description>Official Java SDK for OpenWA, the open-source WhatsApp API Gateway (not affiliated with WhatsApp or Meta)</description>
-  <url>https://github.com/rmyndharis/OpenWA</url>
+  <name>Scalorus WA Java SDK</name>
+  <description>Official Java SDK for Scalorus WA, the open-source WhatsApp API Gateway (not affiliated with WhatsApp or Meta)</description>
+  <url>https://github.com/thisiswajdy-code/OpenWA</url>
 
   <licenses>
     <license>
@@ -21,13 +21,13 @@
   </licenses>
   <developers>
     <developer>
-      <name>OpenWA Contributors</name>
+      <name>Scalorus WA Contributors</name>
     </developer>
   </developers>
   <scm>
-    <connection>scm:git:https://github.com/rmyndharis/OpenWA.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/rmyndharis/OpenWA.git</developerConnection>
-    <url>https://github.com/rmyndharis/OpenWA</url>
+    <connection>scm:git:https://github.com/thisiswajdy-code/OpenWA.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/thisiswajdy-code/OpenWA.git</developerConnection>
+    <url>https://github.com/thisiswajdy-code/OpenWA</url>
   </scm>
 
   <properties>

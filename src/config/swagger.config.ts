@@ -197,96 +197,95 @@ export function documentErrorResponses(document: OpenAPIObject): OpenAPIObject {
 }
 
 /**
- * Builds the OpenAPI document configuration for the OpenWA API.
+ * Builds the OpenAPI document configuration for the Scalorus WA API.
  */
 export function createSwaggerConfig(): Omit<OpenAPIObject, 'paths'> {
   // Source the API version from package.json so it tracks releases automatically — no manual bump, no drift.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { version } = require('../../package.json') as { version: string };
-  return (
-    new DocumentBuilder()
-      .setTitle('OpenWA API')
-      // Three refusals are issued by middleware BEFORE routing, so they apply to every operation
-      // below and cannot be expressed as a per-operation @ApiResponse without repeating them 187
-      // times. Documenting them here keeps the contract honest for clients that would otherwise
-      // meet an undocumented status.
-      .setDescription(
-        'Open Source WhatsApp API Gateway - Free, Self-Hosted HTTP API\n\n' +
-          '**Gateway-wide responses.** Three statuses are returned by middleware before routing, ' +
-          'so any operation can emit them:\n\n' +
-          '- `415 Unsupported Media Type` — the request body carries a `Content-Encoding` other ' +
-          'than `identity`. The aggregate in-flight body cap counts wire bytes, so a compressed ' +
-          'body would be admitted on its compressed size and then inflated past the memory it is ' +
-          'meant to bound. Send the body uncompressed.\n' +
-          '- `413 Payload Too Large`: the declared `Content-Length` is more than the gateway could ' +
-          'hold in flight for this caller even when idle. The body is not read; retrying it unchanged ' +
-          'cannot succeed.\n' +
-          '- `503 Service Unavailable` with `Retry-After` — the gateway already has too much ' +
-          'request body data in flight (the body is not read; retry after the given delay), or, without ' +
-          '`Retry-After`, shutdown teardown has begun: every route except `/api/health` and ' +
-          '`/api/health/*` then answers it with `Connection: close`.\n\n' +
-          'Every operation that takes an API key can also answer `429 Too Many Requests` (the per-IP ' +
-          'rate-limit windows; with send pacing on, a send can also be refused with `code: ' +
-          'SEND_PACING_LIMITED` and `retryAfterSeconds`) and `500 Internal Server Error` (an ' +
-          'unexpected failure, or `code: ENGINE_PAGE_ERROR` when WhatsApp Web threw inside the page ' +
-          'during a whatsapp-web.js send or status post). Error bodies follow the `ErrorResponse` schema.',
-      )
-      .setVersion(version)
-      .addApiKey({ type: 'apiKey', name: 'X-API-Key', in: 'header' }, API_KEY_SECURITY_SCHEME)
-      // The METRICS_TOKEN bearer gates only GET /api/metrics (applied per-operation there —
-      // NOT as a global requirement, since every other route uses the API key).
-      .addBearerAuth(
-        {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'opaque',
-          description: 'METRICS_TOKEN for the GET /api/metrics scrape endpoint',
-        },
-        METRICS_BEARER_SCHEME,
-      )
-      // Apply the scheme globally so Swagger UI sends the key with every request
-      // (mirrors the global ApiKeyGuard). Without this, "Authorize" is cosmetic.
-      .addSecurityRequirements(API_KEY_SECURITY_SCHEME)
-      .setContact('OpenWA', 'https://github.com/rmyndharis/OpenWA', 'yudhi@rmyndharis.com')
-      .addTag('sessions', 'WhatsApp session management')
-      .addTag('messages', 'Send and manage messages')
-      .addTag('webhooks', 'Webhook configuration')
-      .addTag('contacts', 'Contact management')
-      .addTag('groups', 'Group management')
-      .addTag('labels', 'Label management (WhatsApp Business)')
-      .addTag('channels', 'Channel/Newsletter management')
-      .addTag('catalog', 'Product catalog (WhatsApp Business)')
-      .addTag('status', 'Status/Stories')
-      .addTag('calls', 'Call handling')
-      .addTag('profile', 'Own profile management')
-      .addTag('search', 'Global message search')
-      .addTag('statistics', 'Usage statistics')
-      .addTag('templates', 'Message templates')
-      .addTag('plugins', 'Plugin management')
-      .addTag('settings', 'Application settings')
-      .addTag('infrastructure', 'Infrastructure & datastore management')
-      .addTag('integration', 'Integration Fabric (provider webhooks & instances)')
-      .addTag('auth', 'API key management')
-      .addTag('audit', 'Audit log')
-      .addTag('metrics', 'Prometheus metrics')
-      .addTag('health', 'Health check endpoints')
-      // ORDER MATTERS. Swagger UI resolves "Try it" against servers[0], substituting the variable
-      // defaults — it does not consider the origin the page was served from. A templated server
-      // alone therefore aimed every request at `http://localhost:2785`, so on any deployment that
-      // is not exactly that (a LAN address, a different PORT, a TLS proxy) Try-it called the
-      // reader's own machine and failed with "Failed to fetch" — the browser's CSP `connect-src
-      // 'self'` rejects the cross-origin call before it is even sent (#1068). A relative URL is
-      // resolved against the document's own location, which is what OpenAPI 3 specifies and what
-      // the spec did implicitly before it declared any server at all.
-      //
-      // So: relative first, and keep the templated absolute one second. Static consumers of
-      // openapi.json still get a concrete base URL to display (#975), and the host/port editor
-      // stays in the Servers dropdown for anyone pointing the docs at a different instance.
-      .addServer('/', 'This instance (the origin serving these docs)')
-      .addServer('http://{host}:{port}', 'Another instance (set host and port)', {
-        host: { default: 'localhost' },
-        port: { default: '2785', description: 'PORT env var' },
-      })
-      .build()
-  );
+  const document = new DocumentBuilder()
+    .setTitle('Scalorus WA API')
+    // Three refusals are issued by middleware BEFORE routing, so they apply to every operation
+    // below and cannot be expressed as a per-operation @ApiResponse without repeating them 187
+    // times. Documenting them here keeps the contract honest for clients that would otherwise
+    // meet an undocumented status.
+    .setDescription(
+      'Open Source WhatsApp API Gateway - Free, Self-Hosted HTTP API\n\n' +
+        '**Gateway-wide responses.** Three statuses are returned by middleware before routing, ' +
+        'so any operation can emit them:\n\n' +
+        '- `415 Unsupported Media Type` — the request body carries a `Content-Encoding` other ' +
+        'than `identity`. The aggregate in-flight body cap counts wire bytes, so a compressed ' +
+        'body would be admitted on its compressed size and then inflated past the memory it is ' +
+        'meant to bound. Send the body uncompressed.\n' +
+        '- `413 Payload Too Large`: the declared `Content-Length` is more than the gateway could ' +
+        'hold in flight for this caller even when idle. The body is not read; retrying it unchanged ' +
+        'cannot succeed.\n' +
+        '- `503 Service Unavailable` with `Retry-After` — the gateway already has too much ' +
+        'request body data in flight (the body is not read; retry after the given delay), or, without ' +
+        '`Retry-After`, shutdown teardown has begun: every route except `/api/health` and ' +
+        '`/api/health/*` then answers it with `Connection: close`.\n\n' +
+        'Every operation that takes an API key can also answer `429 Too Many Requests` (the per-IP ' +
+        'rate-limit windows; with send pacing on, a send can also be refused with `code: ' +
+        'SEND_PACING_LIMITED` and `retryAfterSeconds`) and `500 Internal Server Error` (an ' +
+        'unexpected failure, or `code: ENGINE_PAGE_ERROR` when WhatsApp Web threw inside the page ' +
+        'during a whatsapp-web.js send or status post). Error bodies follow the `ErrorResponse` schema.',
+    )
+    .setVersion(version)
+    .addApiKey({ type: 'apiKey', name: 'X-API-Key', in: 'header' }, API_KEY_SECURITY_SCHEME)
+    // The METRICS_TOKEN bearer gates only GET /api/metrics (applied per-operation there —
+    // NOT as a global requirement, since every other route uses the API key).
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'opaque',
+        description: 'METRICS_TOKEN for the GET /api/metrics scrape endpoint',
+      },
+      METRICS_BEARER_SCHEME,
+    )
+    // Apply the scheme globally so Swagger UI sends the key with every request
+    // (mirrors the global ApiKeyGuard). Without this, "Authorize" is cosmetic.
+    .addSecurityRequirements(API_KEY_SECURITY_SCHEME)
+    .addTag('sessions', 'WhatsApp session management')
+    .addTag('messages', 'Send and manage messages')
+    .addTag('webhooks', 'Webhook configuration')
+    .addTag('contacts', 'Contact management')
+    .addTag('groups', 'Group management')
+    .addTag('labels', 'Label management (WhatsApp Business)')
+    .addTag('channels', 'Channel/Newsletter management')
+    .addTag('catalog', 'Product catalog (WhatsApp Business)')
+    .addTag('status', 'Status/Stories')
+    .addTag('calls', 'Call handling')
+    .addTag('profile', 'Own profile management')
+    .addTag('search', 'Global message search')
+    .addTag('statistics', 'Usage statistics')
+    .addTag('templates', 'Message templates')
+    .addTag('plugins', 'Plugin management')
+    .addTag('settings', 'Application settings')
+    .addTag('infrastructure', 'Infrastructure & datastore management')
+    .addTag('integration', 'Integration Fabric (provider webhooks & instances)')
+    .addTag('auth', 'API key management')
+    .addTag('audit', 'Audit log')
+    .addTag('metrics', 'Prometheus metrics')
+    .addTag('health', 'Health check endpoints')
+    // ORDER MATTERS. Swagger UI resolves "Try it" against servers[0], substituting the variable
+    // defaults — it does not consider the origin the page was served from. A templated server
+    // alone therefore aimed every request at `http://localhost:2785`, so on any deployment that
+    // is not exactly that (a LAN address, a different PORT, a TLS proxy) Try-it called the
+    // reader's own machine and failed with "Failed to fetch" — the browser's CSP `connect-src
+    // 'self'` rejects the cross-origin call before it is even sent (#1068). A relative URL is
+    // resolved against the document's own location, which is what OpenAPI 3 specifies and what
+    // the spec did implicitly before it declared any server at all.
+    //
+    // So: relative first, and keep the templated absolute one second. Static consumers of
+    // openapi.json still get a concrete base URL to display (#975), and the host/port editor
+    // stays in the Servers dropdown for anyone pointing the docs at a different instance.
+    .addServer('/', 'This instance (the origin serving these docs)')
+    .addServer('http://{host}:{port}', 'Another instance (set host and port)', {
+      host: { default: 'localhost' },
+      port: { default: '2785', description: 'PORT env var' },
+    })
+    .build();
+  document.info.contact = { name: 'Scalorus WA', url: 'https://wa.scalorus.com' };
+  return document;
 }

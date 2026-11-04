@@ -36,7 +36,7 @@ quadrantChart
 | **Risk Level**  | Critical   |
 
 **Description:**  
-WhatsApp can change its Web and multi-device protocols at any time, which can stop either engine library (`whatsapp-web.js` or Baileys) from working. A step WhatsApp enforces server-side inside the linking handshake, such as the passkey prompt some accounts now get ([#560](https://github.com/rmyndharis/OpenWA/issues/560)), blocks new links on both engines at once.
+WhatsApp can change its Web and multi-device protocols at any time, which can stop either engine library (`whatsapp-web.js` or Baileys) from working. A step WhatsApp enforces server-side inside the linking handshake, such as the passkey prompt some accounts now get (#560), blocks new links on both engines at once.
 
 **Indicators:**
 
@@ -60,7 +60,7 @@ flowchart TB
     M4 --> A4[< 24h patch capability]
 ```
 
-Switching `ENGINE_TYPE` (M3) helps only when one engine library breaks, and every session must then be linked again, because each engine keeps its own auth state. A gate WhatsApp enforces inside the linking handshake, such as the passkey step ([#560](https://github.com/rmyndharis/OpenWA/issues/560), upstream [WhiskeySockets/Baileys#2672](https://github.com/WhiskeySockets/Baileys/issues/2672)), stops new links on both engines; the fix has to come from the engine libraries, and operators rely on their fallback channel until then (see [Plan A](#plan-a-whatsapp-protocol-change)).
+Switching `ENGINE_TYPE` (M3) helps only when one engine library breaks, and every session must then be linked again, because each engine keeps its own auth state. A gate WhatsApp enforces inside the linking handshake, such as the passkey step (#560, upstream [WhiskeySockets/Baileys#2672](https://github.com/WhiskeySockets/Baileys/issues/2672)), stops new links on both engines; the fix has to come from the engine libraries, and operators rely on their fallback channel until then (see [Plan A](#plan-a-whatsapp-protocol-change)).
 
 **Action Items:**
 
@@ -375,7 +375,7 @@ WhatsApp/Meta may take legal action against unofficial APIs, or users may misuse
 
 **Mitigation Strategies:**
 
-1. **Published disclaimer**: the [README](../README.md#disclaimer), the project site (https://www.open-wa.org) and the SDK READMEs state that OpenWA is not affiliated with or endorsed by WhatsApp or Meta.
+1. **Published disclaimer**: the [README](../README.md#disclaimer), the project site (https://wa.scalorus.com) and the SDK READMEs state that Scalorus WA is not affiliated with or endorsed by WhatsApp or Meta.
 2. **No support for spam/illegal use cases**
 3. **Built-in anti-abuse measures**
 
@@ -619,7 +619,7 @@ flowchart TB
 
 ## 16.6 Escalation Procedures
 
-Optional template: the project does not run this process. OpenWA has one maintainer and no on-call
+Optional template: the project does not run this process. Scalorus WA has one maintainer and no on-call
 rotation, paging, chat channel or status page; incidents are handled through GitHub Issues, and security
 reports through GitHub Security Advisories (see [SECURITY.md](../SECURITY.md)).
 
@@ -662,7 +662,7 @@ flowchart TB
 ```yaml
 # Example PagerDuty/Opsgenie configuration
 schedule:
-  name: 'OpenWA On-Call'
+  name: 'Scalorus WA On-Call'
   rotation:
     - week: 1
       primary: 'developer-a'

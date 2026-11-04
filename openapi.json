@@ -4855,7 +4855,7 @@
                   "summary": "Plain text message",
                   "value": {
                     "chatId": "628123456789@c.us",
-                    "text": "Hello from OpenWA!"
+                    "text": "Hello from Scalorus WA!"
                   }
                 },
                 "withMentions": {
@@ -8614,7 +8614,7 @@
             }
           }
         },
-        "summary": "Compare the running version with the latest OpenWA release",
+        "summary": "Compare the running version with the latest Scalorus WA release",
         "tags": [
           "infrastructure"
         ]
@@ -18462,13 +18462,12 @@
     }
   },
   "info": {
-    "title": "OpenWA API",
+    "title": "Scalorus WA API",
     "description": "Open Source WhatsApp API Gateway - Free, Self-Hosted HTTP API\n\n**Gateway-wide responses.** Three statuses are returned by middleware before routing, so any operation can emit them:\n\n- `415 Unsupported Media Type` — the request body carries a `Content-Encoding` other than `identity`. The aggregate in-flight body cap counts wire bytes, so a compressed body would be admitted on its compressed size and then inflated past the memory it is meant to bound. Send the body uncompressed.\n- `413 Payload Too Large`: the declared `Content-Length` is more than the gateway could hold in flight for this caller even when idle. The body is not read; retrying it unchanged cannot succeed.\n- `503 Service Unavailable` with `Retry-After` — the gateway already has too much request body data in flight (the body is not read; retry after the given delay), or, without `Retry-After`, shutdown teardown has begun: every route except `/api/health` and `/api/health/*` then answers it with `Connection: close`.\n\nEvery operation that takes an API key can also answer `429 Too Many Requests` (the per-IP rate-limit windows; with send pacing on, a send can also be refused with `code: SEND_PACING_LIMITED` and `retryAfterSeconds`) and `500 Internal Server Error` (an unexpected failure, or `code: ENGINE_PAGE_ERROR` when WhatsApp Web threw inside the page during a whatsapp-web.js send or status post). Error bodies follow the `ErrorResponse` schema.",
     "version": "0.25.0",
     "contact": {
-      "name": "OpenWA",
-      "url": "https://github.com/rmyndharis/OpenWA",
-      "email": "yudhi@rmyndharis.com"
+      "name": "Scalorus WA",
+      "url": "https://wa.scalorus.com"
     }
   },
   "tags": [
@@ -20760,7 +20759,7 @@
           "text": {
             "type": "string",
             "description": "Text message content",
-            "example": "Hello from OpenWA!",
+            "example": "Hello from Scalorus WA!",
             "maxLength": 4096
           },
           "mentions": {
@@ -22194,7 +22193,7 @@
           "header": {
             "type": "string",
             "description": "Optional header text, prepended to the rendered body",
-            "example": "OpenWA Store",
+            "example": "Scalorus WA Store",
             "maxLength": 1024
           },
           "footer": {
@@ -22455,7 +22454,7 @@
           },
           "builtIn": {
             "type": "boolean",
-            "description": "Whether OpenWA's own bundled container is actually running and backing this service, detected live from the labelled container rather than read from the saved intent. Falls back to the saved flag when Docker is unavailable.",
+            "description": "Whether Scalorus WA's own bundled container is actually running and backing this service, detected live from the labelled container rather than read from the saved intent. Falls back to the saved flag when Docker is unavailable.",
             "example": true
           }
         },
@@ -22489,7 +22488,7 @@
           },
           "builtIn": {
             "type": "boolean",
-            "description": "Whether OpenWA's bundled Redis container is backing this.",
+            "description": "Whether Scalorus WA's bundled Redis container is backing this.",
             "example": true
           }
         },
@@ -22571,7 +22570,7 @@
           },
           "builtIn": {
             "type": "boolean",
-            "description": "Whether OpenWA's bundled MinIO container is backing this.",
+            "description": "Whether Scalorus WA's bundled MinIO container is backing this.",
             "example": false
           },
           "s3Available": {
@@ -22769,7 +22768,7 @@
             "type": "string",
             "nullable": true,
             "description": "Release notes page for `latest`.",
-            "example": "https://github.com/rmyndharis/OpenWA/releases/tag/v0.23.6"
+            "example": "https://github.com/thisiswajdy-code/OpenWA/releases/tag/v0.23.6"
           }
         },
         "required": [

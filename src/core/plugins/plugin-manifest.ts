@@ -88,7 +88,7 @@ export function validatePluginManifest(
       throw new Error('manifest.json minOpenWAVersion must be a MAJOR.MINOR.PATCH version');
     }
     if (compareSemver(hostVersion, min) < 0) {
-      throw new Error(`Plugin ${m.id} requires OpenWA >= ${min} (running ${hostVersion})`);
+      throw new Error(`Plugin ${m.id} requires Scalorus WA >= ${min} (running ${hostVersion})`);
     }
   }
 }

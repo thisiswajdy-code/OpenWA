@@ -107,7 +107,7 @@ describe('validatePluginManifest', () => {
 
     it('rejects a floor above the running host, naming both versions', () => {
       expect(() => validatePluginManifest({ ...valid, minOpenWAVersion: '0.24.0' }, host)).toThrow(
-        /my-plg requires OpenWA >= 0\.24\.0 \(running 0\.23\.7\)/,
+        /my-plg requires Scalorus WA >= 0\.24\.0 \(running 0\.23\.7\)/,
       );
     });
 
@@ -123,7 +123,7 @@ describe('validatePluginManifest', () => {
 
     it('checks against the running package version by default', () => {
       expect(() => validatePluginManifest({ ...valid, minOpenWAVersion: '0.0.1' })).not.toThrow();
-      expect(() => validatePluginManifest({ ...valid, minOpenWAVersion: '999.0.0' })).toThrow(/requires OpenWA/);
+      expect(() => validatePluginManifest({ ...valid, minOpenWAVersion: '999.0.0' })).toThrow(/requires Scalorus WA/);
     });
   });
 });

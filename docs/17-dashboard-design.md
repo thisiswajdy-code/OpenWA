@@ -2,7 +2,7 @@
 
 ## 17.1 Overview
 
-The dashboard is a web-based management interface for OpenWA that lets users manage sessions, webhooks, and monitor activity without using the API directly.
+The dashboard is a web-based management interface for Scalorus WA that lets users manage sessions, webhooks, and monitor activity without using the API directly.
 
 ### Tech Stack
 
@@ -22,7 +22,7 @@ flowchart LR
     end
 
     subgraph Backend
-        API[OpenWA API]
+        API[Scalorus WA API]
         WS[socket.io WebSocket]
     end
 
@@ -136,7 +136,7 @@ is mounted for any admin key.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  🔵 OpenWA                              🔍 Search    👤 Admin    ☀️  │
+│  🔵 Scalorus WA                              🔍 Search    👤 Admin    ☀️  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
 │  ┌─────────────┬─────────────┬─────────────┬─────────────┐          │

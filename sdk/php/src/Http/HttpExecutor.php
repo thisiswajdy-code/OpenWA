@@ -15,7 +15,7 @@ use OpenWA\Exceptions\OpenWATimeoutException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Injectable HTTP transport for the OpenWA SDK.
+ * Injectable HTTP transport for the Scalorus WA SDK.
  *
  * The client never builds a bare Guzzle client with a hard-coded handler.
  * Instead it accepts an optional Guzzle {@see ClientInterface} (defaulting to a
@@ -86,11 +86,11 @@ class HttpExecutor
         foreach ($headers as $name => $value) {
             if (!is_string($name) || preg_match('/\A[!#$%&\'*+\-.^_`|~0-9A-Za-z]+\z/', $name) !== 1) {
                 throw new OpenWAException(
-                    'OpenWA Client: defaultHeaders has a header name that is not a valid HTTP token'
+                    'Scalorus WA Client: defaultHeaders has a header name that is not a valid HTTP token'
                 );
             }
             if ($value === []) {
-                throw new OpenWAException(sprintf('OpenWA Client: defaultHeaders value for "%s" must be text or a non-empty list', $name));
+                throw new OpenWAException(sprintf('Scalorus WA Client: defaultHeaders value for "%s" must be text or a non-empty list', $name));
             }
             foreach (is_array($value) ? $value : [$value] as $each) {
                 if (is_scalar($each) || $each === null) {
@@ -101,7 +101,7 @@ class HttpExecutor
                 } else {
                     $reason = 'must be text';
                 }
-                throw new OpenWAException(sprintf('OpenWA Client: defaultHeaders value for "%s" %s', $name, $reason));
+                throw new OpenWAException(sprintf('Scalorus WA Client: defaultHeaders value for "%s" %s', $name, $reason));
             }
         }
     }
@@ -142,7 +142,7 @@ class HttpExecutor
     public function encodeSegment(string $segment): string
     {
         if ($segment === '' || $segment === '.' || $segment === '..') {
-            throw new \InvalidArgumentException(sprintf('OpenWA: empty or dot path segment "%s"', $segment));
+            throw new \InvalidArgumentException(sprintf('Scalorus WA: empty or dot path segment "%s"', $segment));
         }
         return str_replace(['%40', '%3A', '%2B'], ['@', ':', '+'], rawurlencode($segment));
     }
@@ -213,7 +213,7 @@ class HttpExecutor
         // The path is appended to the base URL, so one without a leading "/" could move the host
         // (".example.net/x", "@example.net/x") and send the API key there.
         if (!str_starts_with($path, '/')) {
-            throw new \InvalidArgumentException('OpenWA: path must begin with "/": ' . $path);
+            throw new \InvalidArgumentException('Scalorus WA: path must begin with "/": ' . $path);
         }
         // Auth/JSON headers are applied per-request so they are correct whether
         // a default or injected client is used (and never leak Guzzle exceptions:
@@ -305,7 +305,7 @@ class HttpExecutor
             $messageText = $rawMessage === null ? $response->getReasonPhrase() : (string) $rawMessage;
         }
         $reason = $response->getReasonPhrase();
-        $message = "OpenWA API {$status} {$reason} — {$method} {$path}: {$messageText}";
+        $message = "Scalorus WA API {$status} {$reason} — {$method} {$path}: {$messageText}";
 
         // An intermediary that rewrites the body may send a non-string `error`; the kind stays unset then.
         $errorKind = is_string($envelope['error'] ?? null) ? $envelope['error'] : null;

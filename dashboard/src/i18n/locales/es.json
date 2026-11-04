@@ -6,7 +6,7 @@
     }
   },
   "common": {
-    "appName": "OpenWA",
+    "appName": "Scalorus WA",
     "updateAvailable": "v{{version}} disponible",
     "loading": "Cargando...",
     "cancel": "Cancelar",
@@ -353,7 +353,6 @@
     "connectionError": "No se puede conectar al servidor. Por favor, inténtalo de nuevo.",
     "help": "¿Necesitas ayuda?",
     "viewDocs": "Ver documentación",
-    "footer": "Hecho con ❤️ por Yudhi Armyndharis y la comunidad OpenWA",
     "version": "v{{version}} · {{date}}",
     "email": "Correo electrónico",
     "emailPlaceholder": "tu@example.com",
@@ -1061,7 +1060,7 @@
     "zeroMessages": "Cero mensajes enviados",
     "noSession": {
       "title": "No hay ninguna sesión de WhatsApp activa y conectada.",
-      "desc": "Para verificar números de teléfono, OpenWA requiere al menos una sesión autenticada.",
+      "desc": "Para verificar números de teléfono, Scalorus WA requiere al menos una sesión autenticada.",
       "goToSessions": "Ir a Sesiones"
     },
     "tabs": {
@@ -1184,7 +1183,7 @@
       "postgres": "PostgreSQL",
       "postgresDesc": "Base de datos para producción",
       "useBuiltIn": "Usar contenedor PostgreSQL integrado",
-      "builtInDesc": "OpenWA gestionará un contenedor PostgreSQL por ti",
+      "builtInDesc": "Scalorus WA gestionará un contenedor PostgreSQL por ti",
       "dbName": "Nombre de la base de datos",
       "schema": "Esquema",
       "schemaDesc": "Esquema de PostgreSQL (ignorado para SQLite). Predeterminado 'public'. El esquema debe existir previamente.",
@@ -1219,7 +1218,7 @@
       "enable": "Habilitar Redis",
       "enableDesc": "Se usa para caché, colas BullMQ, contadores de límite de solicitudes y la distribución de WebSocket entre varios nodos",
       "useBuiltIn": "Usar contenedor Redis integrado",
-      "builtInDesc": "OpenWA gestionará un contenedor Redis por ti",
+      "builtInDesc": "Scalorus WA gestionará un contenedor Redis por ti",
       "queueTitle": "Habilitar sistema de colas BullMQ",
       "queueDesc": "Usa colas de mensajes para entrega fiable de mensajes y webhooks",
       "statsTitle": "Estadísticas de colas",
@@ -1241,7 +1240,7 @@
       "s3": "Amazon S3",
       "s3Desc": "Almacenamiento en la nube (compatible con S3)",
       "useBuiltIn": "Usar contenedor MinIO integrado",
-      "builtInDesc": "OpenWA gestionará un contenedor MinIO (compatible con S3) por ti",
+      "builtInDesc": "Scalorus WA gestionará un contenedor MinIO (compatible con S3) por ti",
       "storagePath": "Ruta de almacenamiento",
       "bucket": "Nombre del bucket",
       "region": "Región",
@@ -1293,7 +1292,7 @@
       "importFailed": "No se pudieron importar los datos",
       "importOk": "Datos importados",
       "importConfirm": "La importación REEMPLAZARÁ todos los datos actuales con la copia de seguridad ({{rows}} filas). Esto no se puede deshacer. ¿Continuar?",
-      "invalidFile": "Ese archivo no es una copia de seguridad de datos válida de OpenWA.",
+      "invalidFile": "Ese archivo no es una copia de seguridad de datos válida de Scalorus WA.",
       "importTooLarge": "La copia de seguridad supera el límite de la solicitud. Aumenta BODY_SIZE_LIMIT en el servidor e inténtalo de nuevo."
     },
     "statusLoadError": "No se pudo cargar el estado actual de la infraestructura. Actualiza para reintentar.",
@@ -1327,7 +1326,7 @@
     "uninstallConfirm": "¿Desinstalar \"{{name}}\"? Esto elimina sus archivos.",
     "empty": {
       "title": "No se encontraron plugins",
-      "description": "Instala plugins para ampliar la funcionalidad de OpenWA"
+      "description": "Instala plugins para ampliar la funcionalidad de Scalorus WA"
     },
     "config": {
       "title": "Configurar {{name}}",
@@ -1350,7 +1349,7 @@
       "trustWarning": "Los plugins se ejecutan con todos los privilegios del proceso de la puerta de enlace: el modo aislado contiene fallos, no código malicioso. Instala solo plugins en los que confíes.",
       "choose": "Elige un archivo .zip…",
       "tooLarge": "El archivo supera el límite de 5 MB.",
-      "catalogHint": "Instala directamente desde el catálogo de plugins de OpenWA. El .zip se obtiene en el servidor a través de la protección SSRF, luego se valida y se ejecuta en sandbox.",
+      "catalogHint": "Instala directamente desde el catálogo de plugins de Scalorus WA. El .zip se obtiene en el servidor a través de la protección SSRF, luego se valida y se ejecuta en sandbox.",
       "catalogTeaser": "¿Buscas plugins?",
       "catalogTeaserSuffix": "explora el marketplace oficial.",
       "tabCatalog": "Catálogo",

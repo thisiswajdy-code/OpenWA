@@ -6,7 +6,7 @@
     }
   },
   "common": {
-    "appName": "OpenWA",
+    "appName": "Scalorus WA",
     "updateAvailable": "v{{version}} verfügbar",
     "loading": "Wird geladen...",
     "cancel": "Abbrechen",
@@ -348,7 +348,6 @@
     "connectionError": "Verbindung zum Server nicht möglich. Bitte versuche es erneut.",
     "help": "Brauchst du Hilfe?",
     "viewDocs": "Dokumentation ansehen",
-    "footer": "Mit ❤️ erstellt von Yudhi Armyndharis und der OpenWA-Community",
     "version": "v{{version}} · {{date}}",
     "email": "E-Mail",
     "emailPlaceholder": "du@example.com",
@@ -1055,7 +1054,7 @@
     "zeroMessages": "Keine Nachrichten gesendet",
     "noSession": {
       "title": "Keine aktive WhatsApp-Sitzung verbunden.",
-      "desc": "Zum Prüfen von Telefonnummern benötigt OpenWA mindestens eine authentifizierte Sitzung.",
+      "desc": "Zum Prüfen von Telefonnummern benötigt Scalorus WA mindestens eine authentifizierte Sitzung.",
       "goToSessions": "Zu den Sitzungen"
     },
     "tabs": {
@@ -1175,7 +1174,7 @@
       "postgres": "PostgreSQL",
       "postgresDesc": "Produktionsreife Datenbank",
       "useBuiltIn": "Integrierten PostgreSQL-Container verwenden",
-      "builtInDesc": "OpenWA verwaltet einen PostgreSQL-Container für dich",
+      "builtInDesc": "Scalorus WA verwaltet einen PostgreSQL-Container für dich",
       "dbName": "Datenbankname",
       "schema": "Schema",
       "schemaDesc": "PostgreSQL-Schema (wird bei SQLite ignoriert). Standard: „public“. Das Schema muss bereits existieren.",
@@ -1210,7 +1209,7 @@
       "enable": "Redis aktivieren",
       "enableDesc": "Wird für Caching, BullMQ-Warteschlangen, Rate-Limit-Zähler und die WebSocket-Verteilung über mehrere Knoten verwendet",
       "useBuiltIn": "Integrierten Redis-Container verwenden",
-      "builtInDesc": "OpenWA verwaltet einen Redis-Container für dich",
+      "builtInDesc": "Scalorus WA verwaltet einen Redis-Container für dich",
       "queueTitle": "BullMQ-Warteschlangensystem aktivieren",
       "queueDesc": "Nachrichtenwarteschlangen für die zuverlässige Zustellung von Nachrichten und Webhooks verwenden",
       "statsTitle": "Warteschlangenstatistiken",
@@ -1233,7 +1232,7 @@
       "s3": "Amazon S3",
       "s3Desc": "Cloud-Speicher (S3-kompatibel)",
       "useBuiltIn": "Integrierten MinIO-Container verwenden",
-      "builtInDesc": "OpenWA verwaltet einen MinIO-Container (S3-kompatibel) für dich",
+      "builtInDesc": "Scalorus WA verwaltet einen MinIO-Container (S3-kompatibel) für dich",
       "storagePath": "Speicherpfad",
       "bucket": "Bucket-Name",
       "region": "Region",
@@ -1318,7 +1317,7 @@
     "uninstallConfirm": "„{{name}}“ deinstallieren? Dadurch werden die zugehörigen Dateien gelöscht.",
     "empty": {
       "title": "Keine Plugins installiert",
-      "description": "Installiere ein Plugin, um den Funktionsumfang von OpenWA zu erweitern."
+      "description": "Installiere ein Plugin, um den Funktionsumfang von Scalorus WA zu erweitern."
     },
     "config": {
       "title": "{{name}} konfigurieren",

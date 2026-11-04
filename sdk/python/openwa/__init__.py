@@ -1,7 +1,7 @@
 """
-OpenWA Python SDK.
+Scalorus WA Python SDK.
 
-Official client library for the OpenWA WhatsApp API Gateway.
+Official client library for the Scalorus WA WhatsApp API Gateway.
 
 Example usage::
 
@@ -19,7 +19,7 @@ Example usage::
     # then wait for status "ready". An unlinked session answers the send with 409.
     result = client.messages.send_text(session["id"], {
         "chatId": "628123456789@c.us",
-        "text": "Hello from the OpenWA Python SDK!",
+        "text": "Hello from the Scalorus WA Python SDK!",
     })
     print(result["messageId"])
 """

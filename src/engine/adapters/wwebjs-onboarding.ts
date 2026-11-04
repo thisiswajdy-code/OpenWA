@@ -12,7 +12,7 @@ export const ONBOARDING_DEFAULT_CONTINUE_LABEL = 'Continue';
  *
  * Needed because the match is on visible text and WhatsApp controls those strings; we are not going
  * to carry its translation table. The value comes from the environment loaded at boot, so a label
- * added later takes effect only after OpenWA itself restarts; stopping and starting a session is not
+ * added later takes effect only after Scalorus WA itself restarts; stopping and starting a session is not
  * enough.
  *
  * Supplying labels also drops the heading requirement for THOSE labels: the English heading regex
@@ -348,7 +348,7 @@ export class WwebjsOnboardingWatcher {
             this.host.logger.warn(
               'A visible dialog on WhatsApp Web matches neither the onboarding-modal heading nor a ' +
                 'confirm-button label. If this is the onboarding screen in another language, add its ' +
-                'confirm-button label to WWEBJS_ONBOARDING_CONTINUE_LABELS and restart OpenWA; on a ' +
+                'confirm-button label to WWEBJS_ONBOARDING_CONTINUE_LABELS and restart Scalorus WA; on a ' +
                 'newly linked account WhatsApp unlinks the companion within minutes while it stays open. ' +
                 'An English onboarding screen that is not recognised is worth reporting.',
               {

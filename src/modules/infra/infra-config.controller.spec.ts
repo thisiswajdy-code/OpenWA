@@ -223,7 +223,7 @@ describe('InfraConfigController PostgreSQL schema (POSTGRES_SCHEMA)', () => {
 
   it('refuses a schema the next boot would reject instead of writing it', () => {
     (fs.writeFileSync as jest.Mock).mockClear();
-    for (const schema of ['OpenWA', 'pg_data', 'bad-name']) {
+    for (const schema of ['Scalorus WA', 'pg_data', 'bad-name']) {
       expect(() =>
         newController().saveConfig({
           database: { type: 'postgres', builtIn: false, host: 'db', schema, password: 'unit-test-pw' },
@@ -522,7 +522,7 @@ describe('InfraConfigController.saveConfig byte-identical regression (full dashb
       .sort()
       .map(k => `${k}=${keys[k]}`);
     return [
-      '# OpenWA Configuration',
+      '# Scalorus WA Configuration',
       `# Generated at ${NOW}`,
       '# Managed via Dashboard > Infrastructure. Values in process env or project .env take precedence.',
       '',

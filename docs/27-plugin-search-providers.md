@@ -272,7 +272,7 @@ The contract types are exported from the core:
 import type { SearchQuery, SearchResults, SearchHit } from '../../modules/search/search.types';
 ```
 
-(Add the OpenWA repo as a devDependency or reference the types via a `paths` mapping. A standalone
+(Add the Scalorus WA repo as a devDependency or reference the types via a `paths` mapping. A standalone
 `@openwa/plugin-types` package is planned.)
 
 The worker context a sandboxed plugin receives exposes: `pluginId`, `config` (per-session-resolved),

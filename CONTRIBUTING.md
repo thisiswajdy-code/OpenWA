@@ -1,12 +1,12 @@
-# Contributing to OpenWA
+# Contributing to Scalorus WA
 
-Thanks for your interest in improving OpenWA! This guide covers how to get set up, the
+Thanks for your interest in improving Scalorus WA! This guide covers how to get set up, the
 conventions we follow, and how to get a change merged. Contributions of all sizes are
 welcome — bug fixes, features, docs, and tests.
 
 ## Project layout
 
-OpenWA is a NestJS (backend) + React/Vite (dashboard) project:
+Scalorus WA is a NestJS (backend) + React/Vite (dashboard) project:
 
 - `src/` — the NestJS API. Feature modules under `src/modules/` (session, message,
   webhook, queue, audit, settings, infra, …), the WhatsApp engine abstraction under
@@ -18,7 +18,7 @@ See `docs/03-system-architecture.md` for the bigger picture.
 
 ## Getting started
 
-OpenWA targets **Node.js 22.19 or newer** (`engines.node`).
+Scalorus WA targets **Node.js 22.19 or newer** (`engines.node`).
 
 ```bash
 npm ci
@@ -105,16 +105,16 @@ vulnerabilities, see [`SECURITY.md`](SECURITY.md) — please do **not** open a p
 ### Issues vs. Discussions — pick the right channel
 
 A large share of opened issues turn out to be configuration, provider, or environment
-questions rather than defects in OpenWA. Routing them correctly upfront saves everyone
+questions rather than defects in Scalorus WA. Routing them correctly upfront saves everyone
 (time to answer, time to triage, cleaner issue history). When in doubt, open a Discussion
 first — it can always be promoted to an Issue if a real defect is confirmed.
 
-| Open an **Issue** (here)                                                 | Open a **Discussion**                                                       |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| Reproducible defect in OpenWA code with clear steps, expected vs. actual | Setup / configuration help ("my proxy doesn't work, how do I configure X?") |
-| Crash, panic, wrong API response, regression after upgrade               | Provider-specific quirks (webshare, IPRoyal, brightdata, Twilio, etc.)      |
-| Documented behavior contradicted by actual behavior                      | "Is X possible?" / "What's the best way to Y?"                              |
-| Security issue (use `SECURITY.md` instead)                               | Hosting-platform / network / firewall questions                             |
+| Open an **Issue** (here)                                                      | Open a **Discussion**                                                       |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Reproducible defect in Scalorus WA code with clear steps, expected vs. actual | Setup / configuration help ("my proxy doesn't work, how do I configure X?") |
+| Crash, panic, wrong API response, regression after upgrade                    | Provider-specific quirks (webshare, IPRoyal, brightdata, Twilio, etc.)      |
+| Documented behavior contradicted by actual behavior                           | "Is X possible?" / "What's the best way to Y?"                              |
+| Security issue (use `SECURITY.md` instead)                                    | Hosting-platform / network / firewall questions                             |
 
 When an Issue lands in the gray zone, maintainers will label it `needs-info`,
 `not-a-bug`, or `move-to-discussions`. If after follow-up it turns out to be

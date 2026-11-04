@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 /**
- * Startup guard for OpenWA's install-time engine patches.
+ * Startup guard for Scalorus WA's install-time engine patches.
  *
  * The patches are applied two ways, and only one of them is loud. The Docker production stage runs
  * every patcher WITHOUT `--best-effort`, so an unrecognised source shape fails the image build. A
@@ -96,7 +96,7 @@ export function unappliedPatches(family: PatchFamily, scriptsDir?: string, depDi
 /** The startup line for a non-empty `unappliedPatches` result. */
 export function unappliedPatchesMessage(family: PatchFamily, names: string[]): string {
   return (
-    `The installed ${PACKAGE_FOR[family]} is missing ${names.length} of OpenWA's install-time ` +
+    `The installed ${PACKAGE_FOR[family]} is missing ${names.length} of Scalorus WA's install-time ` +
     `patches: ${names.join(', ')}. The capabilities each one repairs will fail with errors that ` +
     'name no cause. The install skipped them, usually because it ran with --ignore-scripts or ' +
     'because a patcher refused a source shape it did not recognise. Apply them with ' +

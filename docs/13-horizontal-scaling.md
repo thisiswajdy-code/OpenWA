@@ -178,7 +178,7 @@
 > Everything below (node affinity, `replicas: 3`) remains a **design sketch** until those
 > land.
 
-This guide explains a _proposed_ design for deploying OpenWA in a horizontally scaled environment for high availability and increased capacity.
+This guide explains a _proposed_ design for deploying Scalorus WA in a horizontally scaled environment for high availability and increased capacity.
 
 ## 13.1 Architecture Overview
 
@@ -188,10 +188,10 @@ flowchart TB
         NGINX[Nginx/Traefik]
     end
 
-    subgraph Nodes["OpenWA Nodes"]
-        N1[OpenWA Node 1]
-        N2[OpenWA Node 2]
-        N3[OpenWA Node 3]
+    subgraph Nodes["Scalorus WA Nodes"]
+        N1[Scalorus WA Node 1]
+        N2[Scalorus WA Node 2]
+        N3[Scalorus WA Node 3]
     end
 
     subgraph Storage["Shared Storage"]
@@ -263,7 +263,7 @@ version: '3.8'
 
 services:
   openwa:
-    image: ghcr.io/rmyndharis/openwa:latest
+    image: ghcr.io/thisiswajdy-code/openwa:latest
     # Teardown takes up to 63 s with every datastore on; raise this by the amount SHUTDOWN_DELAY_MS or
     # WEBHOOK_SHUTDOWN_DRAIN_MS exceeds its default, or the 10 s default kills the task mid-teardown.
     stop_grace_period: 75s
@@ -329,7 +329,7 @@ services:
     networks:
       - openwa-net
 
-  # NOTE (v0.4.0): OpenWA no longer ships a bundled Traefik container.
+  # NOTE (v0.4.0): Scalorus WA no longer ships a bundled Traefik container.
   # For TLS / public exposure, bring your own reverse proxy (Traefik, nginx,
   # Caddy, a cloud load balancer, etc.) and point it at openwa:2785.
   # See section 13.5 for Traefik / nginx config examples.
@@ -449,7 +449,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
         - name: openwa
-          image: ghcr.io/rmyndharis/openwa:latest
+          image: ghcr.io/thisiswajdy-code/openwa:latest
           ports:
             - containerPort: 2785
               name: http
@@ -671,7 +671,7 @@ server {
     listen 80;
     server_name openwa.example.com;
 
-    # nginx refuses a request body over 1m by default, below the 25mb OpenWA itself accepts
+    # nginx refuses a request body over 1m by default, below the 25mb Scalorus WA itself accepts
     # (BODY_SIZE_LIMIT), so base64 media sends would answer 413 before reaching a node.
     client_max_body_size 25m;
 
@@ -737,7 +737,7 @@ the warning at the top of this guide), so the 3- and 5-node rows could not have 
 
 ### Prometheus Metrics
 
-OpenWA exports Prometheus text exposition at `GET /api/metrics` (`openwa_*` gauges and counters).
+Scalorus WA exports Prometheus text exposition at `GET /api/metrics` (`openwa_*` gauges and counters).
 The endpoint returns `404` until `METRICS_TOKEN` is set, and then requires that token as a Bearer:
 
 ```yaml
@@ -766,7 +766,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: 'OpenWA node high memory usage'
+          summary: 'Scalorus WA node high memory usage'
 
       - alert: NodeDown
         expr: up{job="openwa"} == 0
@@ -774,7 +774,7 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: 'OpenWA node is down'
+          summary: 'Scalorus WA node is down'
 ```
 
 ### Health Check Endpoints

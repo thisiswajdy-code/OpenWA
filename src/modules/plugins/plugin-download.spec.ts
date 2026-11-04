@@ -15,7 +15,7 @@ describe('expectedSha256FromUrl', () => {
     expect(expectedSha256FromUrl(`https://h/pkg.zip#sha256=${digest.toUpperCase()}`)).toBe(digest);
   });
 
-  it('does not seize ?sha256= / ?checksum= query params — they belong to the host, not to OpenWA', () => {
+  it('does not seize ?sha256= / ?checksum= query params — they belong to the host, not to Scalorus WA', () => {
     expect(expectedSha256FromUrl(`https://h/pkg.zip?sha256=${digest}`)).toBeNull();
     expect(expectedSha256FromUrl(`https://h/pkg.zip?checksum=${digest}`)).toBeNull();
     // A host-side checksum param in its own (non-sha256-hex) format must not fail the download.

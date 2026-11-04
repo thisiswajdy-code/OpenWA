@@ -213,7 +213,7 @@ describe('patch-wwebjs-201832 (build-time backport of upstream #201832)', () => 
 
     expect(res.skipped).toBe(false);
     const read = (rel: string): string => fs.readFileSync(path.join(dir, rel), 'utf8');
-    // Root helper + the load-bearing Message constructor that OpenWA's ~40
+    // Root helper + the load-bearing Message constructor that Scalorus WA's ~40
     // `msg.id._serialized` reads depend on, plus every sibling structure.
     expect(read('src/structures/Base.js')).toContain('static _normalizeId');
     expect(read('src/structures/Message.js')).toContain('this.id = Base._normalizeId(data.id)');
@@ -221,7 +221,7 @@ describe('patch-wwebjs-201832 (build-time backport of upstream #201832)', () => 
       expect(read(`src/structures/${f}.js`)).toContain('this.id = Base._normalizeId(data.id)');
     }
     expect(read('src/structures/ClientInfo.js')).toContain('this.wid = Base._normalizeId(data.wid)');
-    // from/to/author fallbacks (OpenWA reads these as chat/sender strings).
+    // from/to/author fallbacks (Scalorus WA reads these as chat/sender strings).
     expect(read('src/structures/Message.js')).toMatch(/data\.from\._serialized \|\| data\.from\.\$1/);
   });
 
@@ -260,7 +260,7 @@ describe('patch-wwebjs-201832 (build-time backport of upstream #201832)', () => 
 
     const affected = { $1: 'true_123@c.us_ABC', remote: '123@c.us', fromMe: true, id: 'ABC' };
     expect(Base._normalizeId(affected)._serialized).toBe('true_123@c.us_ABC');
-    // Sibling fields survive the copy — OpenWA reads id.remote / id.id downstream.
+    // Sibling fields survive the copy — Scalorus WA reads id.remote / id.id downstream.
     expect(Base._normalizeId(affected)).toMatchObject({ remote: '123@c.us', fromMe: true, id: 'ABC' });
 
     const healthy = { _serialized: 'true_123@c.us_XYZ', remote: '123@c.us' };

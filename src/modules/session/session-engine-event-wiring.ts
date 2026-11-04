@@ -183,7 +183,7 @@ export class SessionEngineEventWiring {
         });
         // A whatsapp-web.js revocation that happened while the engine was down leaves no other trace:
         // the engine simply boots into the QR screen, with no LOGOUT, no auth failure and no audit
-        // row. The paths where OpenWA itself discarded the credentials (a LOGOUT close, the
+        // row. The paths where Scalorus WA itself discarded the credentials (a LOGOUT close, the
         // stuck-auth recovery) also end here, but each of those has already logged its own warning,
         // and starting a session under a different ENGINE_TYPE than it was linked with lands here too.
         if (previouslyLinked && !relinkWarned) {

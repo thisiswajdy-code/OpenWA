@@ -543,7 +543,7 @@ describe('BaileysSessionStore', () => {
         messageTimestamp: 100,
         ephemeralDuration: 7776000,
       });
-      // matchwa replies to the neutral phone jid OpenWA delivered on the webhook — the prior no-op case.
+      // matchwa replies to the neutral phone jid Scalorus WA delivered on the webhook — the prior no-op case.
       expect(store.getEphemeralExpiration('5491169954736@c.us')).toBe(7776000);
       expect(store.getEphemeralExpiration('5491169954736@s.whatsapp.net')).toBe(7776000);
       expect(store.getEphemeralExpiration('41562515988583@lid')).toBe(7776000);

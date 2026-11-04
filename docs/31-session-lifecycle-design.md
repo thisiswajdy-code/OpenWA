@@ -110,7 +110,7 @@ worth resuming: unauthenticated, mid-pairing, or operator-flagged failed').
 **Interleaving:** `client.logout()` chains `authStrategy.logout()` → `fs.rm(userDataDir)` while
 the Chromium process still holds file handles → rm fails or races a browser re-write.
 **Defense:** whatsapp-web.js's own `Client.logout()` closes the browser and polls up to ~1 s for it
-to disconnect before LocalAuth removes the profile dir. OpenWA's part is the name-keyed
+to disconnect before LocalAuth removes the profile dir. Scalorus WA's part is the name-keyed
 credential-teardown fence: `teardownEngineSafely` registers the whole `engine.logout()` promise under
 the session name, and `start()`, `delete()` and `executeReconnect` wait for it through
 `awaitPendingTeardown` (bounded at 10 s and fail-closed: a timeout is a 409 for `start()`/`delete()`

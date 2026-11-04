@@ -88,7 +88,7 @@ export function loadEnvironment(): void {
   } else {
     logger.log('First run detected, creating default configuration...');
     // Create minimal .env.generated with sensible defaults
-    const minimalConfig = `# OpenWA Configuration
+    const minimalConfig = `# Scalorus WA Configuration
 # Generated automatically on first run
 # Edit via Dashboard > Infrastructure or modify this file directly.
 # Note: values in process env or project .env take precedence over this file.

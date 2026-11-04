@@ -32,7 +32,7 @@ export class CreateTemplateDto {
 
   @ApiPropertyOptional({
     description: 'Optional header text, prepended to the rendered body',
-    example: 'OpenWA Store',
+    example: 'Scalorus WA Store',
     maxLength: HEADER_FOOTER_MAX_LENGTH,
   })
   @IsOptional()

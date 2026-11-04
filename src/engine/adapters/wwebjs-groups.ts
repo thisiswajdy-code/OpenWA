@@ -211,7 +211,7 @@ export class WwebjsGroups {
    * Baileys engine creates groups normally on the same account.
    *
    * Nothing here can be patched around: `findImpl` belongs to the page, not to whatsapp-web.js —
-   * it appears in neither the installed `Client.js` nor any OpenWA patcher. Restore this method
+   * it appears in neither the installed `Client.js` nor any Scalorus WA patcher. Restore this method
    * when upstream adopts a page API that WhatsApp Web still provides.
    */
   /* eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars */

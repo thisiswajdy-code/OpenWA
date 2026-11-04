@@ -1,4 +1,4 @@
-"""OpenWA Python SDK — client core.
+"""Scalorus WA Python SDK — client core.
 
 The :class:`OpenWAClient` is the single entry point. It owns an
 :class:`HttpExecutor` (which wraps :class:`httpx.Client` with an injectable
@@ -18,7 +18,7 @@ transport) and exposes domain resources as properties::
     # then wait for status "ready". An unlinked session answers the send with 409.
     client.messages.send_text(session["id"], {
         "chatId": "628123456789@c.us",
-        "text": "Hello from the OpenWA SDK!",
+        "text": "Hello from the Scalorus WA SDK!",
     })
 
 Pass ``transport=httpx.MockTransport(handler)`` for testability — no global

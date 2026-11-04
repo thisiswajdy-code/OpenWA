@@ -6,7 +6,7 @@
     }
   },
   "common": {
-    "appName": "OpenWA",
+    "appName": "Scalorus WA",
     "updateAvailable": "الإصدار v{{version}} متاح",
     "loading": "جارٍ التحميل...",
     "cancel": "إلغاء",
@@ -369,7 +369,6 @@
     "connectionError": "تعذّر الاتصال بالخادم. يرجى المحاولة مرة أخرى.",
     "help": "هل تحتاج مساعدة؟",
     "viewDocs": "عرض التوثيق",
-    "footer": "صُنع بـ ❤️ بواسطة Yudhi Armyndharis ومجتمع OpenWA",
     "version": "v{{version}} · {{date}}",
     "email": "البريد الإلكتروني",
     "emailPlaceholder": "you@example.com",
@@ -1080,7 +1079,7 @@
     "zeroMessages": "بدون إرسال أي رسائل",
     "noSession": {
       "title": "لا توجد جلسة WhatsApp نشطة ومتصلة.",
-      "desc": "لفحص أرقام الهاتف، يتطلب OpenWA جلسة واحدة مصادَق عليها على الأقل.",
+      "desc": "لفحص أرقام الهاتف، يتطلب Scalorus WA جلسة واحدة مصادَق عليها على الأقل.",
       "goToSessions": "الانتقال إلى الجلسات"
     },
     "tabs": {
@@ -1212,7 +1211,7 @@
       "postgres": "PostgreSQL",
       "postgresDesc": "قاعدة بيانات جاهزة للإنتاج",
       "useBuiltIn": "استخدام حاوية PostgreSQL المدمجة",
-      "builtInDesc": "سيدير OpenWA حاوية PostgreSQL نيابةً عنك",
+      "builtInDesc": "سيدير Scalorus WA حاوية PostgreSQL نيابةً عنك",
       "dbName": "اسم قاعدة البيانات",
       "schema": "المخطط",
       "schemaDesc": "مخطط PostgreSQL (يُتجاهل لـ SQLite). الافتراضي 'public'. يجب أن يكون المخطط موجوداً مسبقاً.",
@@ -1247,7 +1246,7 @@
       "enable": "تفعيل Redis",
       "enableDesc": "يُستخدم للتخزين المؤقت وقوائم BullMQ وعدّادات تحديد المعدّل وتوزيع WebSocket عبر عدة عُقد",
       "useBuiltIn": "استخدام حاوية Redis المدمجة",
-      "builtInDesc": "سيدير OpenWA حاوية Redis نيابةً عنك",
+      "builtInDesc": "سيدير Scalorus WA حاوية Redis نيابةً عنك",
       "queueTitle": "تفعيل نظام قوائم BullMQ",
       "queueDesc": "استخدام قوائم الرسائل لتوصيل موثوق للرسائل والويب هوك",
       "statsTitle": "إحصائيات القوائم",
@@ -1269,7 +1268,7 @@
       "s3": "Amazon S3",
       "s3Desc": "تخزين سحابي (متوافق مع S3)",
       "useBuiltIn": "استخدام حاوية MinIO المدمجة",
-      "builtInDesc": "سيدير OpenWA حاوية MinIO (متوافقة مع S3) نيابةً عنك",
+      "builtInDesc": "سيدير Scalorus WA حاوية MinIO (متوافقة مع S3) نيابةً عنك",
       "storagePath": "مسار التخزين",
       "bucket": "اسم الحاوية",
       "region": "المنطقة",
@@ -1321,7 +1320,7 @@
       "importFailed": "تعذّر استيراد البيانات",
       "importOk": "تمّ استيراد البيانات",
       "importConfirm": "سيؤدّي الاستيراد إلى استبدال جميع البيانات الحالية بالنسخة الاحتياطية ({{rows}} صفًّا). لا يمكن التراجع عن هذا الإجراء. هل تريد المتابعة؟",
-      "invalidFile": "هذا الملفّ ليس نسخة احتياطية صالحة لبيانات OpenWA.",
+      "invalidFile": "هذا الملفّ ليس نسخة احتياطية صالحة لبيانات Scalorus WA.",
       "importTooLarge": "النسخة الاحتياطية أكبر من حدّ الطلب. زِد قيمة BODY_SIZE_LIMIT على الخادم ثم أعد المحاولة."
     },
     "statusLoadError": "تعذّر تحميل حالة البنية التحتية الحالية. حدّث الصفحة لإعادة المحاولة.",
@@ -1355,7 +1354,7 @@
     "uninstallConfirm": "إزالة \"{{name}}\"؟ سيؤدي ذلك إلى حذف ملفاتها.",
     "empty": {
       "title": "لم يتم العثور على إضافات",
-      "description": "ثبّت إضافات لتوسيع وظائف OpenWA"
+      "description": "ثبّت إضافات لتوسيع وظائف Scalorus WA"
     },
     "config": {
       "title": "إعداد {{name}}",
@@ -1378,7 +1377,7 @@
       "trustWarning": "تعمل الإضافات بكامل صلاحيات عملية البوابة — البيئة المعزولة تحتوي الأعطال فقط، لا الشيفرة الخبيثة. ثبّت فقط الإضافات التي تثق بها.",
       "choose": "اختر ملف .zip…",
       "tooLarge": "يتجاوز الملف الحد الأقصى البالغ 5 MB.",
-      "catalogHint": "ثبّت مباشرة من كتالوج إضافات OpenWA. يتم جلب ملف .zip من جانب الخادم عبر حماية SSRF، ثم يُتحقق منه ويُشغَّل في وضع الحماية.",
+      "catalogHint": "ثبّت مباشرة من كتالوج إضافات Scalorus WA. يتم جلب ملف .zip من جانب الخادم عبر حماية SSRF، ثم يُتحقق منه ويُشغَّل في وضع الحماية.",
       "catalogTeaser": "تبحث عن إضافات؟",
       "catalogTeaserSuffix": "يتصفح المتجر الرسمي.",
       "tabCatalog": "الكتالوج",

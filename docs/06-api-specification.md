@@ -51,11 +51,11 @@ A key may also be restricted to selected chats (`allowedChats`: group `<id>@g.us
 
 ### API-Key Lifecycle
 
-OpenWA seeds an initial admin key on first run (printed to the startup log and written to `data/.api-key`, or `/app/data/.api-key` in Docker). Use it to mint scoped, lower-privilege keys for integrations. Full key creation, listing, rotation, and revocation are documented under the auth resource in **§6.4.9 (API Keys)**.
+Scalorus WA seeds an initial admin key on first run (printed to the startup log and written to `data/.api-key`, or `/app/data/.api-key` in Docker). Use it to mint scoped, lower-privilege keys for integrations. Full key creation, listing, rotation, and revocation are documented under the auth resource in **§6.4.9 (API Keys)**.
 
 ## 6.2 Response Format
 
-> **OpenWA returns the raw handler payload directly — there is NO `{ success, data, meta }` envelope.** A resource route returns the resource object as-is; a list route returns a **bare JSON array**. Read fields directly (`response.id`, not `response.data.id`).
+> **Scalorus WA returns the raw handler payload directly — there is NO `{ success, data, meta }` envelope.** A resource route returns the resource object as-is; a list route returns a **bare JSON array**. Read fields directly (`response.id`, not `response.data.id`).
 
 ### Success Response
 
@@ -134,7 +134,7 @@ Validation failures (`statusCode: 400`) return `message` as an **array** of fiel
 
 ### Timestamp Conventions
 
-OpenWA uses **two** timestamp representations — be careful which a field is:
+Scalorus WA uses **two** timestamp representations — be careful which a field is:
 
 - **Message timestamps are epoch numbers (Unix seconds), not ISO strings.** This applies to the `timestamp` field on messages returned by send responses, history, and persisted message records (the persisted column is stored as a bigint and surfaced as a `number`).
 - **Entity audit fields use ISO-8601 UTC strings** (example: `2026-02-02T10:00:00.000Z`). This applies to `createdAt` / `updatedAt` on persisted entities, `expiresAt`, batch `startedAt` / `completedAt`, and similar metadata fields.
@@ -1363,7 +1363,7 @@ GET /api/sessions/:sessionId/messages?since=1789855200000&until=1789941600000&or
       "to": "628123456789@c.us",
       "chatName": null,
       "author": null,
-      "body": "Hello from OpenWA!",
+      "body": "Hello from Scalorus WA!",
       "type": "text",
       "direction": "outgoing",
       "timestamp": 1719312000,
@@ -1764,7 +1764,7 @@ Send a plain text message.
 | quotedMessageId   | string   | No       | non-empty                                | Quote an earlier message, making this a reply. See [Quoted sends](#quoted-sends) below       |
 
 ```json
-{ "chatId": "628123456789@c.us", "text": "Hello from OpenWA!" }
+{ "chatId": "628123456789@c.us", "text": "Hello from Scalorus WA!" }
 ```
 
 ```json
@@ -3503,7 +3503,7 @@ Bare `Template[]` array (no pagination, no envelope). Ordered by `createdAt` DES
     "sessionId": "9b1c0e2a-3d4f-5a6b-7c8d-9e0f1a2b3c4d",
     "name": "order-confirmation",
     "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-    "header": "OpenWA Store",
+    "header": "Scalorus WA Store",
     "footer": "Reply STOP to unsubscribe.",
     "createdAt": "2026-06-25T10:15:00.000Z",
     "updatedAt": "2026-06-25T10:15:00.000Z"
@@ -3536,7 +3536,7 @@ Raw `Template` entity (no envelope).
   "sessionId": "9b1c0e2a-3d4f-5a6b-7c8d-9e0f1a2b3c4d",
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-  "header": "OpenWA Store",
+  "header": "Scalorus WA Store",
   "footer": "Reply STOP to unsubscribe.",
   "createdAt": "2026-06-25T10:15:00.000Z",
   "updatedAt": "2026-06-25T10:15:00.000Z"
@@ -3570,7 +3570,7 @@ Create a message template for the session (with `{{variable}}` placeholders in t
 {
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-  "header": "OpenWA Store",
+  "header": "Scalorus WA Store",
   "footer": "Reply STOP to unsubscribe."
 }
 ```
@@ -3585,7 +3585,7 @@ Returns the saved `Template` entity raw (no envelope). The lazy `session` relati
   "sessionId": "9b1c0e2a-3d4f-5a6b-7c8d-9e0f1a2b3c4d",
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} has shipped.",
-  "header": "OpenWA Store",
+  "header": "Scalorus WA Store",
   "footer": "Reply STOP to unsubscribe.",
   "createdAt": "2026-06-25T10:15:00.000Z",
   "updatedAt": "2026-06-25T10:15:00.000Z"
@@ -3633,7 +3633,7 @@ Loads via lookup (`404` if missing), patches the provided fields, saves, and ret
   "sessionId": "9b1c0e2a-3d4f-5a6b-7c8d-9e0f1a2b3c4d",
   "name": "order-confirmation",
   "body": "Hi {{customer}}, your order {{orderId}} is out for delivery.",
-  "header": "OpenWA Store",
+  "header": "Scalorus WA Store",
   "footer": "Thanks for shopping with us.",
   "createdAt": "2026-06-25T10:15:00.000Z",
   "updatedAt": "2026-06-25T11:02:00.000Z"
@@ -3831,7 +3831,7 @@ List all channels/newsletters the session is subscribed to.
 [
   {
     "id": "120363000000000000@newsletter",
-    "name": "OpenWA Updates",
+    "name": "Scalorus WA Updates",
     "description": "Release notes and tips",
     "inviteCode": "ABC123xyz",
     "subscriberCount": 1042,
@@ -3864,7 +3864,7 @@ Get a single channel/newsletter by its id.
 ```json
 {
   "id": "120363000000000000@newsletter",
-  "name": "OpenWA Updates",
+  "name": "Scalorus WA Updates",
   "description": "Release notes and tips",
   "inviteCode": "ABC123xyz",
   "subscriberCount": 1042,
@@ -4055,7 +4055,7 @@ Subscribe to a channel using its invite code.
 ```json
 {
   "id": "120363000000000000@newsletter",
-  "name": "OpenWA Updates",
+  "name": "Scalorus WA Updates",
   "description": "Release notes and tips",
   "inviteCode": "ABC123xyz",
   "subscriberCount": 1042,
@@ -4414,7 +4414,7 @@ Post a text status (story) to the session's status feed. The recipients allow-li
 | font            | integer  | no       | `@IsIn([0, 1, 2, 6, 7, 8, 9, 10])` — `3`–`5` are rejected with `400` | WhatsApp status font index: `0` (default), `1`, `2`, `6` (bold), `7`, `8`, `9`, `10`. whatsapp-web.js honors only `0`–`7` and clamps anything above back to the default                                                                                                                                                                            |
 
 ```json
-{ "text": "Hello from OpenWA!", "recipients": ["6281234567890@c.us"], "backgroundColor": "#25D366", "font": 2 }
+{ "text": "Hello from Scalorus WA!", "recipients": ["6281234567890@c.us"], "backgroundColor": "#25D366", "font": 2 }
 ```
 
 **Response** `201`
@@ -5376,7 +5376,7 @@ During shutdown the `details` instead read `{ "shutdown": { "status": "draining"
 
 #### GET /api/metrics
 
-Prometheus exposition scrape of OpenWA process + session + message metrics; gated by a `METRICS_TOKEN` bearer (disabled when the token is unset).
+Prometheus exposition scrape of Scalorus WA process + session + message metrics; gated by a `METRICS_TOKEN` bearer (disabled when the token is unset).
 
 **Auth:** Bearer METRICS_TOKEN — `Authorization: Bearer <METRICS_TOKEN>`. This route is `@Public()` (it bypasses the `X-API-Key` guard); access is instead validated inside the service with a constant-time compare. The `Bearer ` prefix is stripped case-insensitively. Published in the OpenAPI spec under the `metrics-bearer` security scheme.
 
@@ -5390,7 +5390,7 @@ claiming every session had dropped. `openwa_stats_available` is what tells the t
 so alert on it rather than reading a missing series as zero. `docs/10` lists every series.
 
 ```
-# HELP openwa_up 1 if the OpenWA process is running
+# HELP openwa_up 1 if the Scalorus WA process is running
 # TYPE openwa_up gauge
 openwa_up 1
 # TYPE openwa_process_uptime_seconds gauge
@@ -5644,7 +5644,7 @@ Aggregate infrastructure status (database, Redis, queue, storage, engine).
 
 The `queue.webhooks` counters are live BullMQ job counts (`pending` = waiting + active + delayed; plus `completed`/`failed`), degrading to zeros when the queue is disabled or Redis is unreachable. `redis.connected` is a live probe. `database.host` is the configured `DATABASE_HOST` (default `localhost`) and is reported on SQLite too, so read `type`, not `host`, to tell the database apart.
 
-`builtIn` (on `database`/`redis`/`storage`) reports whether OpenWA's own bundled container is actually running _and_ backing this service, detected live from the labelled container; when Docker is unreachable it falls back to the saved `*_BUILTIN` intent from `data/.env.generated`. In S3 mode `storage` additionally carries `bucket` (when one is configured) and `s3Available` (re-probed, throttled, while false; once true it stays true until a restart, so a later outage does not clear it); in local mode neither key is present. `engine.webVersion`/`engine.webVersionSource` (`pinned` / `auto` / `native`) appear only on `whatsapp-web.js`; `webVersion` is `null` until the auto-resolve first succeeds. `engine.browserArgs` is the effective launch argument list: `PUPPETEER_ARGS` (or the four defaults shown) with `--lang=en-US` appended unless a `--lang` flag is already present.
+`builtIn` (on `database`/`redis`/`storage`) reports whether Scalorus WA's own bundled container is actually running _and_ backing this service, detected live from the labelled container; when Docker is unreachable it falls back to the saved `*_BUILTIN` intent from `data/.env.generated`. In S3 mode `storage` additionally carries `bucket` (when one is configured) and `s3Available` (re-probed, throttled, while false; once true it stays true until a restart, so a later outage does not clear it); in local mode neither key is present. `engine.webVersion`/`engine.webVersionSource` (`pinned` / `auto` / `native`) appear only on `whatsapp-web.js`; `webVersion` is `null` until the auto-resolve first succeeds. `engine.browserArgs` is the effective launch argument list: `PUPPETEER_ARGS` (or the four defaults shown) with `--lang=en-US` appended unless a `--lang` flag is already present.
 
 `envPinned` lists which of `DATABASE_TYPE`, `REDIS_ENABLED`, `STORAGE_TYPE`, `STORAGE_LOCAL_PATH`, `ENGINE_TYPE`, `PUPPETEER_HEADLESS`, `SESSION_DATA_PATH` and `PUPPETEER_ARGS` the host environment or the project `.env` sets. Those layers win over `data/.env.generated`, so a value saved for one of these keys through `PUT /api/infra/config` cannot take effect until that layer is changed.
 
@@ -5698,7 +5698,7 @@ Get the currently active engine type. A non-admin key reads the same value from 
 
 #### GET /api/infra/update-check
 
-Compare the running version with the latest published OpenWA release. The dashboard uses it to show
+Compare the running version with the latest published Scalorus WA release. The dashboard uses it to show
 admins a link to the release notes next to the version. The gateway reads GitHub's latest release
 through the SSRF-guarded fetch and caches the answer for six hours (fifteen minutes after a failure).
 The request goes out directly, not through `HTTP(S)_PROXY`. A pre-release or draft is never offered. A
@@ -5721,7 +5721,7 @@ release number until the next release bumps it.
   "current": "0.23.5",
   "latest": "0.23.6",
   "updateAvailable": true,
-  "releaseUrl": "https://github.com/rmyndharis/OpenWA/releases/tag/v0.23.6"
+  "releaseUrl": "https://github.com/thisiswajdy-code/OpenWA/releases/tag/v0.23.6"
 }
 ```
 
@@ -7341,7 +7341,7 @@ Every registered webhook receives an HTTP `POST` with a JSON body of this shape:
 
 ### Event catalog
 
-These are the events OpenWA actually emits. A webhook is registered with an `events` list; an event is delivered to a webhook when its `events` array includes the event name or `"*"` (`"*"` excludes `message.receipt`, which is delivered only when named).
+These are the events Scalorus WA actually emits. A webhook is registered with an `events` list; an event is delivered to a webhook when its `events` array includes the event name or `"*"` (`"*"` excludes `message.receipt`, which is delivered only when named).
 
 | Event                                             | When it fires                                                                                                                                                                                                                         | `data` payload sketch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -7422,7 +7422,7 @@ Outbox creation is best effort, and message persistence and outbox insertion are
 
 Before downgrading to a version that does not recognize the `queued` outbox state, drain or recover those records and take a backup. Its cleanup may otherwise treat an unsettled queued record as settled. Reverting the terminal-identity migration removes its index but does not restore historical duplicates.
 
-**Design your handler to be idempotent**, keyed on the `X-OpenWA-Idempotency-Key` header (see below). As a server-side safety net, OpenWA de-duplicates inbound `message.received` before dispatch (a re-fired event for an already-persisted message is dropped), so one webhook normally sees each inbound message once — but this is best-effort defense-in-depth and does not remove the need for consumer-side idempotency.
+**Design your handler to be idempotent**, keyed on the `X-OpenWA-Idempotency-Key` header (see below). As a server-side safety net, Scalorus WA de-duplicates inbound `message.received` before dispatch (a re-fired event for an already-persisted message is dropped), so one webhook normally sees each inbound message once — but this is best-effort defense-in-depth and does not remove the need for consumer-side idempotency.
 
 ### HMAC signature
 
@@ -7491,7 +7491,7 @@ Recurring lifecycle events (and `message.reaction` / `message.edited` / `presenc
 
 ### Retries with exponential backoff
 
-When the queue is enabled, a non-2xx response, timeout (`WEBHOOK_TIMEOUT`, default `10000` ms), or network error schedules a retry. The number of attempts comes from the webhook's `retryCount` (default `3`) and the delay grows **exponentially** from a base of `WEBHOOK_RETRY_DELAY` (default `5000` ms). Each retry reuses the same `idempotencyKey` and increments `X-OpenWA-Retry-Count`. If Redis/BullMQ rejects the initial enqueue, OpenWA logs a `webhook:error` hook event and falls back to direct delivery with the same inline retry budget. When the queue is disabled, delivery is direct with the same retry budget and the same exponential backoff applied inline. Every retry, queued or direct, re-reads the webhook first: a webhook deleted, disabled or unsubscribed from the event since the dispatch gets no further attempt and no delivery-failure row, and a changed URL, secret or header map applies from the next attempt. With the queue disabled, a delivery that waited behind the failing-webhook cap (`WEBHOOK_DEGRADED_SESSION_CONCURRENCY`) re-reads the webhook the same way before its first attempt; if that read fails, the attempt uses the webhook as loaded at dispatch.
+When the queue is enabled, a non-2xx response, timeout (`WEBHOOK_TIMEOUT`, default `10000` ms), or network error schedules a retry. The number of attempts comes from the webhook's `retryCount` (default `3`) and the delay grows **exponentially** from a base of `WEBHOOK_RETRY_DELAY` (default `5000` ms). Each retry reuses the same `idempotencyKey` and increments `X-OpenWA-Retry-Count`. If Redis/BullMQ rejects the initial enqueue, Scalorus WA logs a `webhook:error` hook event and falls back to direct delivery with the same inline retry budget. When the queue is disabled, delivery is direct with the same retry budget and the same exponential backoff applied inline. Every retry, queued or direct, re-reads the webhook first: a webhook deleted, disabled or unsubscribed from the event since the dispatch gets no further attempt and no delivery-failure row, and a changed URL, secret or header map applies from the next attempt. With the queue disabled, a delivery that waited behind the failing-webhook cap (`WEBHOOK_DEGRADED_SESSION_CONCURRENCY`) re-reads the webhook the same way before its first attempt; if that read fails, the attempt uses the webhook as loaded at dispatch.
 
 ### SSRF guard on registration
 

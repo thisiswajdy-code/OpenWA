@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The single entry point to the OpenWA SDK. Holds configuration and exposes
+ * The single entry point to the Scalorus WA SDK. Holds configuration and exposes
  * domain resources as fields:
  *
  * <pre>{@code
@@ -233,7 +233,7 @@ public final class OpenWAClient {
                 valid = value >= 0x21 && value <= 0x7e;
             }
             if (!valid) {
-                throw new IllegalArgumentException("OpenWA: idempotencyKey must be 1-255 visible ASCII characters");
+                throw new IllegalArgumentException("Scalorus WA: idempotencyKey must be 1-255 visible ASCII characters");
             }
             defaults = new LinkedHashMap<>(defaults);
             defaults.keySet().removeIf(name -> name.equalsIgnoreCase("Idempotency-Key"));

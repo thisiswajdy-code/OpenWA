@@ -1,5 +1,5 @@
 /**
- * OpenWA JavaScript/TypeScript SDK — client core.
+ * Scalorus WA JavaScript/TypeScript SDK — client core.
  *
  * The {@link OpenWAClient} is the single entry point. It holds configuration
  * (base URL, API key, timeout, injectable transport) and exposes domain
@@ -20,14 +20,25 @@
  * // then wait for status 'ready'. An unlinked session answers the send with 409.
  * await client.messages.sendText(session.id, {
  *   chatId: '628123456789@c.us',
- *   text: 'Hello from the OpenWA SDK!',
+ *   text: 'Hello from the Scalorus WA SDK!',
  * });
  * ```
  *
  * @packageDocumentation
  */
 
-import { request, requestBytes, encodeSegment, hasUnsendableChar, toTimeoutMs, warnIfInsecureHttpUrl, type BinaryResponse, type ClientConfig, type FetchLike, type RequestOptions } from './http.js';
+import {
+  request,
+  requestBytes,
+  encodeSegment,
+  hasUnsendableChar,
+  toTimeoutMs,
+  warnIfInsecureHttpUrl,
+  type BinaryResponse,
+  type ClientConfig,
+  type FetchLike,
+  type RequestOptions,
+} from './http.js';
 import { CallsResource } from './resources/calls.js';
 import { MediaResource } from './resources/media.js';
 import { CatalogResource } from './resources/catalog.js';
@@ -47,7 +58,7 @@ import { WebhooksResource } from './resources/webhooks.js';
 import type { AuthValidateResponse, MessageResponse, SendMediaRequest } from './types.js';
 
 export interface OpenWAClientOptions {
-  /** Base URL of the OpenWA API, e.g. `http://localhost:2785`. */
+  /** Base URL of the Scalorus WA API, e.g. `http://localhost:2785`. */
   baseUrl: string;
   /** API key sent as `X-API-Key`. */
   apiKey: string;
@@ -62,7 +73,7 @@ export interface OpenWAClientOptions {
 export class OpenWAClient {
   // Defined non-enumerable in the constructor, so the API key does not appear when a client is logged,
   // inspected or serialized (`declare` keeps the class field from creating an enumerable one).
-  private declare readonly config: Required<Omit<ClientConfig, 'fetch'>> & { fetch: FetchLike };
+  declare private readonly config: Required<Omit<ClientConfig, 'fetch'>> & { fetch: FetchLike };
 
   constructor(options: OpenWAClientOptions) {
     if (!options.baseUrl) throw new Error('OpenWAClient: baseUrl is required');
@@ -135,7 +146,7 @@ export class OpenWAClient {
         idempotencyKey.length > 255 ||
         /[^\x21-\x7E]/.test(idempotencyKey)
       ) {
-        return Promise.reject(new TypeError('OpenWA: idempotencyKey must be 1-255 visible ASCII characters'));
+        return Promise.reject(new TypeError('Scalorus WA: idempotencyKey must be 1-255 visible ASCII characters'));
       }
       const headers = { ...options.headers };
       for (const name of Object.keys(headers)) {
@@ -156,12 +167,20 @@ export class OpenWAClient {
    * Shared transport helper for image/video/audio/document/sticker sends. Public resource methods
    * expose the narrower per-route request types (including audio-only `ptt`).
    */
-  sendMedia(sessionId: string, segment: string, body: SendMediaRequest, idempotencyKey?: string): Promise<MessageResponse> {
-    return this.request<MessageResponse>({
-      method: 'POST',
-      path: `/api/sessions/${encodeSegment(sessionId)}/messages/${segment}`,
-      body,
-    }, idempotencyKey);
+  sendMedia(
+    sessionId: string,
+    segment: string,
+    body: SendMediaRequest,
+    idempotencyKey?: string,
+  ): Promise<MessageResponse> {
+    return this.request<MessageResponse>(
+      {
+        method: 'POST',
+        path: `/api/sessions/${encodeSegment(sessionId)}/messages/${segment}`,
+        body,
+      },
+      idempotencyKey,
+    );
   }
 }
 

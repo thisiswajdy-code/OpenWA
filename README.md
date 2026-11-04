@@ -1,8 +1,4 @@
-<p align="center">
-  <img src="docs/logo/openwa_logo.webp" alt="OpenWA Logo" width="200"/>
-</p>
-
-<h1 align="center">OpenWA</h1>
+<h1 align="center">Scalorus WA</h1>
 <p align="center">
   <strong>Open Source WhatsApp API Gateway</strong>
 </p>
@@ -16,23 +12,22 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/rmyndharis/OpenWA/actions/workflows/ci.yml"><img src="https://github.com/rmyndharis/OpenWA/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"/></a>
-  <img src="https://img.shields.io/github/package-json/v/rmyndharis/OpenWA?label=version&color=blue" alt="Version"/>
+  <a href="https://github.com/thisiswajdy-code/OpenWA/actions/workflows/ci.yml"><img src="https://github.com/thisiswajdy-code/OpenWA/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"/></a>
+  <img src="https://img.shields.io/github/package-json/v/thisiswajdy-code/OpenWA?label=version&color=blue" alt="Version"/>
   <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License"/>
   <img src="https://img.shields.io/badge/node-22_LTS-brightgreen.svg" alt="Node"/>
-  <img src="https://img.shields.io/github/package-json/dependency-version/rmyndharis/OpenWA/@nestjs/core?label=NestJS&color=red" alt="NestJS"/>
+  <img src="https://img.shields.io/github/package-json/dependency-version/thisiswajdy-code/OpenWA/@nestjs/core?label=NestJS&color=red" alt="NestJS"/>
   <img src="https://img.shields.io/badge/docker-ready-blue.svg" alt="Docker"/>
-  <img src="https://img.shields.io/github/package-json/dependency-version/rmyndharis/OpenWA/dev/typescript?label=TypeScript&color=3178C6" alt="TypeScript"/>
-  <a href="https://buymeacoffee.com/rmyndharis"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-support-FFDD00?logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee"/></a>
+  <img src="https://img.shields.io/github/package-json/dependency-version/thisiswajdy-code/OpenWA/dev/typescript?label=TypeScript&color=3178C6" alt="TypeScript"/>
 </p>
 
 ---
 
-## ✨ Why OpenWA?
+## ✨ Why Scalorus WA?
 
-**OpenWA** is a free, open-source WhatsApp API Gateway designed for developers who need full control over their messaging infrastructure—without vendor lock-in or hidden paywalls.
+**Scalorus WA** is a free, open-source WhatsApp API Gateway designed for developers who need full control over their messaging infrastructure—without vendor lock-in or hidden paywalls.
 
-Built on a **pluggable architecture**, OpenWA lets you select database engines (SQLite/PostgreSQL), media storage backends (Local/S3), and cache layers (disabled/Redis) through configuration rather than application-code changes. The storage backend is the live store for status media and, when chat-media archiving is enabled, archived chat media; other message media is returned inline to API and webhook consumers. Of the media, `scripts/backup.sh` archives only the local media directory, so an S3 bucket needs a backup of its own.
+Built on a **pluggable architecture**, Scalorus WA lets you select database engines (SQLite/PostgreSQL), media storage backends (Local/S3), and cache layers (disabled/Redis) through configuration rather than application-code changes. The storage backend is the live store for status media and, when chat-media archiving is enabled, archived chat media; other message media is returned inline to API and webhook consumers. Of the media, `scripts/backup.sh` archives only the local media directory, so an S3 bucket needs a backup of its own.
 
 |                               |                                                                                                                                          |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -78,7 +73,7 @@ None of this changes the ban-risk guidance below. It limits what a _key_ can rea
 
 ## ⚠️ Before you connect a number — please read
 
-OpenWA is an unofficial, community-maintained gateway. It connects to WhatsApp through **reverse-engineered clients** (the [`whatsapp-web.js`](https://github.com/pedroslopez/whatsapp-web.js) project and [`@whiskeysockets/baileys`](https://github.com/WhiskeySockets/Baileys)), **not** through Meta's official Cloud API. This has real consequences you should understand before you link a phone number.
+Scalorus WA is an unofficial, community-maintained gateway. It connects to WhatsApp through **reverse-engineered clients** (the [`whatsapp-web.js`](https://github.com/pedroslopez/whatsapp-web.js) project and [`@whiskeysockets/baileys`](https://github.com/WhiskeySockets/Baileys)), **not** through Meta's official Cloud API. This has real consequences you should understand before you link a phone number.
 
 ### What this means in practice
 
@@ -106,15 +101,15 @@ These are practical guardrails, not guarantees — but they materially reduce th
 
 ### Known platform behaviour (not bugs)
 
-A few things that look like bugs but are actually server-side WhatsApp policy, not OpenWA defects — we track them separately so we can distinguish them from real bugs:
+A few things that look like bugs but are actually server-side WhatsApp policy, not Scalorus WA defects — we track them separately so we can distinguish them from real bugs:
 
-- **First message to a brand-new contact sometimes never arrives.** The API returns success because the message leaves OpenWA, but WhatsApp's server-side reach-out / trust policy drops it at delivery. This is independent of OpenWA. We track it in [#830](https://github.com/rmyndharis/OpenWA/issues/830).
-- **Accounts that get restricted cannot be "unrestricted" by us.** If WhatsApp disables a number, you need to appeal through their channels — OpenWA has no lever to pull.
-- **Some accounts cannot link a new device at all.** WhatsApp has added a passkey step to companion linking for some accounts: the phone asks to "Create a passkey" or "Continue on your other device" and the session stays at `qr_ready`. Neither engine implements that step, so switching engine or using a pairing code does not help, and no OpenWA setting changes it. Avoid logging out or re-linking a session that works, since linking it again may hit the same gate, and keep the fallback from rule 5 above. See [the FAQ entry](docs/12-troubleshooting-faq.md#issue-linking-asks-for-a-passkey-and-never-completes-both-engines); tracked in [#560](https://github.com/rmyndharis/OpenWA/issues/560).
+- **First message to a brand-new contact sometimes never arrives.** The API returns success because the message leaves Scalorus WA, but WhatsApp's server-side reach-out / trust policy drops it at delivery. This is independent of Scalorus WA. We track it in #830.
+- **Accounts that get restricted cannot be "unrestricted" by us.** If WhatsApp disables a number, you need to appeal through their channels — Scalorus WA has no lever to pull.
+- **Some accounts cannot link a new device at all.** WhatsApp has added a passkey step to companion linking for some accounts: the phone asks to "Create a passkey" or "Continue on your other device" and the session stays at `qr_ready`. Neither engine implements that step, so switching engine or using a pairing code does not help, and no Scalorus WA setting changes it. Avoid logging out or re-linking a session that works, since linking it again may hit the same gate, and keep the fallback from rule 5 above. See [the FAQ entry](docs/12-troubleshooting-faq.md#issue-linking-asks-for-a-passkey-and-never-completes-both-engines); tracked in #560.
 
 ### Compliance
 
-For any deployment where ethical, legal, or regulatory compliance matters (healthcare, finance, large-scale commercial messaging, anything touching end users in the EU/EEA under DMA/GDPR framings), treat OpenWA as **not approved** and use Meta's [official WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api). OpenWA is an excellent fit for personal projects, internal tooling, automation hobbyists, and learning — it is not a drop-in replacement for the official API in regulated environments.
+For any deployment where ethical, legal, or regulatory compliance matters (healthcare, finance, large-scale commercial messaging, anything touching end users in the EU/EEA under DMA/GDPR framings), treat Scalorus WA as **not approved** and use Meta's [official WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api). Scalorus WA is an excellent fit for personal projects, internal tooling, automation hobbyists, and learning — it is not a drop-in replacement for the official API in regulated environments.
 
 📖 For the deeper, maintainer-side risk analysis (protocol-change exposure, dependency strategy, security posture), see [Risk Management (`docs/16`)](./docs/16-risk-management.md).
 
@@ -179,8 +174,8 @@ For any deployment where ethical, legal, or regulatory compliance matters (healt
 
 ```bash
 # Clone and start
-git clone https://github.com/rmyndharis/OpenWA.git
-cd OpenWA
+git clone https://github.com/thisiswajdy-code/OpenWA.git
+cd Scalorus WA
 docker compose -f docker-compose.dev.yml up -d
 
 # Access (the dashboard is bundled into the API image and served on the same port)
@@ -210,8 +205,8 @@ then use it to sign in to the dashboard and as the `X-API-Key` header wherever t
 
 ```bash
 # Clone repository
-git clone https://github.com/rmyndharis/OpenWA.git
-cd OpenWA
+git clone https://github.com/thisiswajdy-code/OpenWA.git
+cd Scalorus WA
 
 # Install the locked dependencies (includes dashboard)
 npm ci
@@ -227,7 +222,7 @@ npm run dev
 
 The first boot writes the admin API key to `data/.api-key` (read it with `cat data/.api-key`; the file has no trailing newline, so copy only the key).
 
-Use `npm install` instead when intentionally changing dependencies. OpenWA's committed lockfile uses
+Use `npm install` instead when intentionally changing dependencies. Scalorus WA's committed lockfile uses
 registry artifacts only, so npm 12 works with its secure default that blocks Git dependencies; do not
 disable that policy globally.
 
@@ -287,9 +282,9 @@ docker compose --profile full up -d
 | `minio`    | S3-compatible storage (MinIO fork `pgsty/silo`) |
 | `full`     | All services above                              |
 
-A profile only starts the container; OpenWA keeps using SQLite and local storage until it is told
+A profile only starts the container; Scalorus WA keeps using SQLite and local storage until it is told
 to use the new service. The simplest route is **Dashboard > Infrastructure**: pick the built-in
-option, save, and restart from there, and OpenWA starts the container itself. The built-in storage
+option, save, and restart from there, and Scalorus WA starts the container itself. The built-in storage
 option creates its own `openwa-minio` container, so do not also start the `minio` or `full` profile
 for it. The same goes for built-in PostgreSQL and Redis: each built-in option creates its own
 container, and the compose profiles are for the manual `.env` route below. The compose `minio`
@@ -328,7 +323,7 @@ To run a published image instead of building from source, add a `docker-compose.
 ```yaml
 services:
   openwa-api:
-    image: ghcr.io/rmyndharis/openwa:latest
+    image: ghcr.io/thisiswajdy-code/openwa:latest
 ```
 
 Run `docker compose pull openwa-api && docker compose up -d --no-build`. To upgrade, update the checkout
@@ -384,7 +379,7 @@ curl -X POST http://localhost:2785/api/sessions/{sessionId}/messages/send-text \
   -H "X-API-Key: YOUR_API_KEY" \
   -d '{
     "chatId": "628123456789@c.us",
-    "text": "Hello from OpenWA!"
+    "text": "Hello from Scalorus WA!"
   }'
 ```
 
@@ -410,7 +405,7 @@ curl -X POST http://localhost:2785/api/sessions/{sessionId}/webhooks \
 
 ## 🤖 MCP Server (AI Agents)
 
-OpenWA can expose a **curated set of tools over the [Model Context Protocol](https://modelcontextprotocol.io)** so AI agents (Claude, Cursor, …) can drive WhatsApp. It is **off by default** and **additive** — every REST route keeps working unchanged.
+Scalorus WA can expose a **curated set of tools over the [Model Context Protocol](https://modelcontextprotocol.io)** so AI agents (Claude, Cursor, …) can drive WhatsApp. It is **off by default** and **additive** — every REST route keeps working unchanged.
 
 Set `MCP_ENABLED=true` to mount a stateless Streamable-HTTP transport at **`POST /mcp`** on the existing server (same port, no extra process). It mounts **25 read-only tools** by default — session, message, contact, group, webhook, label and automation-rule _reads_ — because the surface is read-only unless you opt out. Add `MCP_READONLY=false` to mount all **51 tools**, adding the write tier (send, reply, group operations). Either way it is a focused surface rather than the full API, so agents aren't overwhelmed.
 
@@ -525,17 +520,9 @@ Please read our [Development Guidelines](./docs/08-development-guidelines.md) fo
 
 ---
 
-## ☕ Support
-
-OpenWA is free and open source. If it saves you time or helps your business, you can support its development by buying me a coffee.
-
-<a href="https://buymeacoffee.com/rmyndharis"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" height="50"/></a>
-
----
-
 ## Disclaimer
 
-OpenWA is an independent open-source project and is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Meta Platforms, Inc., WhatsApp LLC, or any of their subsidiaries or affiliates. The official WhatsApp website can be found at [whatsapp.com](https://www.whatsapp.com). The name "WhatsApp" as well as related names, marks, emblems, and images are registered trademarks of their respective owners.
+Scalorus WA is an independent open-source project and is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Meta Platforms, Inc., WhatsApp LLC, or any of their subsidiaries or affiliates. The official WhatsApp website can be found at [whatsapp.com](https://www.whatsapp.com). The name "WhatsApp" as well as related names, marks, emblems, and images are registered trademarks of their respective owners.
 
 Use it at your own risk; you are responsible for complying with WhatsApp's terms and the law where you operate.
 
@@ -551,12 +538,8 @@ See [LICENSE](./LICENSE) for details.
 
 <div align="center">
 
-**OpenWA** – Free, Open Source WhatsApp API Gateway
+**Scalorus WA** – Free, Open Source WhatsApp API Gateway
 
-[📖 Documentation](./docs/README.md) · [🔌 API Docs](http://localhost:2785/api/docs) · [🐛 Report Bug](https://github.com/rmyndharis/OpenWA/issues) · [💡 Request Feature](https://github.com/rmyndharis/OpenWA/issues)
-
-<br/>
-
-<sub>Made with ❤️ by <a href="https://github.com/rmyndharis">Yudhi Armyndharis</a> and the OpenWA Community</sub>
+[📖 Documentation](./docs/README.md) · [🔌 API Docs](http://localhost:2785/api/docs) · [🌐 Website](https://wa.scalorus.com)
 
 </div>

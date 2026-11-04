@@ -20,9 +20,9 @@ describe('admin controller role coverage (server-side authorization is the real 
 });
 
 // A group invite code is a bearer capability, not read data: whoever holds the link joins the group
-// on WhatsApp with no OpenWA credential at all, and that membership survives revoking the key that
+// on WhatsApp with no Scalorus WA credential at all, and that membership survives revoking the key that
 // fetched the code. Both invite-code routes therefore sit at OPERATOR, like the QR endpoint: the
-// reads whose payload is a credential for a system outside OpenWA's authority.
+// reads whose payload is a credential for a system outside Scalorus WA's authority.
 describe('group invite-code role coverage (the code is a capability, not read data)', () => {
   it.each(['getInviteCode', 'revokeInviteCode'] as const)('GroupController.%s requires the OPERATOR role', method => {
     // eslint-disable-next-line @typescript-eslint/unbound-method -- reading route metadata, not invoking

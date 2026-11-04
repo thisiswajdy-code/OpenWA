@@ -129,7 +129,7 @@ export async function assertDataConnectionUtc(dataSource: DataSource): Promise<v
   throw new Error(
     `PostgreSQL data connection is not on UTC: TimeZone is "${effective?.zone}" ` +
       `(offset ${effective?.offset_seconds}s now, ${effective?.offset_seconds_later}s in six months; a zone that ` +
-      `observes daylight saving is not UTC even while it reads +00). OpenWA stores every timestamp column in UTC. ` +
+      `observes daylight saving is not UTC even while it reads +00). Scalorus WA stores every timestamp column in UTC. ` +
       `Set the server default to UTC (ALTER DATABASE "<database>" SET TimeZone='UTC'), or let the connection's own ` +
       `"SET TIME ZONE 'UTC'" through the pooler.`,
   );

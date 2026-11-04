@@ -80,7 +80,7 @@ describe('data CLI DataSource', () => {
     const prevType = process.env.DATABASE_TYPE;
     const prevSchema = process.env.POSTGRES_SCHEMA;
     process.env.DATABASE_TYPE = 'postgres';
-    process.env.POSTGRES_SCHEMA = 'OpenWA';
+    process.env.POSTGRES_SCHEMA = 'Scalorus WA';
     jest.resetModules();
     try {
       expect(() => {

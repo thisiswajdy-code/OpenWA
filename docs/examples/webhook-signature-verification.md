@@ -1,10 +1,10 @@
 # Webhook Signature Verification
 
-OpenWA signs webhook deliveries when a webhook is configured with a secret. Receivers should verify the signature before processing the event.
+Scalorus WA signs webhook deliveries when a webhook is configured with a secret. Receivers should verify the signature before processing the event.
 
 ## Headers
 
-OpenWA sends these system headers with webhook deliveries:
+Scalorus WA sends these system headers with webhook deliveries:
 
 | Header                     | Description                                                        |
 | -------------------------- | ------------------------------------------------------------------ |
@@ -22,7 +22,7 @@ sha256=<hex digest>
 
 The digest is computed over the exact raw request body bytes using the webhook secret.
 
-## With an OpenWA SDK
+## With an Scalorus WA SDK
 
 Since SDK 0.5.1, each SDK ships this check. Pass the raw body, the `X-OpenWA-Signature` header value and the secret; the helper returns false for a missing, malformed or wrong signature and compares in constant time.
 

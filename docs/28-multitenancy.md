@@ -1,14 +1,14 @@
 # 28 - Multitenancy
 
 > **Status:** Draft (design proposal — nothing here is implemented). This document defines the target
-> architecture for operating OpenWA as a multi-tenant platform: tenant identity, access control, 2FA,
+> architecture for operating Scalorus WA as a multi-tenant platform: tenant identity, access control, 2FA,
 > per-tenant branding, isolation, quotas, and the migration path from today's single-operator model.
 
 ## 28.1 Goals & non-goals
 
 **Goals**
 
-- One OpenWA deployment safely hosts many independent organizations (tenants), each with its own
+- One Scalorus WA deployment safely hosts many independent organizations (tenants), each with its own
   WhatsApp sessions, users, API keys, branding, plugins, and data — with no cross-tenant visibility.
 - Enterprise-grade identity: named users with per-tenant roles and optional/enforced two-factor
   authentication (TOTP), alongside the existing API-key model for programmatic access.
@@ -23,7 +23,7 @@
 
 ## 28.2 Current state assessment
 
-OpenWA today is **multi-session, not multi-tenant**. What already exists and is reused by this design:
+Scalorus WA today is **multi-session, not multi-tenant**. What already exists and is reused by this design:
 
 | Primitive                                                                                                         | Where                                                                                                       | Reuse                                                                                                                            |
 | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |

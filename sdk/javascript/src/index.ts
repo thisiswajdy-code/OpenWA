@@ -1,7 +1,7 @@
 /**
- * OpenWA JavaScript/TypeScript SDK.
+ * Scalorus WA JavaScript/TypeScript SDK.
  *
- * Official client library for the OpenWA WhatsApp API Gateway.
+ * Official client library for the Scalorus WA WhatsApp API Gateway.
  *
  * @example
  * ```typescript
@@ -19,7 +19,7 @@
  * // then wait for status 'ready'. An unlinked session answers the send with 409.
  * const result = await client.messages.sendText(session.id, {
  *   chatId: '628123456789@c.us',
- *   text: 'Hello from the OpenWA SDK!',
+ *   text: 'Hello from the Scalorus WA SDK!',
  * });
  * console.log(result.messageId);
  * ```

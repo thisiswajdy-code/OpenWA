@@ -141,7 +141,7 @@ export async function loadSharp() {
 }
 
 /**
- * Refuse SVG input process-wide. OpenWA never needs it, yet a sticker and the thumbnail of every outbound
+ * Refuse SVG input process-wide. Scalorus WA never needs it, yet a sticker and the thumbnail of every outbound
  * image hand caller-supplied bytes to sharp, which autodetects SVG and parses it with librsvg: a native
  * decoder with a memory-safety record that is the largest attack surface on those two routes. The block is
  * libvips state shared by every importer of sharp, Baileys included, so it has to be set before the first

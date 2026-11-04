@@ -1,6 +1,6 @@
 package openwa
 
-// Wire types for the OpenWA API, split by domain into types_*.go files. Field
+// Wire types for the Scalorus WA API, split by domain into types_*.go files. Field
 // names / JSON tags mirror the backend DTOs exactly (camelCase). Optional
 // request fields use `omitempty` (and pointers where the zero value is
 // meaningful); nullable response fields use pointers so absent and empty are

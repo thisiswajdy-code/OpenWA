@@ -2,7 +2,7 @@
 
 ## 2.1 Overview
 
-This document defines the functional and non-functional requirements for OpenWA.
+This document defines the functional and non-functional requirements for Scalorus WA.
 
 ## 2.2 Functional Requirements
 
@@ -82,7 +82,7 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     participant WA as WhatsApp
-    participant OW as OpenWA
+    participant OW as Scalorus WA
     participant WH as Webhook URL
 
     WA->>OW: New Message Event
@@ -378,7 +378,7 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     actor User
-    participant API as OpenWA API
+    participant API as Scalorus WA API
     participant Engine as WA Engine
     participant WA as WhatsApp
 
@@ -412,7 +412,7 @@ sequenceDiagram
 sequenceDiagram
     participant WA as WhatsApp
     participant Engine as WA Engine
-    participant API as OpenWA
+    participant API as Scalorus WA
     participant WH as User Webhook
 
     WA->>Engine: New message received

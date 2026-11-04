@@ -1,24 +1,24 @@
 # 29 - Engine Capability Matrix
 
 Three-way comparison of every capability: the **Baileys library** (`@whiskeysockets/baileys`
-7.0.0-rc14), the **whatsapp-web.js library** (1.34.7), and what **OpenWA actually exposes** through
-its adapter layer and REST API — including which "supported" cells only work because OpenWA patches
+7.0.0-rc14), the **whatsapp-web.js library** (1.34.7), and what **Scalorus WA actually exposes** through
+its adapter layer and REST API — including which "supported" cells only work because Scalorus WA patches
 the installed library. Coverage is total: all 113 `IWhatsAppEngine` methods (29.4), **all 152
 Baileys + 81 whatsapp-web.js library methods** (29.5), all 34 + 31 library events (29.5.4), and all
-12 install-time patches (29.3). If it exists upstream or in OpenWA, it has a row here.
+12 install-time patches (29.3). If it exists upstream or in Scalorus WA, it has a row here.
 
 ## 29.1 How to read this matrix
 
 Statuses used in the tables:
 
-- **✅** — works end-to-end through the OpenWA adapter.
-- **✅🔧ⁿ** — works end-to-end, but **only because OpenWA patches the installed library** (patch
+- **✅** — works end-to-end through the Scalorus WA adapter.
+- **✅🔧ⁿ** — works end-to-end, but **only because Scalorus WA patches the installed library** (patch
   `🔧ⁿ`, see 29.3). On a stock, unpatched install of the library this cell would be broken.
-- **❌ gap** — _adapter-gap_: the underlying library HAS the capability; only the OpenWA adapter
+- **❌ gap** — _adapter-gap_: the underlying library HAS the capability; only the Scalorus WA adapter
   wiring is missing. Fixable in this repo.
 - **❌ lib** — _library-limitation_: the underlying library exposes no first-class symbol for the
   operation. Not fixable without raw-proto/fork work or an event-cache hack.
-- **OpenWA REST** column — what a caller of the REST API gets: **✅** on any engine session,
+- **Scalorus WA REST** column — what a caller of the REST API gets: **✅** on any engine session,
   **⚠️ `<engine>` only** when the answer depends on the session's engine (the other engine
   answers HTTP 501), **❌ 501** on both engines, and **⚙️ internal** for a method the REST surface
   never exposes: the gateway calls it itself (`probeLiveness`), or no route calls it (`getPhoneNumber`,
@@ -26,32 +26,32 @@ Statuses used in the tables:
 
 Two complementary views:
 
-- **29.4, the OpenWA contract view.** Rows are the 113 `IWhatsAppEngine` methods; use it to see
+- **29.4, the Scalorus WA contract view.** Rows are the 113 `IWhatsAppEngine` methods; use it to see
   what a REST caller gets per engine. Source of truth: `src/engine/engine-capability-matrix.ts`
   (per-cell `evidence` strings cite the exact library `file:symbol` inspected).
 - **29.5 — the full engine inventory.** Rows are **every method the installed libraries expose**,
-  each mapped to the OpenWA interface method that uses it (or marked unexposed). Use it as the
+  each mapped to the Scalorus WA interface method that uses it (or marked unexposed). Use it as the
   implementation backlog: anything `❌ not exposed` with a library symbol behind it is wiring work,
   not research work. 29.5.3 distills the sweetest spot: capabilities **both** libraries already
-  have and only OpenWA lacks.
+  have and only Scalorus WA lacks.
 
 ## 29.2 Adapter architecture
 
-OpenWA never calls a WhatsApp library directly from a controller. Every session owns one engine
+Scalorus WA never calls a WhatsApp library directly from a controller. Every session owns one engine
 instance behind the neutral `IWhatsAppEngine` interface (113 methods +
 `EngineEventCallbacks`), and all modules go through it:
 
 ```mermaid
 flowchart LR
-    subgraph OpenWA["OpenWA"]
+    subgraph ScalorusWA["Scalorus WA"]
         API["REST API controllers"] --> SVC["Modules / services"]
         SVC --> IF["IWhatsAppEngine - 113 methods"]
         IF --> WA["WhatsAppWebJsAdapter"]
         IF --> BA["BaileysAdapter"]
         SVC --> STORE["OpenWA-side stores"]
     end
-    WA --> WLIB["whatsapp-web.js 1.34.7<br/>+ 9 OpenWA patches"]
-    BA --> BLIB["@whiskeysockets/baileys 7.0.0-rc14<br/>+ 3 OpenWA patches"]
+    WA --> WLIB["whatsapp-web.js 1.34.7<br/>+ 9 Scalorus WA patches"]
+    BA --> BLIB["@whiskeysockets/baileys 7.0.0-rc14<br/>+ 3 Scalorus WA patches"]
     WLIB --> WEB["WhatsApp Web<br/>headless Chromium"]
     BLIB --> WAS["WhatsApp servers<br/>browser-free socket"]
     WA -.->|"not-available"| E["EngineNotSupportedError<br/>HTTP 501"]
@@ -85,7 +85,7 @@ Key adapter facts:
   refused option' is not 'not-available'.
 - **Inbound events** flow the other way: each adapter normalizes library events into the neutral
   `EngineEventCallbacks` (`onMessage`, `onMessageAck`, `onGroupEvent`, `onCall`, …), which the
-  session module turns into OpenWA webhook events. Which library events are consumed — and which
+  session module turns into Scalorus WA webhook events. Which library events are consumed — and which
   are dropped — is listed in 29.5.4.
 - **Some REST reads bypass the engine entirely.** `GET …/status` reads are served from
   `StatusStoreService` (fed by inbound ingestion on both engines), so status-read parity holds at
@@ -126,9 +126,9 @@ methods where the symbol really serves eight still passes), it cannot separate a
 from an adapter method of the same name (`logout`), and it cannot see a mapping pointed at the
 wrong interface method. Those three remain reader-verified.
 
-## 29.3 Install-time patches OpenWA applies to the libraries
+## 29.3 Install-time patches Scalorus WA applies to the libraries
 
-OpenWA ships twelve exact, self-disabling source transforms over the installed engines. Each runs at
+Scalorus WA ships twelve exact, self-disabling source transforms over the installed engines. Each runs at
 `npm install` (`scripts/postinstall.js`, `--best-effort`) and again in the Docker production stage
 (**without** best-effort — dependency drift fails the image build). A recognized repaired source shape makes the
 patcher no-op; an unrecognized source shape fails loudly rather than shipping a silently partial
@@ -156,7 +156,7 @@ reaching READY is not evidence that every patch landed. See docs/12 for the oper
 | 🔧⁸  | `scripts/patch-wwebjs-block.js`                            | whatsapp-web.js `Contact.js`                       | `Contact.block()`/`unblock()` resolved their target through `getContactToBlockOnlyUseIfNoAssociatedChat`, which WhatsApp Web removed, so both answered an opaque `500` for every id shape. The replacement helpers `handleBlock`/`handleUnblock` are modal-driven UI wrappers that block nothing when called headless, and the server now refuses a phone-keyed block outright (`trying to block a pn contact without a chat`) because individual chats are keyed by LID while wwjs folds every id back to a phone number. Resolves through `WAWebLidMigrationUtils.toUserLid` to the chat-owning identity and calls `blockContact`/`unblockContact` directly, falling back to the original contact when no LID or chat exists.                                                                                                                                                                                                                                                                                                                                                                                                                    | exact-shape match on both bodies; unknown shape fails the build.                                                                                                                                                                                                                                                                                                      |
 | 🔧⁹  | `scripts/patch-wwebjs-group-description.js`                | whatsapp-web.js `GroupChat.js`                     | `GroupChat.setDescription()` calls the page's `WAWebGroupModifyInfoJob.setGroupDescription(chatWid, description, newId, descId)` positionally, but that job now takes a single options object `{desc, groupWid, newDescId, prevDescId}`. The first positional argument lands where the object is read, every field comes back undefined, and `widToGroupJid(undefined)` throws inside the page — reaching the caller as a bare `500` while the library still types the method `Promise<boolean>`. `setGroupSubject` in the same module is still positional, which is why subjects kept working and made the Wid look innocent. The patch sends the options object, takes `newDescId` from `WARandomHex.randomHex(8)` as the product does, and maps an empty description to `desc: null` so it selects the job's delete branch rather than sending an empty body element. The open upstream fix #201895 changes the same call, but keeps `WAWebMsgKey.newId()` and passes an empty description through verbatim, so this patcher will not stand down when it lands and the `desc: null` mapping has to be carried over rather than dropped with it. | exact-shape match; unknown shape fails the build.                                                                                                                                                                                                                                                                                                                     |
 | 🔧¹⁰ | `scripts/patch-wwebjs-media-id.js`                         | whatsapp-web.js `Injected/Utils.js`                | Every media send built by `processMediaData` failed on the WhatsApp Web builds rolled out on 2026-09-17 with `Data passed to getter must include an id property`, while text still sent. `window.WWebJS.sendMessage` builds the outgoing message with `id: newMsgKey` and then spreads the media model returned by `processMediaData` into it, and on those builds that model carries an enumerable private `__x_id` that clobbers the id when the `Msg` model initialises. The patch deletes `message.__x_id` right after the object is built, which is upstream's own fix (whatsapp-web.js PR #201923, unmerged, no release after 1.34.7). It stands down once the installed tree carries that line.                                                                                                                                                                                                                                                                                                                                                                                                                                             | exact-shape match; unknown shape fails the build.                                                                                                                                                                                                                                                                                                                     |
-| 🔧¹¹ | `scripts/patch-wwebjs-send-error.js`                       | whatsapp-web.js `Client.js`                        | A send the page refused reached OpenWA as the minified `t: t`, with nothing but Node frames: puppeteer rebuilds a page-side exception from its class name and description only, and WhatsApp Web's own error classes are minified to one letter and keep their detail in their own properties. The patch wraps the `window.WWebJS.sendMessage` call inside `Client.sendMessage`'s evaluate. A plain `Error`, which is what whatsapp-web.js's own send failures and WhatsApp Web's `No LID for user` already are, is rethrown as the same object, so its text and OpenWA's matching on it are unchanged. Anything else is rethrown as an `Error` reading `page threw {...}`, a capped JSON summary of the WhatsApp Web build actually running, the constructor name, `name`, `message`, `stack` and the value's own properties. Diagnostic only: a successful send returns what it returned before, and the dead-page classifier never reads a captured error as a transport death.                                                                                                                                                                 | exact-shape match; unknown shape fails the build.                                                                                                                                                                                                                                                                                                                     |
+| 🔧¹¹ | `scripts/patch-wwebjs-send-error.js`                       | whatsapp-web.js `Client.js`                        | A send the page refused reached Scalorus WA as the minified `t: t`, with nothing but Node frames: puppeteer rebuilds a page-side exception from its class name and description only, and WhatsApp Web's own error classes are minified to one letter and keep their detail in their own properties. The patch wraps the `window.WWebJS.sendMessage` call inside `Client.sendMessage`'s evaluate. A plain `Error`, which is what whatsapp-web.js's own send failures and WhatsApp Web's `No LID for user` already are, is rethrown as the same object, so its text and Scalorus WA's matching on it are unchanged. Anything else is rethrown as an `Error` reading `page threw {...}`, a capped JSON summary of the WhatsApp Web build actually running, the constructor name, `name`, `message`, `stack` and the value's own properties. Diagnostic only: a successful send returns what it returned before, and the dead-page classifier never reads a captured error as a transport death.                                                                                                                                                       | exact-shape match; unknown shape fails the build.                                                                                                                                                                                                                                                                                                                     |
 
 ### 29.3.2 Which matrix rows depend on which patch
 
@@ -206,7 +206,7 @@ else, which is the behaviour we would want and the same shape as `deleteProfileP
 indiscriminate `catch (ignoredError) { return false; }` appears **once**, in
 `transferChannelOwnership` (`Client.js:2627`).
 
-So it is not a house style, and the one method carrying it is the one OpenWA answers 501 for and
+So it is not a house style, and the one method carrying it is the one Scalorus WA answers 501 for and
 never invokes (29.6.2). The patch would repair a path our code does not take. It is also not an
 upstream oversight but a deliberate design choice — a boolean return means discarding the cause — so
 unlike 🔧⁶ there is no upstream fix that would ever retire it.
@@ -216,27 +216,27 @@ opens `if (!channel) return false;` before its try, so its `false` conflates _ch
 _WhatsApp refused_, and the adapter answers 403 for both. That distinction is ours to make in our own
 adapter and involves no library change.
 
-## 29.4 Full capability matrix: the OpenWA contract view (113 methods)
+## 29.4 Full capability matrix: the Scalorus WA contract view (113 methods)
 
-Legend recap: **✅** supported · **✅🔧ⁿ** supported via OpenWA patch `🔧ⁿ` (29.3) ·
+Legend recap: **✅** supported · **✅🔧ⁿ** supported via Scalorus WA patch `🔧ⁿ` (29.3) ·
 **❌ gap** adapter-gap · **❌ lib** library-limitation. Column headers carry the engine-wide
 patch dependencies (🔧¹ message-id backport on wwjs; 🔧⁵ app-state bound on
-Baileys). The **OpenWA REST** column reads from the caller's side: ✅ works whatever engine the
+Baileys). The **Scalorus WA REST** column reads from the caller's side: ✅ works whatever engine the
 session runs; ⚠️ depends on the session engine; ❌ 501 on both.
 
 ### 29.4.1 Session & connection
 
-| Method               | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST |
-| -------------------- | ------------------- | ---------------- | ----------- |
-| `initialize`         | ✅                  | ✅🔧⁴            | ✅          |
-| `disconnect`         | ✅                  | ✅               | ✅          |
-| `logout`             | ✅                  | ✅               | ✅          |
-| `destroy`            | ✅                  | ✅               | ✅          |
-| `forceDestroy`       | ✅                  | ✅               | ✅          |
-| `getQRCode`          | ✅                  | ✅               | ✅          |
-| `requestPairingCode` | ✅                  | ✅               | ✅          |
-| `getStatus`          | ✅                  | ✅               | ✅          |
-| `probeLiveness`      | ✅ local            | ✅ round trip    | ⚙️ internal |
+| Method               | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| -------------------- | ------------------- | ---------------- | ---------------- |
+| `initialize`         | ✅                  | ✅🔧⁴            | ✅               |
+| `disconnect`         | ✅                  | ✅               | ✅               |
+| `logout`             | ✅                  | ✅               | ✅               |
+| `destroy`            | ✅                  | ✅               | ✅               |
+| `forceDestroy`       | ✅                  | ✅               | ✅               |
+| `getQRCode`          | ✅                  | ✅               | ✅               |
+| `requestPairingCode` | ✅                  | ✅               | ✅               |
+| `getStatus`          | ✅                  | ✅               | ✅               |
+| `probeLiveness`      | ✅ local            | ✅ round trip    | ⚙️ internal      |
 
 `probeLiveness` is the one optional member of `IWhatsAppEngine`, and the two adapters answer it to
 different depths — which is what the optional marker exists to allow. wwjs races a real
@@ -247,123 +247,123 @@ socket is caught by the transport instead. No REST route: the session watchdog p
 
 ### 29.4.2 Sending messages
 
-| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST     |
-| --------------------- | ------------------- | ---------------- | --------------- |
-| `sendTextMessage`     | ✅                  | ✅🔧³            | ✅              |
-| `sendImageMessage`    | ✅                  | ✅               | ✅              |
-| `sendVideoMessage`    | ✅                  | ✅               | ✅              |
-| `sendAudioMessage`    | ✅                  | ✅               | ✅              |
-| `sendDocumentMessage` | ✅                  | ✅               | ✅              |
-| `sendStickerMessage`  | ✅                  | ✅               | ✅              |
-| `sendContactMessage`  | ✅                  | ✅               | ✅              |
-| `sendLocationMessage` | ✅                  | ✅               | ✅              |
-| `sendPollMessage`     | ✅                  | ✅               | ✅              |
-| `sendProduct`         | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `sendCatalog`         | ❌ lib              | ❌ lib           | ❌ not exposed  |
-| `replyToMessage`      | ✅                  | ✅               | ✅              |
-| `forwardMessage`      | ✅                  | ✅               | ✅              |
-| `sendChatState`       | ✅                  | ✅               | ✅              |
-| `sendSeen`            | ✅                  | ✅               | ✅              |
+| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| --------------------- | ------------------- | ---------------- | ---------------- |
+| `sendTextMessage`     | ✅                  | ✅🔧³            | ✅               |
+| `sendImageMessage`    | ✅                  | ✅               | ✅               |
+| `sendVideoMessage`    | ✅                  | ✅               | ✅               |
+| `sendAudioMessage`    | ✅                  | ✅               | ✅               |
+| `sendDocumentMessage` | ✅                  | ✅               | ✅               |
+| `sendStickerMessage`  | ✅                  | ✅               | ✅               |
+| `sendContactMessage`  | ✅                  | ✅               | ✅               |
+| `sendLocationMessage` | ✅                  | ✅               | ✅               |
+| `sendPollMessage`     | ✅                  | ✅               | ✅               |
+| `sendProduct`         | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `sendCatalog`         | ❌ lib              | ❌ lib           | ❌ not exposed   |
+| `replyToMessage`      | ✅                  | ✅               | ✅               |
+| `forwardMessage`      | ✅                  | ✅               | ✅               |
+| `sendChatState`       | ✅                  | ✅               | ✅               |
+| `sendSeen`            | ✅                  | ✅               | ✅               |
 
 ### 29.4.3 Message management
 
-| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST     |
-| --------------------- | ------------------- | ---------------- | --------------- |
-| `editMessage`         | ✅                  | ✅               | ✅              |
-| `deleteMessage`       | ✅                  | ✅               | ✅              |
-| `reactToMessage`      | ✅                  | ✅               | ✅              |
-| `starMessage`         | ✅                  | ✅               | ✅              |
-| `pinMessage`          | ✅                  | ✅               | ✅              |
-| `unpinMessage`        | ✅                  | ✅               | ✅              |
-| `getMessageReactions` | ❌ lib              | ✅               | ⚠️ wwjs only    |
-| `votePoll`            | ❌ lib              | ✅               | ⚠️ wwjs only    |
-| `clickButton`         | ✅                  | ❌ lib           | ⚠️ Baileys only |
+| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| --------------------- | ------------------- | ---------------- | ---------------- |
+| `editMessage`         | ✅                  | ✅               | ✅               |
+| `deleteMessage`       | ✅                  | ✅               | ✅               |
+| `reactToMessage`      | ✅                  | ✅               | ✅               |
+| `starMessage`         | ✅                  | ✅               | ✅               |
+| `pinMessage`          | ✅                  | ✅               | ✅               |
+| `unpinMessage`        | ✅                  | ✅               | ✅               |
+| `getMessageReactions` | ❌ lib              | ✅               | ⚠️ wwjs only     |
+| `votePoll`            | ❌ lib              | ✅               | ⚠️ wwjs only     |
+| `clickButton`         | ✅                  | ❌ lib           | ⚠️ Baileys only  |
 
 ### 29.4.4 Chats
 
-| Method              | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST  |
-| ------------------- | ------------------- | ---------------- | ------------ |
-| `getChats`          | ✅                  | ✅               | ✅           |
-| `getChatHistory`    | ❌ lib              | ✅               | ⚠️ wwjs only |
-| `archiveChat`       | ✅                  | ✅               | ✅           |
-| `clearChatMessages` | ✅                  | ✅               | ✅           |
-| `deleteChat`        | ✅                  | ✅               | ✅           |
-| `markUnread`        | ✅                  | ✅               | ✅           |
-| `muteChat`          | ✅                  | ✅               | ✅           |
-| `pinChat`           | ✅                  | ✅               | ✅           |
+| Method              | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| ------------------- | ------------------- | ---------------- | ---------------- |
+| `getChats`          | ✅                  | ✅               | ✅               |
+| `getChatHistory`    | ❌ lib              | ✅               | ⚠️ wwjs only     |
+| `archiveChat`       | ✅                  | ✅               | ✅               |
+| `clearChatMessages` | ✅                  | ✅               | ✅               |
+| `deleteChat`        | ✅                  | ✅               | ✅               |
+| `markUnread`        | ✅                  | ✅               | ✅               |
+| `muteChat`          | ✅                  | ✅               | ✅               |
+| `pinChat`           | ✅                  | ✅               | ✅               |
 
 ### 29.4.5 Contacts
 
-| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST |
-| --------------------- | ------------------- | ---------------- | ----------- |
-| `getContacts`         | ✅                  | ✅               | ✅          |
-| `getContactById`      | ✅                  | ✅               | ✅          |
-| `upsertContact`       | ✅                  | ✅               | ✅          |
-| `deleteContact`       | ✅                  | ✅               | ✅          |
-| `blockContact`        | ✅                  | ✅               | ✅          |
-| `unblockContact`      | ✅                  | ✅               | ✅          |
-| `getBlockedContacts`  | ✅                  | ✅               | ✅          |
-| `checkNumberExists`   | ✅                  | ✅               | ✅          |
-| `getNumberId`         | ✅                  | ✅               | ✅          |
-| `getPhoneNumber`      | ✅                  | ✅               | ⚙️ internal |
-| `getPushName`         | ✅                  | ✅               | ⚙️ internal |
-| `resolveContactPhone` | ✅                  | ✅               | ✅          |
-| `getProfilePicture`   | ✅                  | ✅               | ✅          |
+| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| --------------------- | ------------------- | ---------------- | ---------------- |
+| `getContacts`         | ✅                  | ✅               | ✅               |
+| `getContactById`      | ✅                  | ✅               | ✅               |
+| `upsertContact`       | ✅                  | ✅               | ✅               |
+| `deleteContact`       | ✅                  | ✅               | ✅               |
+| `blockContact`        | ✅                  | ✅               | ✅               |
+| `unblockContact`      | ✅                  | ✅               | ✅               |
+| `getBlockedContacts`  | ✅                  | ✅               | ✅               |
+| `checkNumberExists`   | ✅                  | ✅               | ✅               |
+| `getNumberId`         | ✅                  | ✅               | ✅               |
+| `getPhoneNumber`      | ✅                  | ✅               | ⚙️ internal      |
+| `getPushName`         | ✅                  | ✅               | ⚙️ internal      |
+| `resolveContactPhone` | ✅                  | ✅               | ✅               |
+| `getProfilePicture`   | ✅                  | ✅               | ✅               |
 
 ### 29.4.6 Groups
 
-| Method                           | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST     |
-| -------------------------------- | ------------------- | ---------------- | --------------- |
-| `createGroup`                    | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `getGroups`                      | ✅                  | ✅               | ✅              |
-| `getGroupInfo`                   | ✅                  | ✅               | ✅              |
-| `addParticipants`                | ✅                  | ✅               | ✅              |
-| `removeParticipants`             | ✅                  | ✅🔧⁷            | ✅              |
-| `promoteParticipants`            | ✅                  | ✅🔧⁷            | ✅              |
-| `demoteParticipants`             | ✅                  | ✅🔧⁷            | ✅              |
-| `approveGroupMembershipRequests` | ✅                  | ✅               | ✅              |
-| `rejectGroupMembershipRequests`  | ✅                  | ✅               | ✅              |
-| `getGroupMembershipRequests`     | ✅                  | ✅               | ✅              |
-| `leaveGroup`                     | ✅                  | ✅               | ✅              |
-| `getGroupInviteCode`             | ✅                  | ✅               | ✅              |
-| `joinGroupViaInviteCode`         | ✅                  | ✅               | ✅              |
-| `revokeGroupInviteCode`          | ✅                  | ✅               | ✅              |
-| `getGroupJoinInfo`               | ✅                  | ✅               | ✅              |
-| `setGroupSubject`                | ✅                  | ✅               | ✅              |
-| `setGroupDescription`            | ✅                  | ✅🔧⁹            | ✅              |
-| `setGroupPicture`                | ✅                  | ✅               | ✅              |
-| `deleteGroupPicture`             | ✅                  | ✅               | ✅              |
-| `setGroupMessagesAdminsOnly`     | ✅                  | ✅               | ✅              |
-| `setGroupInfoAdminsOnly`         | ✅                  | ✅               | ✅              |
-| `setGroupMemberAddMode`          | ✅                  | ✅               | ✅              |
-| `setGroupEphemeral`              | ✅                  | ❌ lib           | ⚠️ baileys only |
+| Method                           | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| -------------------------------- | ------------------- | ---------------- | ---------------- |
+| `createGroup`                    | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `getGroups`                      | ✅                  | ✅               | ✅               |
+| `getGroupInfo`                   | ✅                  | ✅               | ✅               |
+| `addParticipants`                | ✅                  | ✅               | ✅               |
+| `removeParticipants`             | ✅                  | ✅🔧⁷            | ✅               |
+| `promoteParticipants`            | ✅                  | ✅🔧⁷            | ✅               |
+| `demoteParticipants`             | ✅                  | ✅🔧⁷            | ✅               |
+| `approveGroupMembershipRequests` | ✅                  | ✅               | ✅               |
+| `rejectGroupMembershipRequests`  | ✅                  | ✅               | ✅               |
+| `getGroupMembershipRequests`     | ✅                  | ✅               | ✅               |
+| `leaveGroup`                     | ✅                  | ✅               | ✅               |
+| `getGroupInviteCode`             | ✅                  | ✅               | ✅               |
+| `joinGroupViaInviteCode`         | ✅                  | ✅               | ✅               |
+| `revokeGroupInviteCode`          | ✅                  | ✅               | ✅               |
+| `getGroupJoinInfo`               | ✅                  | ✅               | ✅               |
+| `setGroupSubject`                | ✅                  | ✅               | ✅               |
+| `setGroupDescription`            | ✅                  | ✅🔧⁹            | ✅               |
+| `setGroupPicture`                | ✅                  | ✅               | ✅               |
+| `deleteGroupPicture`             | ✅                  | ✅               | ✅               |
+| `setGroupMessagesAdminsOnly`     | ✅                  | ✅               | ✅               |
+| `setGroupInfoAdminsOnly`         | ✅                  | ✅               | ✅               |
+| `setGroupMemberAddMode`          | ✅                  | ✅               | ✅               |
+| `setGroupEphemeral`              | ✅                  | ❌ lib           | ⚠️ baileys only  |
 
 ### 29.4.7 Channels
 
-| Method                     | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST     |
-| -------------------------- | ------------------- | ---------------- | --------------- |
-| `createChannel`            | ✅🔧⁶               | ✅               | ✅              |
-| `deleteChannel`            | ✅                  | ✅               | ✅              |
-| `muteChannel`              | ✅                  | ✅               | ✅              |
-| `demoteChannelAdmin`       | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `transferChannelOwnership` | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `getChannelById`           | ✅                  | ✅               | ✅              |
-| `getChannelMessages`       | ❌ gap              | ✅               | ⚠️ wwjs only    |
-| `getSubscribedChannels`    | ❌ lib              | ✅               | ⚠️ wwjs only    |
-| `subscribeToChannel`       | ✅                  | ❌ gap           | ⚠️ baileys only |
-| `unsubscribeFromChannel`   | ✅                  | ✅               | ✅              |
+| Method                     | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| -------------------------- | ------------------- | ---------------- | ---------------- |
+| `createChannel`            | ✅🔧⁶               | ✅               | ✅               |
+| `deleteChannel`            | ✅                  | ✅               | ✅               |
+| `muteChannel`              | ✅                  | ✅               | ✅               |
+| `demoteChannelAdmin`       | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `transferChannelOwnership` | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `getChannelById`           | ✅                  | ✅               | ✅               |
+| `getChannelMessages`       | ❌ gap              | ✅               | ⚠️ wwjs only     |
+| `getSubscribedChannels`    | ❌ lib              | ✅               | ⚠️ wwjs only     |
+| `subscribeToChannel`       | ✅                  | ❌ gap           | ⚠️ baileys only  |
+| `unsubscribeFromChannel`   | ✅                  | ✅               | ✅               |
 
 ### 29.4.8 Status / stories
 
-| Method               | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST  |
-| -------------------- | ------------------- | ---------------- | ------------ |
-| `postTextStatus`     | ✅                  | ✅🔧²            | ✅           |
-| `postImageStatus`    | ✅                  | ✅🔧²            | ✅           |
-| `postVideoStatus`    | ✅                  | ✅🔧²            | ✅           |
-| `postVoiceStatus`    | ✅                  | ✅🔧²            | ✅           |
-| `deleteStatus`       | ✅                  | ✅               | ✅           |
-| `getContactStatus`   | ❌ lib              | ✅               | ✅ (store) ‡ |
-| `getContactStatuses` | ❌ lib              | ✅               | ✅ (store) ‡ |
+| Method               | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| -------------------- | ------------------- | ---------------- | ---------------- |
+| `postTextStatus`     | ✅                  | ✅🔧²            | ✅               |
+| `postImageStatus`    | ✅                  | ✅🔧²            | ✅               |
+| `postVideoStatus`    | ✅                  | ✅🔧²            | ✅               |
+| `postVoiceStatus`    | ✅                  | ✅🔧²            | ✅               |
+| `deleteStatus`       | ✅                  | ✅               | ✅               |
+| `getContactStatus`   | ❌ lib              | ✅               | ✅ (store) ‡     |
+| `getContactStatuses` | ❌ lib              | ✅               | ✅ (store) ‡     |
 
 ‡ Status **reads** are served from `StatusStoreService` (fed by inbound status ingestion on both
 engines), not by calling the engine — so the REST API is engine-neutral here even though the
@@ -372,42 +372,42 @@ answers 501.
 
 ### 29.4.9 Labels (WA Business)
 
-| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST     |
-| --------------------- | ------------------- | ---------------- | --------------- |
-| `getLabels`           | ❌ lib              | ✅               | ⚠️ wwjs only    |
-| `getLabelById`        | ❌ lib              | ✅               | ⚠️ wwjs only    |
-| `getChatLabels`       | ❌ lib              | ✅               | ⚠️ wwjs only    |
-| `getChatsByLabel`     | ❌ lib              | ✅               | ⚠️ wwjs only    |
-| `addLabelToChat`      | ✅                  | ✅               | ✅              |
-| `removeLabelFromChat` | ✅                  | ✅               | ✅              |
-| `upsertLabel`         | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `deleteLabel`         | ✅                  | ❌ lib           | ⚠️ baileys only |
+| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| --------------------- | ------------------- | ---------------- | ---------------- |
+| `getLabels`           | ❌ lib              | ✅               | ⚠️ wwjs only     |
+| `getLabelById`        | ❌ lib              | ✅               | ⚠️ wwjs only     |
+| `getChatLabels`       | ❌ lib              | ✅               | ⚠️ wwjs only     |
+| `getChatsByLabel`     | ❌ lib              | ✅               | ⚠️ wwjs only     |
+| `addLabelToChat`      | ✅                  | ✅               | ✅               |
+| `removeLabelFromChat` | ✅                  | ✅               | ✅               |
+| `upsertLabel`         | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `deleteLabel`         | ✅                  | ❌ lib           | ⚠️ baileys only  |
 
 ### 29.4.10 Catalog & products (WA Business)
 
-| Method        | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST     |
-| ------------- | ------------------- | ---------------- | --------------- |
-| `getCatalog`  | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `getProducts` | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `getProduct`  | ✅                  | ❌ lib           | ⚠️ baileys only |
+| Method        | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| ------------- | ------------------- | ---------------- | ---------------- |
+| `getCatalog`  | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `getProducts` | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `getProduct`  | ✅                  | ❌ lib           | ⚠️ baileys only  |
 
 ### 29.4.11 Own profile & presence
 
-| Method                 | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST |
-| ---------------------- | ------------------- | ---------------- | ----------- |
-| `setProfileName`       | ✅                  | ✅               | ✅          |
-| `setProfilePicture`    | ✅                  | ✅               | ✅          |
-| `deleteProfilePicture` | ✅                  | ✅               | ✅          |
-| `setProfileStatus`     | ✅                  | ✅               | ✅          |
-| `setOnlinePresence`    | ✅                  | ✅               | ✅          |
+| Method                 | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| ---------------------- | ------------------- | ---------------- | ---------------- |
+| `setProfileName`       | ✅                  | ✅               | ✅               |
+| `setProfilePicture`    | ✅                  | ✅               | ✅               |
+| `deleteProfilePicture` | ✅                  | ✅               | ✅               |
+| `setProfileStatus`     | ✅                  | ✅               | ✅               |
+| `setOnlinePresence`    | ✅                  | ✅               | ✅               |
 
 ### 29.4.12 Presence & calls
 
-| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | OpenWA REST     |
-| --------------------- | ------------------- | ---------------- | --------------- |
-| `subscribeToPresence` | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `rejectCall`          | ✅                  | ❌ lib           | ⚠️ baileys only |
-| `createCallLink`      | ✅                  | ✅               | ✅              |
+| Method                | Baileys adapter 🔧⁵ | wwjs adapter 🔧¹ | Scalorus WA REST |
+| --------------------- | ------------------- | ---------------- | ---------------- |
+| `subscribeToPresence` | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `rejectCall`          | ✅                  | ❌ lib           | ⚠️ baileys only  |
+| `createCallLink`      | ✅                  | ✅               | ✅               |
 
 **Totals:** 113 methods → 226 adapter cells: **199 ✅, 27 ❌** (2 adapter-gaps, 25
 library-limitations, 0 uncertain) across 26 methods. From the REST caller's side: **89** methods
@@ -416,10 +416,10 @@ work on any engine (87 fully supported + 2 store-backed status reads), **14** ar
 is not exposed. Three of the 89 (`probeLiveness`, `getPhoneNumber`, `getPushName`) are ⚙️ internal and
 have no route.
 
-## 29.5 Full engine method inventory — every library method, mapped to OpenWA
+## 29.5 Full engine method inventory — every library method, mapped to Scalorus WA
 
 This is the backlog view: **all 152 Baileys socket methods and all 81 whatsapp-web.js Client
-methods**, each marked with where OpenWA uses it. The symbol list itself is gated:
+methods**, each marked with where Scalorus WA uses it. The symbol list itself is gated:
 `check-upstream-surface.mjs` extracts the installed libraries' public surface and fails on any
 drift from `scripts/upstream-surface.snapshot.json`, so a library bump forces a review of this
 section. The exposure mapping is hand-maintained against the adapter sources
@@ -436,14 +436,14 @@ Exposure column values:
   wiring, health probes, helpers).
 - **🔩 plumbing** — E2EE/socket/media-transport internals that are adapter machinery, not user
   capabilities; correctly never exposed.
-- **❌ not exposed** — a real library capability with no OpenWA path. **This is the implementation
+- **❌ not exposed** — a real library capability with no Scalorus WA path. **This is the implementation
   backlog.**
 
 ### 29.5.1 Baileys — 152 socket methods
 
 **Messaging & media** (19)
 
-| Library method                 | OpenWA exposure                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Library method                 | Scalorus WA exposure                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `getMediaHost`                 | 🔩 plumbing                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `readMessages`                 | ✅ `sendSeen`                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -467,7 +467,7 @@ Exposure column values:
 
 **Groups** (19)
 
-| Library method                   | OpenWA exposure                                                                         |
+| Library method                   | Scalorus WA exposure                                                                    |
 | -------------------------------- | --------------------------------------------------------------------------------------- |
 | `groupAcceptInvite`              | ✅ `joinGroupViaInviteCode`                                                             |
 | `groupAcceptInviteV4`            | ❌ **not exposed**                                                                      |
@@ -490,37 +490,37 @@ Exposure column values:
 | `groupUpdateSubject`             | ✅ `setGroupSubject`                                                                    |
 
 **Communities** (23) — the largest single gap: an entire WhatsApp feature area (groups-of-groups)
-with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at all.
+with zero Scalorus WA surface. Baileys-only; whatsapp-web.js has no community API at all.
 
-| Library method                       | OpenWA exposure    |
-| ------------------------------------ | ------------------ |
-| `communityAcceptInvite`              | ❌ **not exposed** |
-| `communityAcceptInviteV4`            | ❌ **not exposed** |
-| `communityCreate`                    | ❌ **not exposed** |
-| `communityCreateGroup`               | ❌ **not exposed** |
-| `communityFetchAllParticipating`     | ❌ **not exposed** |
-| `communityFetchLinkedGroups`         | ❌ **not exposed** |
-| `communityGetInviteInfo`             | ❌ **not exposed** |
-| `communityInviteCode`                | ❌ **not exposed** |
-| `communityJoinApprovalMode`          | ❌ **not exposed** |
-| `communityLeave`                     | ❌ **not exposed** |
-| `communityLinkGroup`                 | ❌ **not exposed** |
-| `communityMemberAddMode`             | ❌ **not exposed** |
-| `communityMetadata`                  | ❌ **not exposed** |
-| `communityParticipantsUpdate`        | ❌ **not exposed** |
-| `communityRequestParticipantsList`   | ❌ **not exposed** |
-| `communityRequestParticipantsUpdate` | ❌ **not exposed** |
-| `communityRevokeInvite`              | ❌ **not exposed** |
-| `communityRevokeInviteV4`            | ❌ **not exposed** |
-| `communitySettingUpdate`             | ❌ **not exposed** |
-| `communityToggleEphemeral`           | ❌ **not exposed** |
-| `communityUnlinkGroup`               | ❌ **not exposed** |
-| `communityUpdateDescription`         | ❌ **not exposed** |
-| `communityUpdateSubject`             | ❌ **not exposed** |
+| Library method                       | Scalorus WA exposure |
+| ------------------------------------ | -------------------- |
+| `communityAcceptInvite`              | ❌ **not exposed**   |
+| `communityAcceptInviteV4`            | ❌ **not exposed**   |
+| `communityCreate`                    | ❌ **not exposed**   |
+| `communityCreateGroup`               | ❌ **not exposed**   |
+| `communityFetchAllParticipating`     | ❌ **not exposed**   |
+| `communityFetchLinkedGroups`         | ❌ **not exposed**   |
+| `communityGetInviteInfo`             | ❌ **not exposed**   |
+| `communityInviteCode`                | ❌ **not exposed**   |
+| `communityJoinApprovalMode`          | ❌ **not exposed**   |
+| `communityLeave`                     | ❌ **not exposed**   |
+| `communityLinkGroup`                 | ❌ **not exposed**   |
+| `communityMemberAddMode`             | ❌ **not exposed**   |
+| `communityMetadata`                  | ❌ **not exposed**   |
+| `communityParticipantsUpdate`        | ❌ **not exposed**   |
+| `communityRequestParticipantsList`   | ❌ **not exposed**   |
+| `communityRequestParticipantsUpdate` | ❌ **not exposed**   |
+| `communityRevokeInvite`              | ❌ **not exposed**   |
+| `communityRevokeInviteV4`            | ❌ **not exposed**   |
+| `communitySettingUpdate`             | ❌ **not exposed**   |
+| `communityToggleEphemeral`           | ❌ **not exposed**   |
+| `communityUnlinkGroup`               | ❌ **not exposed**   |
+| `communityUpdateDescription`         | ❌ **not exposed**   |
+| `communityUpdateSubject`             | ❌ **not exposed**   |
 
 **Newsletters (channels)** (19)
 
-| Library method                | OpenWA exposure                              |
+| Library method                | Scalorus WA exposure                         |
 | ----------------------------- | -------------------------------------------- |
 | `newsletterAdminCount`        | ❌ **not exposed**                           |
 | `newsletterChangeOwner`       | ✅ `transferChannelOwnership`                |
@@ -544,7 +544,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Business & catalog** (12)
 
-| Library method          | OpenWA exposure                                                                                    |
+| Library method          | Scalorus WA exposure                                                                               |
 | ----------------------- | -------------------------------------------------------------------------------------------------- |
 | `addOrEditQuickReply`   | ❌ **not exposed**                                                                                 |
 | `fetchMessageHistory`   | ❌ **not exposed**                                                                                 |
@@ -561,7 +561,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Labels** (6)
 
-| Library method       | OpenWA exposure                 |
+| Library method       | Scalorus WA exposure            |
 | -------------------- | ------------------------------- |
 | `addChatLabel`       | ✅ `addLabelToChat`             |
 | `addLabel`           | ✅ `upsertLabel`, `deleteLabel` |
@@ -572,7 +572,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Privacy & account settings** (13)
 
-| Library method                     | OpenWA exposure                                                                                                                                                                                      |
+| Library method                     | Scalorus WA exposure                                                                                                                                                                                 |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `fetchPrivacySettings`             | ❌ **not exposed** — never called by the adapter; the library reaches it internally from `readMessages` (`sendSeen`), and its raw TypeError on an unanswered query is what forces the deadline bound |
 | `issuePrivacyTokens`               | ❌ **not exposed**                                                                                                                                                                                   |
@@ -590,7 +590,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Queries** (8)
 
-| Library method                 | OpenWA exposure                                                                                                                                        |
+| Library method                 | Scalorus WA exposure                                                                                                                                   |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `executeUSyncQuery`            | ❌ **not exposed**                                                                                                                                     |
 | `fetchAccountReachoutTimelock` | ⚙️ internal wiring                                                                                                                                     |
@@ -603,7 +603,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Profile, contacts & presence** (12)
 
-| Library method           | OpenWA exposure                                                                                        |
+| Library method           | Scalorus WA exposure                                                                                   |
 | ------------------------ | ------------------------------------------------------------------------------------------------------ |
 | `addOrEditContact`       | ✅ `upsertContact`                                                                                     |
 | `createCallLink`         | ✅ `createCallLink`                                                                                    |
@@ -620,7 +620,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Socket, session & plumbing** (21)
 
-| Library method                    | OpenWA exposure                                                                                                                                                             |
+| Library method                    | Scalorus WA exposure                                                                                                                                                        |
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `appPatch`                        | 🔩 plumbing                                                                                                                                                                 |
 | `assertSessions`                  | 🔩 plumbing                                                                                                                                                                 |
@@ -648,7 +648,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Session & connection** (16)
 
-| Library method             | OpenWA exposure                                                                                   |
+| Library method             | Scalorus WA exposure                                                                              |
 | -------------------------- | ------------------------------------------------------------------------------------------------- |
 | `cancelPairingCode`        | ❌ **not exposed** — session/transport setting, not a WhatsApp capability                         |
 | `constructor`              | — class plumbing (not a capability)                                                               |
@@ -669,7 +669,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Messages** (8)
 
-| Library method                 | OpenWA exposure                                                                                                                                                                                                                                                          |
+| Library method                 | Scalorus WA exposure                                                                                                                                                                                                                                                     |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `getMessageById`               | ❌ **not exposed**                                                                                                                                                                                                                                                       |
 | `getPinnedMessages`            | ❌ **not exposed**                                                                                                                                                                                                                                                       |
@@ -682,7 +682,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Chats** (9)
 
-| Library method   | OpenWA exposure                                                                                                                                                                                                                                                                                                                                                                          |
+| Library method   | Scalorus WA exposure                                                                                                                                                                                                                                                                                                                                                                     |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `archiveChat`    | ✅ `archiveChat`                                                                                                                                                                                                                                                                                                                                                                         |
 | `getChatById`    | ✅ `muteChannel`, `sendSeen`, `clearChatMessages`, `markUnread`, `deleteChat`, `sendChatState`, `getGroupInfo`, `addParticipants`, `leaveGroup`, `setGroupSubject`, `setGroupDescription`, `getGroupInviteCode`, `revokeGroupInviteCode`, `getChatLabels`, `replyToMessage`, `forwardMessage`, `reactToMessage`, `getMessageReactions`, `getChatHistory`, `deleteMessage`, `editMessage` |
@@ -696,7 +696,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Groups** (7)
 
-| Library method                   | OpenWA exposure                     |
+| Library method                   | Scalorus WA exposure                |
 | -------------------------------- | ----------------------------------- |
 | `acceptInvite`                   | ✅ `joinGroupViaInviteCode`         |
 | `approveGroupMembershipRequests` | ✅ `approveGroupMembershipRequests` |
@@ -708,7 +708,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Channels** (12)
 
-| Library method             | OpenWA exposure                                                                                      |
+| Library method             | Scalorus WA exposure                                                                                 |
 | -------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `acceptChannelAdminInvite` | ❌ **not exposed**                                                                                   |
 | `createChannel`            | ✅ `createChannel`                                                                                   |
@@ -725,7 +725,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Labels** (5)
 
-| Library method      | OpenWA exposure                                                                                     |
+| Library method      | Scalorus WA exposure                                                                                |
 | ------------------- | --------------------------------------------------------------------------------------------------- |
 | `addOrRemoveLabels` | ✅ `addLabelToChat`, `removeLabelFromChat`                                                          |
 | `getChatLabels`     | ❌ **not exposed** — the adapter reads the chat and calls `Chat.getLabels()`, not the Client method |
@@ -735,7 +735,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Status & broadcasts** (3)
 
-| Library method        | OpenWA exposure         |
+| Library method        | Scalorus WA exposure    |
 | --------------------- | ----------------------- |
 | `getBroadcastById`    | ✅ `getContactStatus`   |
 | `getBroadcasts`       | ✅ `getContactStatuses` |
@@ -743,7 +743,7 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Contacts & numbers** (11)
 
-| Library method                 | OpenWA exposure                                                  |
+| Library method                 | Scalorus WA exposure                                             |
 | ------------------------------ | ---------------------------------------------------------------- |
 | `deleteAddressbookContact`     | ✅ `deleteContact`                                               |
 | `getBlockedContacts`           | ✅ `getBlockedContacts`                                          |
@@ -759,14 +759,14 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Business** (2)
 
-| Library method          | OpenWA exposure    |
-| ----------------------- | ------------------ |
-| `addOrEditCustomerNote` | ❌ **not exposed** |
-| `getCustomerNote`       | ❌ **not exposed** |
+| Library method          | Scalorus WA exposure |
+| ----------------------- | -------------------- |
+| `addOrEditCustomerNote` | ❌ **not exposed**   |
+| `getCustomerNote`       | ❌ **not exposed**   |
 
 **Profile & presence** (7)
 
-| Library method            | OpenWA exposure           |
+| Library method            | Scalorus WA exposure      |
 | ------------------------- | ------------------------- |
 | `deleteProfilePicture`    | ✅ `deleteProfilePicture` |
 | `getProfilePicUrl`        | ✅ `getProfilePicture`    |
@@ -778,11 +778,11 @@ with zero OpenWA surface. Baileys-only; whatsapp-web.js has no community API at 
 
 **Misc** (1)
 
-| Library method   | OpenWA exposure     |
-| ---------------- | ------------------- |
-| `createCallLink` | ✅ `createCallLink` |
+| Library method   | Scalorus WA exposure |
+| ---------------- | -------------------- |
+| `createCallLink` | ✅ `createCallLink`  |
 
-### 29.5.3 Supported by BOTH libraries — missing only in OpenWA
+### 29.5.3 Supported by BOTH libraries — missing only in Scalorus WA
 
 **Empty.** No capability has a first-class symbol on both engines and no `IWhatsAppEngine` method.
 
@@ -804,12 +804,12 @@ search — would be store-backed), **poll-vote read** (wwjs `getPollVotes`; Bail
 
 ### 29.5.4 Events inventory — all 34 Baileys + 31 wwjs events
 
-OpenWA consumes events by normalizing them into `EngineEventCallbacks`; anything else is dropped.
+Scalorus WA consumes events by normalizing them into `EngineEventCallbacks`; anything else is dropped.
 "Consumed" below means referenced by the adapter code.
 
 **Baileys (34):**
 
-| Event                       | OpenWA                                              |     | Event                            | OpenWA                          |
+| Event                       | Scalorus WA                                         |     | Event                            | Scalorus WA                     |
 | --------------------------- | --------------------------------------------------- | --- | -------------------------------- | ------------------------------- |
 | `messages.upsert`           | ✅                                                  |     | `chats.lock`                     | ❌                              |
 | `messages.update`           | ✅                                                  |     | `message-capping.update`         | ❌                              |
@@ -831,7 +831,7 @@ OpenWA consumes events by normalizing them into `EngineEventCallbacks`; anything
 
 **whatsapp-web.js (31):**
 
-| Event                       | OpenWA       |     | Event                  | OpenWA                                                                          |
+| Event                       | Scalorus WA  |     | Event                  | Scalorus WA                                                                     |
 | --------------------------- | ------------ | --- | ---------------------- | ------------------------------------------------------------------------------- |
 | `message`                   | ✅           |     | `change_battery`       | ❌                                                                              |
 | `message_create`            | ✅           |     | `change_state`         | ❌                                                                              |
@@ -875,23 +875,23 @@ adapter boundary — none silently stubs.
 
 ### 29.6.2 wwjs adapter (15 cells)
 
-| Method                     | Cause | What's missing (evidence)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| -------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `subscribeToChannel`       | gap   | `Client.subscribeToChannel(channelId)` (`Client.js:2542`) takes a channel **id** and resolves a boolean — it cannot satisfy the subscribe-by-invite-code contract alone. Correct wiring is two-step: `getChannelByInviteCode(inviteCode)` (`Client.js:1716`) → `subscribeToChannel(channel.id)`, unverified against a live session (the previous one-step call was a phantom success). The one remaining wwjs adapter-gap.                                                                                                                                                                                                                                                                                                                     |
-| `createGroup`              | lib   | `Client.createGroup` exists and is typed `Promise<CreateGroupResult \| string>`, but its injected evaluate reaches a WhatsApp Web internal that no longer exposes `findImpl` (`Client.js:2325`). Measured live on **two** builds — `2.3000.1044858477-alpha` auto-resolved and `2.3000.1044770897-alpha` pinned — both `TypeError: this.findImpl is not a function`, reaching the caller as a bare 500. Bare and `@c.us`-qualified participant ids fail identically, so the id shape is not the variable; varying the build is what separates this from registry pin drift. `findImpl` is in neither the installed `Client.js` nor any OpenWA patcher, so it belongs to the page and cannot be patched around. Baileys serves this capability. |
-| `demoteChannelAdmin`       | lib   | `Client.demoteChannelAdmin` exists (`index.d.ts:35`) but its page body calls `window.require('WAWebDemoteNewsletterAdminAction').demoteNewsletterAdmin` (`Client.js:1907-1925`), and a module probe on a live session (Web `2.3000.1044824727-alpha`, unpinned) returned that module resolving with `demoteNewsletterAdmin: undefined`. The sibling path used inside `transferChannelOwnership` (`WAWebNewsletterDemoteAdminJob.demoteNewsletterAdminAction`) is undefined too, so there is nothing to retarget. Baileys serves this capability.                                                                                                                                                                                               |
-| `transferChannelOwnership` | lib   | `Client.transferChannelOwnership` exists (`index.d.ts:375`) and its page function `WAWebChangeNewsletterOwnerAction.changeNewsletterOwnerAction` is present, but on Web `2.3000.1044824727-alpha` it rejects every call **locally** with `contact-not-found-in-newsletter-subscriber-list` — 4-9ms against a 352-531ms known-server baseline measured in the same page, so it never reaches WhatsApp. Unchanged by subscribing the target, promoting it to admin, or restarting the session; the only repopulation path, `WAWebCollections.NewsletterMetadataCollection.update`, is `undefined`. Baileys serves this capability.                                                                                                               |
-| `upsertLabel`              | lib   | 1.34.7 reads labels and assigns them (`getLabels`, `getLabelById`, `getChatLabels`, `getChatsByLabelId`, `addOrRemoveLabels`, `index.d.ts:129-154`) but exposes nothing that creates/edits a label definition.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `deleteLabel`              | lib   | Same as above.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `subscribeToPresence`      | lib   | Only `sendPresenceAvailable`/`sendPresenceUnavailable` (`index.d.ts:230,233`), which publish the _account's own_ presence; no subscribe call and no presence event is emitted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `rejectCall`               | lib   | `Call.reject()` exists and is typed `Promise<void>` (`index.d.ts:2417`), but measured live on 2026-09-17 on OpenWA 0.23.4 with WhatsApp Web `2.3000.1047471845-alpha` the reject resolved and OpenWA logged the call as auto-rejected while the caller's phone kept ringing until it timed out. The cause is not established. The page function it runs, `WWebJS.rejectCall`, is modified by OpenWA patch 🔧¹ (`wwebjs-201832`), which reads the own user id from `getMaybeMePnUser()._serialized` or `$1`. Baileys serves this capability, and its auto-reject stopped the caller's phone at once in a live test the same day.                                                                                                                |
-| `getCatalog`               | lib   | No `Client.getCatalog` in `index.d.ts` (0 hits); `Product`/`Order` are inbound-only parsers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `getProducts`              | lib   | Same as above.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `getProduct`               | lib   | Only page-internal `getProductMetadata` (`Utils.js:1290`), not a public Client fn.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `sendProduct`              | lib   | No outbound product content type.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `sendCatalog`              | lib   | No `Client.sendCatalog` in `index.d.ts` (0 hits).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `setGroupEphemeral`        | lib   | No disappearing-timer setter (0 hits for `ephemeral` in `index.d.ts`); only the create-time `messageTimer` option (`Client.js:2328`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `clickButton`              | lib   | No interactive button-reply send path; inbound buttons are not exposable as a clickable Client action. Baileys uses `sendMessage({buttonReply})` / `sendMessage({listReply})` for classic prompts. Native-flow `interactiveMessage` replies are unverified.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Method                     | Cause | What's missing (evidence)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| -------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `subscribeToChannel`       | gap   | `Client.subscribeToChannel(channelId)` (`Client.js:2542`) takes a channel **id** and resolves a boolean — it cannot satisfy the subscribe-by-invite-code contract alone. Correct wiring is two-step: `getChannelByInviteCode(inviteCode)` (`Client.js:1716`) → `subscribeToChannel(channel.id)`, unverified against a live session (the previous one-step call was a phantom success). The one remaining wwjs adapter-gap.                                                                                                                                                                                                                                                                                                                          |
+| `createGroup`              | lib   | `Client.createGroup` exists and is typed `Promise<CreateGroupResult \| string>`, but its injected evaluate reaches a WhatsApp Web internal that no longer exposes `findImpl` (`Client.js:2325`). Measured live on **two** builds — `2.3000.1044858477-alpha` auto-resolved and `2.3000.1044770897-alpha` pinned — both `TypeError: this.findImpl is not a function`, reaching the caller as a bare 500. Bare and `@c.us`-qualified participant ids fail identically, so the id shape is not the variable; varying the build is what separates this from registry pin drift. `findImpl` is in neither the installed `Client.js` nor any Scalorus WA patcher, so it belongs to the page and cannot be patched around. Baileys serves this capability. |
+| `demoteChannelAdmin`       | lib   | `Client.demoteChannelAdmin` exists (`index.d.ts:35`) but its page body calls `window.require('WAWebDemoteNewsletterAdminAction').demoteNewsletterAdmin` (`Client.js:1907-1925`), and a module probe on a live session (Web `2.3000.1044824727-alpha`, unpinned) returned that module resolving with `demoteNewsletterAdmin: undefined`. The sibling path used inside `transferChannelOwnership` (`WAWebNewsletterDemoteAdminJob.demoteNewsletterAdminAction`) is undefined too, so there is nothing to retarget. Baileys serves this capability.                                                                                                                                                                                                    |
+| `transferChannelOwnership` | lib   | `Client.transferChannelOwnership` exists (`index.d.ts:375`) and its page function `WAWebChangeNewsletterOwnerAction.changeNewsletterOwnerAction` is present, but on Web `2.3000.1044824727-alpha` it rejects every call **locally** with `contact-not-found-in-newsletter-subscriber-list` — 4-9ms against a 352-531ms known-server baseline measured in the same page, so it never reaches WhatsApp. Unchanged by subscribing the target, promoting it to admin, or restarting the session; the only repopulation path, `WAWebCollections.NewsletterMetadataCollection.update`, is `undefined`. Baileys serves this capability.                                                                                                                    |
+| `upsertLabel`              | lib   | 1.34.7 reads labels and assigns them (`getLabels`, `getLabelById`, `getChatLabels`, `getChatsByLabelId`, `addOrRemoveLabels`, `index.d.ts:129-154`) but exposes nothing that creates/edits a label definition.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `deleteLabel`              | lib   | Same as above.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `subscribeToPresence`      | lib   | Only `sendPresenceAvailable`/`sendPresenceUnavailable` (`index.d.ts:230,233`), which publish the _account's own_ presence; no subscribe call and no presence event is emitted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `rejectCall`               | lib   | `Call.reject()` exists and is typed `Promise<void>` (`index.d.ts:2417`), but measured live on 2026-09-17 on Scalorus WA 0.23.4 with WhatsApp Web `2.3000.1047471845-alpha` the reject resolved and Scalorus WA logged the call as auto-rejected while the caller's phone kept ringing until it timed out. The cause is not established. The page function it runs, `WWebJS.rejectCall`, is modified by Scalorus WA patch 🔧¹ (`wwebjs-201832`), which reads the own user id from `getMaybeMePnUser()._serialized` or `$1`. Baileys serves this capability, and its auto-reject stopped the caller's phone at once in a live test the same day.                                                                                                      |
+| `getCatalog`               | lib   | No `Client.getCatalog` in `index.d.ts` (0 hits); `Product`/`Order` are inbound-only parsers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `getProducts`              | lib   | Same as above.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `getProduct`               | lib   | Only page-internal `getProductMetadata` (`Utils.js:1290`), not a public Client fn.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `sendProduct`              | lib   | No outbound product content type.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `sendCatalog`              | lib   | No `Client.sendCatalog` in `index.d.ts` (0 hits).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `setGroupEphemeral`        | lib   | No disappearing-timer setter (0 hits for `ephemeral` in `index.d.ts`); only the create-time `messageTimer` option (`Client.js:2328`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `clickButton`              | lib   | No interactive button-reply send path; inbound buttons are not exposable as a clickable Client action. Baileys uses `sendMessage({buttonReply})` / `sendMessage({listReply})` for classic prompts. Native-flow `interactiveMessage` replies are unverified.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 ## 29.7 Caveats on supported rows
 

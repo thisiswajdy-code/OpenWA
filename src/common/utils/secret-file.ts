@@ -17,13 +17,13 @@ export function writeSecretFile(filePath: string, content: string): void {
     // world-readable secret on a chmod-unsupported FS (or an unexpected error) is not silently left
     // world-readable after a rewrite.
     if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      console.warn(`[OpenWA] pre-write chmod 0o600 failed for ${filePath}: ${(error as Error).message}`);
+      console.warn(`[Scalorus WA] pre-write chmod 0o600 failed for ${filePath}: ${(error as Error).message}`);
     }
   }
   writeFileSync(filePath, content, { mode: 0o600 });
   try {
     chmodSync(filePath, 0o600);
   } catch (error) {
-    console.warn(`[OpenWA] post-write chmod 0o600 failed for ${filePath}: ${(error as Error).message}`);
+    console.warn(`[Scalorus WA] post-write chmod 0o600 failed for ${filePath}: ${(error as Error).message}`);
   }
 }

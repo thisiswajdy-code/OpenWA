@@ -4,7 +4,7 @@
 
 > **Current Status: ✅ Implemented — opt-in, off by default**
 >
-> OpenWA can expose a curated set of its capabilities to AI agents over the
+> Scalorus WA can expose a curated set of its capabilities to AI agents over the
 > [Model Context Protocol](https://modelcontextprotocol.io). The server is **off by
 > default** and **purely additive**: when disabled, none of its code (or the MCP SDK)
 > is loaded and every REST route behaves exactly as before.
@@ -33,7 +33,7 @@
 ## 24.1 Overview
 
 MCP lets AI agents (Claude, Cursor, and other MCP clients) call external capabilities
-as first-class tools. OpenWA's MCP integration exposes a **focused, curated** slice of
+as first-class tools. Scalorus WA's MCP integration exposes a **focused, curated** slice of
 its functionality — listing sessions, sending messages, reading chats/contacts, basic
 group management — so an agent can drive WhatsApp through the same business logic the
 REST API uses.
@@ -71,7 +71,7 @@ flowchart TB
 2. **No vendor lock-in.** Core never imports the MCP SDK. The `@modelcontextprotocol/sdk`
    dependency lives in exactly one place (`src/modules/mcp/`) and is loaded only when MCP
    is enabled.
-3. **Curated surface.** Rather than reflecting every REST route, OpenWA exposes an
+3. **Curated surface.** Rather than reflecting every REST route, Scalorus WA exposes an
    intentional, named, read/write-tiered set of tools. A focused surface keeps agents from
    getting overwhelmed and keeps destructive/privileged operations off the agent path.
 4. **Reuse the pipeline.** Each tool runs through the **existing services** and the

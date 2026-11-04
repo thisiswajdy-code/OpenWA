@@ -1,20 +1,20 @@
-# n8n Workflow: OpenWA to Discord
+# n8n Workflow: Scalorus WA to Discord
 
-This example demonstrates how to receive OpenWA webhooks using n8n and forward incoming WhatsApp messages to a Discord channel using n8n's built-in HTTP Request node. No custom n8n node package is required.
+This example demonstrates how to receive Scalorus WA webhooks using n8n and forward incoming WhatsApp messages to a Discord channel using n8n's built-in HTTP Request node. No custom n8n node package is required.
 
 ## Prerequisites
 
 1. An n8n instance.
 2. A Discord Webhook URL.
-3. OpenWA configured and running.
+3. Scalorus WA configured and running.
 
 ## Setup
 
 1. **Import the Workflow**: Open n8n, click the "Import from file" option, and select the [`workflow.json`](./workflow.json) file.
 2. **Set the Discord Webhook URL**: Open the Post to Discord node and replace the placeholder URL with your Discord webhook URL. Paste the URL itself rather than reading it from `$env`: n8n 2.0 and later block `$env` in expressions by default.
-3. **Protect the Webhook**: Open the OpenWA Webhook node, set **Authentication** to **Header Auth**, and create a Header Auth credential with **Name** `X-Webhook-Token` and a long random **Value**. Without it, anyone who learns the URL can post into your Discord channel. Header Auth only guards the n8n URL: the message text still comes from any WhatsApp sender, so the workflow sends it with Discord's `allowed_mentions: { "parse": [] }` and a message cannot ping `@everyone`, `@here`, a role, or a user.
-4. **Get the Webhook URL**: Publish the workflow (activate it on n8n 1.x) and copy the **Production URL** from the OpenWA Webhook node (e.g., `https://n8n.example.com/webhook/openwa-discord`).
-5. **Register in OpenWA**: Register the Production URL for the `message.received` event, with the same header and value:
+3. **Protect the Webhook**: Open the Scalorus WA Webhook node, set **Authentication** to **Header Auth**, and create a Header Auth credential with **Name** `X-Webhook-Token` and a long random **Value**. Without it, anyone who learns the URL can post into your Discord channel. Header Auth only guards the n8n URL: the message text still comes from any WhatsApp sender, so the workflow sends it with Discord's `allowed_mentions: { "parse": [] }` and a message cannot ping `@everyone`, `@here`, a role, or a user.
+4. **Get the Webhook URL**: Publish the workflow (activate it on n8n 1.x) and copy the **Production URL** from the Scalorus WA Webhook node (e.g., `https://n8n.example.com/webhook/openwa-discord`).
+5. **Register in Scalorus WA**: Register the Production URL for the `message.received` event, with the same header and value:
 
    ```bash
    curl -X POST https://openwa.example.com/api/sessions/<sessionId>/webhooks \
@@ -27,15 +27,15 @@ This example demonstrates how to receive OpenWA webhooks using n8n and forward i
      }'
    ```
 
-   If n8n is only reachable at a private address (`localhost`, a Docker service name), add its host to `SSRF_ALLOWED_HOSTS` on the OpenWA server, or the registration is refused with `400`. The other webhook options, including a `secret` that signs every delivery, are in the [API Specification](../../06-api-specification.md) and [Webhook Signature Verification](../webhook-signature-verification.md).
+   If n8n is only reachable at a private address (`localhost`, a Docker service name), add its host to `SSRF_ALLOWED_HOSTS` on the Scalorus WA server, or the registration is refused with `400`. The other webhook options, including a `secret` that signs every delivery, are in the [API Specification](../../06-api-specification.md) and [Webhook Signature Verification](../webhook-signature-verification.md).
 
 ### API Key Scope
 
-The API key used to register the webhook in OpenWA needs the **`OPERATOR`** role (or higher, such as `ADMIN`). A `VIEWER` key cannot register webhooks.
+The API key used to register the webhook in Scalorus WA needs the **`OPERATOR`** role (or higher, such as `ADMIN`). A `VIEWER` key cannot register webhooks.
 
 ### Webhook Payload Expected
 
-This workflow expects the standard OpenWA webhook payload for the `message.received` event.
+This workflow expects the standard Scalorus WA webhook payload for the `message.received` event.
 
 ```json
 {
@@ -55,4 +55,4 @@ This workflow expects the standard OpenWA webhook payload for the `message.recei
 }
 ```
 
-The workflow posts `data.author || data.from` as the sender and `data.body` as the message. In a group, `from` is the group and `author` is the member who sent the message; a direct message has no `author`, so `from` is used. Discord rejects a message over 2000 characters, and n8n has already answered OpenWA by then, so nothing would retry it; the workflow therefore cuts a longer message at 2000 characters.
+The workflow posts `data.author || data.from` as the sender and `data.body` as the message. In a group, `from` is the group and `author` is the member who sent the message; a direct message has no `author`, so `from` is used. Discord rejects a message over 2000 characters, and n8n has already answered Scalorus WA by then, so nothing would retry it; the workflow therefore cuts a longer message at 2000 characters.

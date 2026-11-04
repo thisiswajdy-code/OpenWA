@@ -21,7 +21,7 @@ import { wwjsAuthDir } from '../auth-dir-paths';
 type HygieneLogger = Pick<LoggerService, 'debug' | 'log'>;
 
 /**
- * SIGKILL any Chromium orphaned by a previous lifetime of this process. When OpenWA dies hard
+ * SIGKILL any Chromium orphaned by a previous lifetime of this process. When Scalorus WA dies hard
  * (kill -9, crash, host reboot) Puppeteer's exit hook never runs, so the browser survives as an
  * orphan — leaking memory and pinning the session profile dir. Orphans are identified by the
  * `--openwa-session=<id>` marker arg appended to the puppeteer args at launch (Chromium ignores

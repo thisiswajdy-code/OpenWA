@@ -12,7 +12,7 @@ import { Session } from './../src/modules/session/entities/session.entity';
 
 /**
  * Plugin install/lifecycle routes are deployment-global and their sink is code execution as the
- * OpenWA process user, so a session-restricted key must not reach them. The full session
+ * Scalorus WA process user, so a session-restricted key must not reach them. The full session
  * activation replacement (PUT /:id/sessions) is fenced too: it overwrites the ENTIRE active set,
  * so a scoped key could otherwise delete another tenant's activation by sending [] or its own
  * session. The per-session config route (PUT /:id/config/:sessionId) stays reachable for a scoped

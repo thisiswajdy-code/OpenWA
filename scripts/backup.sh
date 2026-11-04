@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# OpenWA backup.
+# Scalorus WA backup.
 #
 # Captures the load-bearing state needed to restore a working install:
 #   - main.sqlite   — auth (API keys) + audit log, ALWAYS SQLite (see app.module.ts)

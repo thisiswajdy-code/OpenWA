@@ -1,6 +1,6 @@
 # openwa
 
-Helm chart for [OpenWA](https://github.com/rmyndharis/OpenWA) — WhatsApp API.
+Helm chart for [Scalorus WA](https://github.com/thisiswajdy-code/OpenWA) — WhatsApp API.
 
 > **Single instance only.** A session lease stops two pods from launching the same session,
 > but API keys and the audit log live in each pod's own `main.sqlite` (a key revoked or

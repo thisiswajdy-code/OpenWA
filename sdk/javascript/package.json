@@ -1,7 +1,7 @@
 {
     "name": "@rmyndharis/openwa",
     "version": "0.6.0",
-    "description": "Official JavaScript/TypeScript SDK for OpenWA, the open-source WhatsApp API Gateway (not affiliated with WhatsApp or Meta)",
+    "description": "Official JavaScript/TypeScript SDK for Scalorus WA, the open-source WhatsApp API Gateway (not affiliated with WhatsApp or Meta)",
     "type": "module",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
@@ -38,11 +38,11 @@
         "openwa",
         "gateway"
     ],
-    "author": "OpenWA Contributors",
+    "author": "Scalorus WA Contributors",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/rmyndharis/OpenWA",
+        "url": "https://github.com/thisiswajdy-code/OpenWA",
         "directory": "sdk/javascript"
     },
     "engines": {

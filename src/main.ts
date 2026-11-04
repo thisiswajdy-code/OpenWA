@@ -262,7 +262,7 @@ async function bootstrap() {
   // sending #731 chasing BASE_URL/BIND_HOST/API_PORT instead of the real cause.
   const publicUrl = process.env.BASE_URL || `http://localhost:${port}`;
 
-  bootstrapLogger.log(`OpenWA is running on: ${publicUrl}`);
+  bootstrapLogger.log(`Scalorus WA is running on: ${publicUrl}`);
   if (swaggerEnabled) {
     bootstrapLogger.log(`Swagger docs: ${publicUrl}/api/docs`);
   }

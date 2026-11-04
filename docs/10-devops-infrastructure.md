@@ -9,7 +9,7 @@
 
 ## 10.1 Infrastructure Overview
 
-OpenWA is a **single-process** application, so a deployment is exactly one app instance per
+Scalorus WA is a **single-process** application, so a deployment is exactly one app instance per
 session-data volume (`replicas: 1` — see §10.2). The repo has no staging/production environments and
 no auto-deploy: CI builds and publishes images, and pulling one onto a server is the operator's step.
 
@@ -25,7 +25,7 @@ flowchart TB
 
     subgraph Deployment["Deployment (single server)"]
         PROXY[Reverse Proxy]
-        PROXY --> APP[OpenWA - one instance]
+        PROXY --> APP[Scalorus WA - one instance]
         APP --> DB[(PostgreSQL or SQLite)]
         APP --> REDIS[(Redis - optional)]
         APP --> VOL["Data volume (/app/data)"]
@@ -166,7 +166,7 @@ version: '3.8'
 
 services:
   app:
-    image: ghcr.io/rmyndharis/openwa:latest
+    image: ghcr.io/thisiswajdy-code/openwa:latest
     # Teardown takes up to 63 s with every datastore on; raise this by the amount SHUTDOWN_DELAY_MS or
     # WEBHOOK_SHUTDOWN_DRAIN_MS exceeds its default, or Docker's 10 s default kills the container mid-teardown.
     stop_grace_period: 75s
@@ -299,7 +299,7 @@ the pending Dependabot digest refresh, or refresh both FROM lines by hand.
 flowchart TB
     subgraph Server["Single Server"]
         NGINX[Nginx Reverse Proxy]
-        NGINX --> APP[OpenWA App]
+        NGINX --> APP[Scalorus WA App]
         APP --> PG[(PostgreSQL)]
         APP --> RD[(Redis)]
         APP --> FS[File Storage]
@@ -310,8 +310,8 @@ flowchart TB
 
 ### Multi-Server Deployment
 
-> **Design sketch, not a supported topology.** OpenWA is single-process with in-memory engine state,
-> so the multi-`OpenWA` fan-out below would corrupt WhatsApp auth across replicas. It is retained only
+> **Design sketch, not a supported topology.** Scalorus WA is single-process with in-memory engine state,
+> so the multi-`Scalorus WA` fan-out below would corrupt WhatsApp auth across replicas. It is retained only
 > as the target architecture once the remaining gaps listed in
 > [13 - Horizontal Scaling Guide](./13-horizontal-scaling.md) are closed. Deploy with `replicas: 1`.
 
@@ -326,9 +326,9 @@ flowchart TB
     end
 
     subgraph AppServers["Application Servers"]
-        APP1[OpenWA 1]
-        APP2[OpenWA 2]
-        APP3[OpenWA N]
+        APP1[Scalorus WA 1]
+        APP2[Scalorus WA 2]
+        APP3[Scalorus WA N]
     end
 
     subgraph DataLayer["Data Layer"]
@@ -755,7 +755,7 @@ scrape_configs:
 
 ### Alert Rules
 
-These rules use the metric names OpenWA actually exports (`openwa_*`). The memory rule below uses a
+These rules use the metric names Scalorus WA actually exports (`openwa_*`). The memory rule below uses a
 node-exporter metric — an **external** exporter, not the app — and is kept as a host-level example.
 
 ```yaml
@@ -770,8 +770,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: 'OpenWA service is down'
-          description: 'The OpenWA application is not responding'
+          summary: 'Scalorus WA service is down'
+          description: 'The Scalorus WA application is not responding'
 
       # Session(s) disconnected
       - alert: SessionDisconnected
@@ -800,10 +800,10 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: 'High OpenWA process memory'
+          summary: 'High Scalorus WA process memory'
           description: 'RSS is {{ $value | humanize1024 }}B'
 
-      # Host memory pressure — EXTERNAL (node-exporter), not exported by OpenWA
+      # Host memory pressure — EXTERNAL (node-exporter), not exported by Scalorus WA
       - alert: HighHostMemoryUsage
         expr: |
           (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)
@@ -913,7 +913,7 @@ export class HealthController {
 
 ### Prometheus Metrics Implementation
 
-The metrics surface is small, so OpenWA emits Prometheus text exposition format (v0.0.4) **by hand** —
+The metrics surface is small, so Scalorus WA emits Prometheus text exposition format (v0.0.4) **by hand** —
 there is **no `prom-client` dependency** and **no `collectDefaultMetrics`**. `MetricsService` reads an
 aggregate overview from `StatsService` plus `process.memoryUsage()`, memoizes the rendered text for a
 short TTL (~5s, so back-to-back scrapes don't repeat the DB scan), and exposes it at
@@ -989,7 +989,7 @@ export class MetricsService {
 | `http_request_duration_seconds`              | histogram | `method`, `route`                   | HTTP request duration (`_bucket` / `_sum` / `_count`)                                                                       |
 
 The last two are deliberately **unprefixed** so a generic RED dashboard or alert rule matches them
-without knowing anything about OpenWA. They come from `src/common/metrics/request-metrics.ts`, which
+without knowing anything about Scalorus WA. They come from `src/common/metrics/request-metrics.ts`, which
 `render()` splices into the same output.
 
 Not every row appears on every scrape, and the difference matters when you write alerts. The
@@ -1027,9 +1027,9 @@ seen, so keep new renderers on that composition.
 ### Grafana Dashboard Definition
 
 ```json
-// monitoring/grafana/dashboards/openwa.json — panels use the openwa_* metrics OpenWA exports
+// monitoring/grafana/dashboards/openwa.json — panels use the openwa_* metrics Scalorus WA exports
 {
-  "title": "OpenWA Dashboard",
+  "title": "Scalorus WA Dashboard",
   "uid": "openwa-main",
   "panels": [
     {
@@ -1094,7 +1094,7 @@ replaced with `[REDACTED]` before the line is written.
 
 The same logger is installed as Nest's framework logger, so framework lines (route mapping, unhandled
 exception stacks from the exception handler) follow `LOG_LEVEL` and `LOG_FORMAT` and carry the
-request id like every other line; they are tagged `[OpenWA]` in pretty output, not `[Nest]`.
+request id like every other line; they are tagged `[Scalorus WA]` in pretty output, not `[Nest]`.
 
 There is no in-app Loki transport: in the stack above, logs reach Loki because **promtail** scrapes
 the container's stdout and stderr from `/var/lib/docker/containers`.
@@ -1121,7 +1121,7 @@ export class MessageService {
 
 ### Key Metrics to Monitor
 
-These are the metrics OpenWA actually exports at `GET /api/metrics`:
+These are the metrics Scalorus WA actually exports at `GET /api/metrics`:
 
 | Category     | Metric                                        | Description                                             | Alert Idea                       |
 | ------------ | --------------------------------------------- | ------------------------------------------------------- | -------------------------------- |
@@ -1139,7 +1139,7 @@ These are the metrics OpenWA actually exports at `GET /api/metrics`:
 > This table is a starting subset. The HTTP (`http_requests_total`, `http_request_duration_seconds`),
 > webhook (`openwa_webhook_delivery_failures_total`), queue (`openwa_queue_jobs`) and event-loop
 > (`openwa_event_loop_delay_*`) series are in the complete list under **Exported metric names** above.
-> OpenWA does **not** expose Node default (`nodejs_*`) metrics or host/container CPU and memory
+> Scalorus WA does **not** expose Node default (`nodejs_*`) metrics or host/container CPU and memory
 > signals; scrape cAdvisor (`container_*`) or node-exporter (`node_*`) for those. `up` is recorded by
 > Prometheus itself for every scrape target.
 
@@ -1200,7 +1200,7 @@ before restoring; PostgreSQL dumps still require the explicit `psql` step descri
 
 ### Vertical Scaling
 
-OpenWA scales **vertically** — add CPU/RAM to a single instance. The table below is **unbenchmarked
+Scalorus WA scales **vertically** — add CPU/RAM to a single instance. The table below is **unbenchmarked
 starting guidance**, not measured figures; actual usage depends heavily on engine choice
 (whatsapp-web.js spawns a Chromium per session; Baileys is far lighter), message volume, and media.
 Size up from your own monitoring.
@@ -1214,7 +1214,7 @@ Size up from your own monitoring.
 
 ### Horizontal Scaling
 
-**Not currently supported.** OpenWA is a single-process application with in-memory engine state, so
+**Not currently supported.** Scalorus WA is a single-process application with in-memory engine state, so
 multiple replicas against a shared session volume corrupt WhatsApp auth. Run exactly **one** API
 instance per session-data volume (`replicas: 1`). Session claims and leases ship; the rest of the design
 that would be required to scale out is documented — as a future design sketch, not a shipped feature —

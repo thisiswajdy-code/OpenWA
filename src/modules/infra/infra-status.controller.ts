@@ -28,7 +28,7 @@ import { DEFAULT_PUPPETEER_ARGS } from '../../config/configuration';
 import { checkForUpdate, type UpdateCheck } from './update-check';
 
 interface InfraStatus {
-  // `builtIn` reflects whether OpenWA's own bundled container is actually running and backing this
+  // `builtIn` reflects whether Scalorus WA's own bundled container is actually running and backing this
   // service (detected live from the labeled container), not merely the saved intent. Falls back to the
   // saved flag when Docker is unavailable. (#488)
   database: { connected: boolean; type: string; host: string; builtIn: boolean };
@@ -275,7 +275,7 @@ export class InfraStatusController {
   @Get('update-check')
   @RequireRole(ApiKeyRole.ADMIN)
   @ApiOperation({
-    summary: 'Compare the running version with the latest OpenWA release',
+    summary: 'Compare the running version with the latest Scalorus WA release',
     description:
       'Reads the latest published GitHub release through the SSRF-guarded fetch and caches it. ' +
       'Set UPDATE_CHECK_ENABLED=false to turn the outbound request off.',

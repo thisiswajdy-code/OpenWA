@@ -32,7 +32,7 @@ describe('validateEnv', () => {
     expect(() => validateEnv({ ...pg, POSTGRES_SCHEMA: 'has space' })).toThrow(/POSTGRES_SCHEMA/);
     expect(() => validateEnv({ ...pg, POSTGRES_SCHEMA: 'a.b' })).toThrow(/POSTGRES_SCHEMA/);
     // upper case rejected: the unquoted search_path folds it, TypeORM's quoted schema does not
-    expect(() => validateEnv({ ...pg, POSTGRES_SCHEMA: 'OpenWA' })).toThrow(/lower-case/);
+    expect(() => validateEnv({ ...pg, POSTGRES_SCHEMA: 'Scalorus WA' })).toThrow(/lower-case/);
     // reserved pg_ prefix rejected
     expect(() => validateEnv({ ...pg, POSTGRES_SCHEMA: 'pg_catalog' })).toThrow(/POSTGRES_SCHEMA/);
     expect(() => validateEnv({ ...pg, POSTGRES_SCHEMA: 'Pg_temp' })).toThrow(/POSTGRES_SCHEMA/);

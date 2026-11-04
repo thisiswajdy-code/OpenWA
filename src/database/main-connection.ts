@@ -82,7 +82,7 @@ export async function createMainDataSource(options?: DataSourceOptions): Promise
     if (unknown.length) {
       throw new MainSchemaMismatchError(
         `${String(opts.database)} records migration(s) this release does not ship (${unknown.join(', ')}): a ` +
-          'newer OpenWA release has upgraded it. Run that release, or restore the file from the backup taken ' +
+          'newer Scalorus WA release has upgraded it. Run that release, or restore the file from the backup taken ' +
           'before the upgrade (docs/14-migration-guide.md, section 14.6).',
       );
     }
@@ -100,7 +100,7 @@ export async function createMainDataSource(options?: DataSourceOptions): Promise
     if (missing.length) {
       throw new MainSchemaMismatchError(
         `${String(opts.database)} lacks ${missing.join(', ')} after every shipped migrations-main migration ` +
-          'ran. Either an older OpenWA release has rebuilt the table and the values it held are gone (restore ' +
+          'ran. Either an older Scalorus WA release has rebuilt the table and the values it held are gone (restore ' +
           'the file from the backup taken before the downgrade, docs/14-migration-guide.md, section 14.6; ' +
           'without a backup, docs/05-database-design.md section 5.6 re-creates the column empty, and each ' +
           "key's chat scope must then be re-applied), or " +

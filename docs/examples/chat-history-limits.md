@@ -1,6 +1,6 @@
 # Chat History Limits
 
-OpenWA has two different history paths, and they answer different questions.
+Scalorus WA has two different history paths, and they answer different questions.
 
 ## Local Message History
 
@@ -8,9 +8,9 @@ OpenWA has two different history paths, and they answer different questions.
 GET /api/sessions/{sessionId}/messages
 ```
 
-This endpoint reads from OpenWA's local database. It returns messages that OpenWA has observed and persisted while the session was connected, including, on Baileys, the history WhatsApp syncs to the device when it is linked.
+This endpoint reads from Scalorus WA's local database. It returns messages that Scalorus WA has observed and persisted while the session was connected, including, on Baileys, the history WhatsApp syncs to the device when it is linked.
 
-Use this when you want stable pagination over messages already stored by OpenWA.
+Use this when you want stable pagination over messages already stored by Scalorus WA.
 
 ## Live WhatsApp Chat History
 
@@ -18,7 +18,7 @@ Use this when you want stable pagination over messages already stored by OpenWA.
 GET /api/sessions/{sessionId}/messages/{chatId}/history?limit=50
 ```
 
-This endpoint asks the active WhatsApp engine for recent messages in a chat. It bypasses OpenWA's local database and can be useful for retrieving messages that are visible to the linked WhatsApp Web session but were not yet stored locally.
+This endpoint asks the active WhatsApp engine for recent messages in a chat. It bypasses Scalorus WA's local database and can be useful for retrieving messages that are visible to the linked WhatsApp Web session but were not yet stored locally.
 
 The endpoint is intentionally bounded:
 
@@ -33,7 +33,7 @@ The endpoint is intentionally bounded:
 By default the live history endpoint returns at most the **100 most recent** messages per request (the
 `limit` clamp above). The `whatsapp-web.js` engine _can_ load older messages on demand — internally it
 drives WhatsApp Web's "load earlier messages" mechanism — so reaching further back is bounded by
-**OpenWA's cap**, not by what WhatsApp Web is willing to expose.
+**Scalorus WA's cap**, not by what WhatsApp Web is willing to expose.
 
 To go back weeks or months, set `deep=true`. This raises the ceiling to **2000** messages per request:
 
@@ -59,7 +59,7 @@ does not guarantee a complete import of all server-side WhatsApp history.
 
 ## Recommended Usage
 
-For reliable long-term history, keep the OpenWA session connected and consume messages as they arrive through local storage, webhooks, or WebSocket events.
+For reliable long-term history, keep the Scalorus WA session connected and consume messages as they arrive through local storage, webhooks, or WebSocket events.
 
 Use the live history endpoint as a bounded recent-history helper, not as a full historical import mechanism.
 
@@ -70,4 +70,4 @@ curl -H "X-API-Key: $API_KEY" \
   "http://localhost:2785/api/sessions/{sessionId}/messages/628123456789@c.us/history?limit=100"
 ```
 
-Use `limit=100` when you want the maximum single-request live history window currently allowed by OpenWA.
+Use `limit=100` when you want the maximum single-request live history window currently allowed by Scalorus WA.

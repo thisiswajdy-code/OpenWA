@@ -21,7 +21,7 @@
  *    "not implemented" and return null/[] without throwing).
  *  - `rootCause` (present only when `not-available`): WHY it is not available, so a contributor knows
  *    exactly where to start. Three values:
- *      'adapter-gap'        — the underlying library HAS the capability; only the OpenWA adapter
+ *      'adapter-gap'        — the underlying library HAS the capability; only the Scalorus WA adapter
  *                             wiring is missing. FIXABLE in this repo (a PR that calls the library
  *                             symbol the evidence points at).
  *      'library-limitation' — the underlying library exposes NO first-class symbol for this op. Not
@@ -129,7 +129,7 @@ export const CURATED_CAPABILITY_EXCEPTIONS: Record<string, MethodCapability> = {
     wwjs: { status: 'not-available', rootCause: 'library-limitation' },
     baileys: { status: 'supported' },
     evidence:
-      'baileys groupCreate(subject, participants) → GroupMetadata (Socket/groups.d.ts). wwjs Client.createGroup exists and is typed Promise<CreateGroupResult | string> (index.d.ts) but its injected evaluate reaches a WhatsApp Web internal that no longer exposes findImpl (Client.js:2325) — measured live on TWO builds, 2.3000.1044858477-alpha auto-resolved and 2.3000.1044770897-alpha pinned, both TypeError "this.findImpl is not a function" reaching the caller as a bare 500. Bare and @c.us-qualified participant ids fail identically, so the id shape is not the variable, and varying the build is what separates this from registry pin drift. findImpl appears in neither the installed Client.js nor any OpenWA patcher, so it is the page\'s, not the library\'s, and cannot be patched around. Baileys creates groups normally on the same account',
+      'baileys groupCreate(subject, participants) → GroupMetadata (Socket/groups.d.ts). wwjs Client.createGroup exists and is typed Promise<CreateGroupResult | string> (index.d.ts) but its injected evaluate reaches a WhatsApp Web internal that no longer exposes findImpl (Client.js:2325) — measured live on TWO builds, 2.3000.1044858477-alpha auto-resolved and 2.3000.1044770897-alpha pinned, both TypeError "this.findImpl is not a function" reaching the caller as a bare 500. Bare and @c.us-qualified participant ids fail identically, so the id shape is not the variable, and varying the build is what separates this from registry pin drift. findImpl appears in neither the installed Client.js nor any Scalorus WA patcher, so it is the page\'s, not the library\'s, and cannot be patched around. Baileys creates groups normally on the same account',
   },
   deleteContact: {
     wwjs: { status: 'supported' },
@@ -302,7 +302,7 @@ export const CURATED_CAPABILITY_EXCEPTIONS: Record<string, MethodCapability> = {
     wwjs: { status: 'not-available', rootCause: 'library-limitation' },
     baileys: { status: 'supported' },
     evidence:
-      "baileys rejectCall(callId, callFrom) (Socket/messages-recv.d.ts:10) with the raw `from` JID cached from the 'offer' call event (Types/Call.d.ts); measured live on 2026-09-17 with 7.0.0-rc14, a real call fired call.received then call.rejected and auto-reject stopped the caller's phone at once. wwjs Call.reject() exists and is typed Promise<void> (index.d.ts:2417) on the Call from the client 'call' event (index.d.ts:643), but measured live on 2026-09-17 on OpenWA 0.23.4 with WhatsApp Web 2.3000.1047471845-alpha the reject resolved and OpenWA logged the call as auto-rejected while the caller's phone kept ringing until it timed out. The cause is not established. The page function Call.reject() runs, WWebJS.rejectCall, is modified by OpenWA patch 1 (scripts/wwebjs-201832.patch), which reads getMaybeMePnUser()._serialized || $1",
+      "baileys rejectCall(callId, callFrom) (Socket/messages-recv.d.ts:10) with the raw `from` JID cached from the 'offer' call event (Types/Call.d.ts); measured live on 2026-09-17 with 7.0.0-rc14, a real call fired call.received then call.rejected and auto-reject stopped the caller's phone at once. wwjs Call.reject() exists and is typed Promise<void> (index.d.ts:2417) on the Call from the client 'call' event (index.d.ts:643), but measured live on 2026-09-17 on Scalorus WA 0.23.4 with WhatsApp Web 2.3000.1047471845-alpha the reject resolved and Scalorus WA logged the call as auto-rejected while the caller's phone kept ringing until it timed out. The cause is not established. The page function Call.reject() runs, WWebJS.rejectCall, is modified by Scalorus WA patch 1 (scripts/wwebjs-201832.patch), which reads getMaybeMePnUser()._serialized || $1",
   },
   requestPairingCode: {
     wwjs: { status: 'supported' },

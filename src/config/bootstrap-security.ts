@@ -194,7 +194,7 @@ export interface SecretCheckEnv {
   nodeEnv?: string;
   databaseType?: string;
   databasePassword?: string;
-  /** POSTGRES_BUILTIN — when 'true', OpenWA runs the bundled Postgres on the internal-only network. */
+  /** POSTGRES_BUILTIN — when 'true', Scalorus WA runs the bundled Postgres on the internal-only network. */
   postgresBuiltIn?: string;
   /** DATABASE_HOST — used to confirm a built-in exemption really points at the internal `postgres`. */
   databaseHost?: string;
@@ -203,7 +203,7 @@ export interface SecretCheckEnv {
   s3SecretKey?: string;
   /** S3_ENDPOINT — used to confirm a built-in exemption really points at the internal `minio`. */
   s3Endpoint?: string;
-  /** MINIO_BUILTIN — when 'true', OpenWA runs the bundled MinIO on the internal-only network. */
+  /** MINIO_BUILTIN — when 'true', Scalorus WA runs the bundled MinIO on the internal-only network. */
   minioBuiltIn?: string;
   apiMasterKey?: string;
   /** ALLOW_DEV_API_KEY — when 'true' it seeds the well-known public `dev-admin-key` as an ADMIN credential. */

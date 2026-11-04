@@ -9,7 +9,7 @@ import type { WASocket } from '@whiskeysockets/baileys';
 
 /**
  * Chat mute/unmute across both engines — the first of the §29.5.3 "supported by BOTH libraries,
- * missing only in OpenWA" backlog.
+ * missing only in Scalorus WA" backlog.
  *
  * `muteUntil` is an absolute epoch-MILLISECONDS timestamp, `null` unmutes. Milliseconds is a
  * measured fact, not a reading of the proto: `MuteAction.muteEndTimestamp` is unsuffixed while the

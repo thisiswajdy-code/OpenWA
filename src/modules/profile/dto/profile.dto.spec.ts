@@ -12,7 +12,7 @@ function errorsFor<T extends object>(cls: new () => T, payload: unknown): Promis
 
 describe('profile DTO validation', () => {
   it('requires a non-empty name within the WhatsApp limit (25)', async () => {
-    expect(await errorsFor(SetProfileNameDto, { name: 'OpenWA Bot' })).toHaveLength(0);
+    expect(await errorsFor(SetProfileNameDto, { name: 'Scalorus WA Bot' })).toHaveLength(0);
     expect((await errorsFor(SetProfileNameDto, { name: '' })).length).toBeGreaterThan(0);
     expect((await errorsFor(SetProfileNameDto, {})).length).toBeGreaterThan(0);
     expect((await errorsFor(SetProfileNameDto, { name: 'x'.repeat(26) })).length).toBeGreaterThan(0);

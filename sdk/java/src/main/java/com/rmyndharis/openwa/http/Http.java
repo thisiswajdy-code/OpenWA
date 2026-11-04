@@ -21,7 +21,7 @@ public final class Http {
      */
     public static String encodeSegment(String segment) {
         if (segment.isEmpty() || segment.equals(".") || segment.equals("..")) {
-            throw new IllegalArgumentException("OpenWA: empty or dot path segment \"" + segment + "\"");
+            throw new IllegalArgumentException("Scalorus WA: empty or dot path segment \"" + segment + "\"");
         }
         // URLEncoder is form-encoding: it encodes space as '+'. Restore true
         // percent-encoding first, then keep already-path-safe WhatsApp-id chars readable.
@@ -39,13 +39,13 @@ public final class Http {
      */
     public static String buildUrl(String baseUrl, String path, Object query, Gson gson) {
         if (!path.startsWith("/")) {
-            throw new IllegalArgumentException("OpenWA: path must begin with \"/\": \"" + path + "\"");
+            throw new IllegalArgumentException("Scalorus WA: path must begin with \"/\": \"" + path + "\"");
         }
         String pathOnly = path.split("[?#]", 2)[0];
         for (String segment : pathOnly.split("/", -1)) {
             String dots = segment.replaceAll("(?i)%2e", ".");
             if (dots.equals(".") || dots.equals("..")) {
-                throw new IllegalArgumentException("OpenWA: dot path segment in \"" + path + "\"");
+                throw new IllegalArgumentException("Scalorus WA: dot path segment in \"" + path + "\"");
             }
         }
         String base = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;

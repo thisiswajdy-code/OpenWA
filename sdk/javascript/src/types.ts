@@ -1,5 +1,5 @@
 /**
- * Request and response type definitions for the OpenWA API.
+ * Request and response type definitions for the Scalorus WA API.
  *
  * IMPORTANT (hybrid codegen strategy): this module is the single source of truth
  * for wire types. It is the part most prone to drift with the backend, and is

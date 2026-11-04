@@ -1,4 +1,4 @@
-// Package openwa is the official Go client for OpenWA, the open-source WhatsApp API Gateway (not
+// Package openwa is the official Go client for Scalorus WA, the open-source WhatsApp API Gateway (not
 // affiliated with WhatsApp or Meta).
 //
 // The single entry point is New, which returns a *Client whose exported fields
@@ -22,7 +22,7 @@
 //	// then wait for status "ready". An unlinked session answers the send with 409.
 //	res, err := client.Messages.SendText(ctx, session.ID, openwa.SendTextRequest{
 //	    ChatID: "628123456789@c.us",
-//	    Text:   "Hello from the OpenWA Go SDK!",
+//	    Text:   "Hello from the Scalorus WA Go SDK!",
 //	})
 //
 // Every network method is context-first. Configuration and dependency injection
@@ -52,7 +52,7 @@ import (
 	"time"
 )
 
-// Client is the entry point to the OpenWA API. Construct it with New. It is safe
+// Client is the entry point to the Scalorus WA API. Construct it with New. It is safe
 // for concurrent use by multiple goroutines. The exported service fields group
 // the API by domain.
 type Client struct {

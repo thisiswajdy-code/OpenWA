@@ -220,7 +220,7 @@ describe('LoggerService', () => {
         JSON.parse(output);
       }).toThrow();
       // NestJS-style prefix, level label, context and message all present.
-      expect(output).toContain('[OpenWA]');
+      expect(output).toContain('[Scalorus WA]');
       expect(output).toContain('LOG');
       expect(output).toContain('[TestContext]');
       expect(output).toContain('Test message');

@@ -2,7 +2,7 @@
 
 ## Our pledge
 
-We as members, contributors, and maintainers pledge to make participation in the OpenWA
+We as members, contributors, and maintainers pledge to make participation in the Scalorus WA
 community a welcoming, respectful, and inclusive experience for everyone, regardless of
 background or identity.
 
@@ -27,7 +27,7 @@ including the detailed standards, enforcement guidelines, and scope — is publi
 ## Enforcement
 
 Concerns about a community member's conduct may be reported privately to the project
-maintainer at **yudhi@rmyndharis.com**. All reports will be reviewed and investigated
+maintainers through the project website at **https://wa.scalorus.com**. All reports will be reviewed and investigated
 promptly and fairly, and the reporter's privacy will be respected.
 
 ## Attribution

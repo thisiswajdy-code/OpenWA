@@ -2,7 +2,7 @@
 
 ## 11.1 Overview
 
-This document contains Standard Operating Procedures (SOP) for OpenWA operations, including incident response, maintenance procedures, and troubleshooting guides.
+This document contains Standard Operating Procedures (SOP) for Scalorus WA operations, including incident response, maintenance procedures, and troubleshooting guides.
 
 ### Runbook Structure
 
@@ -576,10 +576,10 @@ curl -X POST http://localhost:2785/api/sessions/{sessionId}/messages/send-text \
 ```
 
 > If you deploy the published image instead of building from source — your own compose file with
-> `image: ghcr.io/rmyndharis/openwa:<tag>` — keep step 5 (or copy the release's `docker-compose.yml`
+> `image: ghcr.io/thisiswajdy-code/openwa:<tag>` — keep step 5 (or copy the release's `docker-compose.yml`
 > changes into your own compose file) and replace step 6 with editing that tag, running
 > `docker compose pull openwa-api`, and confirming the image landed with
-> `docker image inspect ghcr.io/rmyndharis/openwa:<tag>`. `docker compose run` in step 7 has no
+> `docker image inspect ghcr.io/thisiswajdy-code/openwa:<tag>`. `docker compose run` in step 7 has no
 > `--no-build`, so when the service keeps a `build:` section a failed pull would otherwise build from
 > source under the published name. Run step 8 as `docker compose up -d --no-build`.
 
@@ -643,7 +643,7 @@ tar -xzOf "$BACKUP_DIR/openwa-backup-<timestamp>.tar.gz" ./database.sql | sed '/
 
 # An external PostgreSQL server: rename the upgraded database and create an empty one under the
 # DATABASE_NAME the app uses in the same way, then load the dump into it. DATABASE_URL is not an
-# OpenWA setting: fill in your own URL for that database, such as
+# Scalorus WA setting: fill in your own URL for that database, such as
 # postgres://<user>@<host>:5432/<database>, with the password in PGPASSWORD. With DATABASE_SSL=true,
 # run psql under PGSSLMODE=verify-full (require when DATABASE_SSL_REJECT_UNAUTHORIZED=false), as the
 # command restore.sh prints does; libpq's default sslmode=prefer accepts any certificate. verify-full
@@ -939,7 +939,7 @@ tar -xzOf ./backups/openwa-backup-<timestamp>.tar.gz ./database.sql | sed '/^SET
 
 #    An external PostgreSQL server: rename the current database and create an empty one under the
 #    DATABASE_NAME the app uses in the same way, then load the dump into it. DATABASE_URL is not an
-#    OpenWA setting: fill in your own URL for that database, such as
+#    Scalorus WA setting: fill in your own URL for that database, such as
 #    postgres://<user>@<host>:5432/<database>, with the password in PGPASSWORD. With
 #    DATABASE_SSL=true, run psql under PGSSLMODE=verify-full (require when
 #    DATABASE_SSL_REJECT_UNAUTHORIZED=false), as the command restore.sh prints does; libpq's default
@@ -994,7 +994,7 @@ curl -s -X POST -H "X-API-Key: <an-existing-key>" http://localhost:2785/api/auth
 >     seccompProfile: { type: RuntimeDefault }
 >   containers:
 >     - name: restore
->       image: ghcr.io/rmyndharis/openwa:<version>
+>       image: ghcr.io/thisiswajdy-code/openwa:<version>
 >       command: ['sleep', 'infinity']
 >       securityContext:
 >         allowPrivilegeEscalation: false

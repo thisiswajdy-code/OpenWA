@@ -11,7 +11,7 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/rmyndharis/openwa
+  repository: ghcr.io/thisiswajdy-code/openwa
   # Defaults to the chart's appVersion when empty.
   tag: ""
   pullPolicy: IfNotPresent

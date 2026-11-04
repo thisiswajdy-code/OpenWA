@@ -84,7 +84,7 @@ it into Postgres). Concretely:
   Docker image and the official Node builds include FTS5, so this only affects a custom-compiled
   SQLite.)
 - **Export/import round-trip.** Because the index is a derived, DB-maintained structure (not a
-  separate data store), an OpenWA export/import — which clears the `messages` table and re-inserts —
+  separate data store), an Scalorus WA export/import — which clears the `messages` table and re-inserts —
   leaves FTS correct on both dialects: Postgres regenerates the `body_ts` column from the re-inserted
   rows, and SQLite's triggers repopulate `messages_fts` on the re-inserts. No separate search reindex
   step is needed after a restore or a dialect migration. This is covered by the dual-DB test suite.

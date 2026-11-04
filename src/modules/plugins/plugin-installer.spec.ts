@@ -120,11 +120,11 @@ describe('parsePluginPackage', () => {
     );
   });
 
-  it('rejects a package that needs a newer OpenWA with a 400', () => {
+  it('rejects a package that needs a newer Scalorus WA with a 400', () => {
     const bad = { ...validManifest, minOpenWAVersion: '999.0.0' };
     const zip = zipOf({ 'manifest.json': JSON.stringify(bad), 'index.js': 'x' });
     expect(() => parsePluginPackage(zip)).toThrow(BadRequestException);
-    expect(() => parsePluginPackage(zip)).toThrow(/requires OpenWA >= 999\.0\.0/);
+    expect(() => parsePluginPackage(zip)).toThrow(/requires Scalorus WA >= 999\.0\.0/);
   });
 
   it('rejects a non-string required field (numeric main) with a clean 400, not a TypeError/500', () => {

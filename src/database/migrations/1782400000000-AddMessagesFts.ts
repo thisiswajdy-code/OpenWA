@@ -35,7 +35,7 @@ export class AddMessagesFts1782400000000 implements MigrationInterface {
     }>;
     if (!Number(fts5?.[0]?.enabled)) {
       // FTS5 unavailable on this SQLite build — leave no FTS schema. The provider detects the absent
-      // messages_fts table and 501s; OpenWA still boots. See Task 12.
+      // messages_fts table and 501s; Scalorus WA still boots. See Task 12.
       return;
     }
     await qr.query(

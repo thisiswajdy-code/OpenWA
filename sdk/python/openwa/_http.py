@@ -1,4 +1,4 @@
-"""HTTP transport wrapper for the OpenWA Python SDK.
+"""HTTP transport wrapper for the Scalorus WA Python SDK.
 
 The client never builds a bare :class:`httpx.Client` with a hard-coded
 transport. Instead it accepts an optional ``transport`` (an ``httpx.BaseTransport``)
@@ -31,7 +31,7 @@ def quote_segment(segment: Any) -> str:
     """
     text = str(segment)
     if text in ("", ".", ".."):
-        raise ValueError(f"OpenWA: empty or dot path segment {text!r}")
+        raise ValueError(f"Scalorus WA: empty or dot path segment {text!r}")
     return quote(text, safe="@:+")
 
 
@@ -44,7 +44,7 @@ def build_url(base_url: str, path: str, query: Mapping[str, Any] | None = None) 
     API key there.
     """
     if not path.startswith("/"):
-        raise ValueError(f"OpenWA: path must begin with '/': {path!r}")
+        raise ValueError(f"Scalorus WA: path must begin with '/': {path!r}")
     url = f"{base_url.rstrip('/')}{path}"
     if not query:
         return url

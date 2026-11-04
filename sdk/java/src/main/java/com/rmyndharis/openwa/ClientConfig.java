@@ -113,7 +113,7 @@ public final class ClientConfig {
                 String h = host.replaceAll("^\\[|\\]$", "").toLowerCase();
                 if (!h.equals("localhost") && !h.equals("127.0.0.1") && !h.equals("::1")) {
                     System.err.println(
-                        "[OpenWA SDK] WARNING: baseUrl uses an insecure http:// URL (host: " + host + "). "
+                        "[Scalorus WA SDK] WARNING: baseUrl uses an insecure http:// URL (host: " + host + "). "
                             + "The API key will be sent in cleartext. Use https:// in production.");
                 }
             }
@@ -133,7 +133,7 @@ public final class ClientConfig {
         private Map<String, String> defaultHeaders;
         private HttpTransport transport;
 
-        /** Base URL of the OpenWA API, e.g. {@code http://localhost:2785}. */
+        /** Base URL of the Scalorus WA API, e.g. {@code http://localhost:2785}. */
         public Builder baseUrl(String v) {
             this.baseUrl = v;
             return this;

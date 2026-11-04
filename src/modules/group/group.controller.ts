@@ -593,7 +593,7 @@ export class GroupController {
     return { success: true, message: 'Group picture removed' };
   }
 
-  // The invite code is a bearer join capability, not read data: it works outside OpenWA and keeps
+  // The invite code is a bearer join capability, not read data: it works outside Scalorus WA and keeps
   // working after the key that fetched it is revoked. OPERATOR, like the QR endpoint.
   @Get(':groupId/invite-code')
   @RequireRole(ApiKeyRole.OPERATOR)

@@ -496,11 +496,10 @@ jobs:
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
         with:
-          # Both registries the promote job tags. Computed once here and handed to promote /
+          # The registry the promote job tags. Computed once here and handed to promote /
           # verify-published via job outputs, so the promoted set cannot drift from the build.
           images: |
             ghcr.io/${{ github.repository }}
-            docker.io/rmyndharis/openwa
           tags: |
             type=semver,pattern={{version}}
             # The mutable channels (X.Y, latest) are disabled for prereleases, meaning any tag with
@@ -573,7 +572,7 @@ jobs:
         # The image under test carries only the staging tag at this point — the release tags are
         # applied by `promote`, after this job passes. ${REPO,,} lowercases github.repository: GHCR
         # normalizes the repo name to lowercase on push and `docker run` rejects a mixed-case
-        # reference, so the pull target must be lowercase too (this repo is rmyndharis/OpenWA).
+        # reference, so the pull target must be lowercase too (the repository name is mixed-case).
         env:
           REPO: ${{ github.repository }}
         run: echo "ref=ghcr.io/${REPO,,}:smoke-${{ github.run_id }}" >> "$GITHUB_OUTPUT"

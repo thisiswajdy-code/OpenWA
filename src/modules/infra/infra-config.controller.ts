@@ -390,7 +390,7 @@ export class InfraConfigController {
       return `${key}=${encoded}`;
     });
     const contents = [
-      '# OpenWA Configuration',
+      '# Scalorus WA Configuration',
       `# Generated at ${new Date().toISOString()}`,
       '# Managed via Dashboard > Infrastructure. Values in process env or project .env take precedence.',
       '',

@@ -161,7 +161,7 @@ public class OpenWAApiError extends OpenWAError {
         // emitting a double space, and omit the trailing ": " when there is no message text at all.
         String reason = statusText == null || statusText.isBlank() ? "" : " " + statusText;
         String tail = messageText.isEmpty() ? "" : ": " + messageText;
-        String message = "OpenWA API " + status + reason + " — " + context + tail;
+        String message = "Scalorus WA API " + status + reason + " — " + context + tail;
         return classify(status, message, parsedBody, errorKind, headers);
     }
 

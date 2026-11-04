@@ -173,7 +173,7 @@ docker compose up -d --build   # `docker compose pull` never updates it
 - You reach the instance directly over plain HTTP (a host:port allocation, a private network, a
   panel like Pterodactyl) rather than through a TLS-terminating reverse proxy
 
-**Cause:** In production OpenWA sends the CSP `upgrade-insecure-requests` directive, which tells the
+**Cause:** In production Scalorus WA sends the CSP `upgrade-insecure-requests` directive, which tells the
 browser to upgrade every sub-resource fetch to HTTPS. That is correct behind a TLS proxy. Over plain
 HTTP the browser upgrades the dashboard's own script requests to `https://`, the non-TLS server
 cannot answer them, no JavaScript runs, and React never mounts — a blank page. The failure happens
@@ -192,7 +192,7 @@ docker compose exec openwa-api printenv NODE_ENV CSP_UPGRADE_INSECURE_REQUESTS
 A production boot that serves the dashboard with the opt-out unset prints a warning naming this
 setting. If you are behind a TLS proxy, ignore that warning — the directive is doing its job.
 
-> The alternative is to front OpenWA with your own TLS-terminating reverse proxy (the shipped
+> The alternative is to front Scalorus WA with your own TLS-terminating reverse proxy (the shipped
 > `docker-compose.yml` has none; see the nginx example in 12.8), which serves the dashboard over
 > HTTPS and makes the upgrade a no-op.
 
@@ -262,13 +262,13 @@ entry below: on whatsapp-web.js `/start` returns `504`, on Baileys it succeeds a
 
 **Cause:** WhatsApp added a passkey (WebAuthn) step to its companion linking handshake for some
 accounts. That step is enforced server-side inside the linking frames, which live in the engine
-libraries; neither whatsapp-web.js 1.34.7 nor Baileys 7.0.0-rc14 implements it, and OpenWA passes the
+libraries; neither whatsapp-web.js 1.34.7 nor Baileys 7.0.0-rc14 implements it, and Scalorus WA passes the
 QR string and the pairing-code request straight through to those libraries. There is no OpenWA-side
 fix, and nothing on the client side changes the outcome: switching engine, using a pairing code instead
 of a QR, or presenting a different client identity (`BAILEYS_BROWSER_NAME` or otherwise) all end at the
 same gate. Re-registering the number as a different account type has also been tried by the community
 and did not hold; the block returned on its own within days. Tracked in
-[#560](https://github.com/rmyndharis/OpenWA/issues/560) and upstream in
+#560 and upstream in
 [WhiskeySockets/Baileys#2672](https://github.com/WhiskeySockets/Baileys/issues/2672); the only durable
 change will come from the engine libraries implementing the step.
 
@@ -283,7 +283,7 @@ change will come from the engine libraries implementing the step.
 **Cause:** the pairing request carries the linked-device identity, and some accounts reject a
 non-standard one. The default device name is `Ubuntu`; if `BAILEYS_BROWSER_NAME` is set to a custom
 brand, set it back to `Ubuntu` (or another standard OS name like `macOS` or `Windows`),
-restart OpenWA itself (the name is read at boot, so stopping and starting the session is not enough),
+restart Scalorus WA itself (the name is read at boot, so stopping and starting the session is not enough),
 and request a fresh code. The name applies to new pairings only; a session that is already linked
 keeps the name it was paired with until it is re-linked. See the phone-number pairing example in
 `docs/examples/session-phone-number-pairing.md`.
@@ -340,7 +340,7 @@ stuck. Often seen on ARM64 (e.g. Raspberry Pi) after upgrading to v0.2.x.
 stalls the post-link sync. (If you also see `chrome_crashpad_handler: --database is required` _and the
 session never starts at all_, that is a different problem — see "Session fails to launch …" below.)
 
-**Fix:** OpenWA reconciles a missed `ready` event when WhatsApp Web is connected, the injected
+**Fix:** Scalorus WA reconciles a missed `ready` event when WhatsApp Web is connected, the injected
 runtime is available, and whatsapp-web.js has populated the linked account identity. If your
 environment still hits a WA-Web compatibility hang, pin a known-good WA-Web version with
 `WWEBJS_WEB_VERSION`:
@@ -355,7 +355,7 @@ Restart the container after changing it. Pick the build from
 build the registry no longer serves cannot be fetched, and the session starts on the live build rather
 than the pin you asked for, with a warning at start (action `web_version_html_unavailable`, naming the
 build, the URL and the reason). With
-`WWEBJS_WEB_VERSION` unset, `latest`, or `auto` (the default), OpenWA auto-resolves a settled build
+`WWEBJS_WEB_VERSION` unset, `latest`, or `auto` (the default), Scalorus WA auto-resolves a settled build
 from that registry and pins its HTML — note this HTML is fetched from a third-party repository and
 executed inside the `web.whatsapp.com` origin without an integrity check. Set
 `WWEBJS_WEB_VERSION=off` to disable pinning and use the first-party build served by WhatsApp. An
@@ -370,7 +370,7 @@ at start (the `web_version_html_unavailable` warning above) and the live build l
 Web's service worker can serve its own cached build without the request reaching whatsapp-web.js. In
 the second case the page runs a different build than the one requested, while the startup line
 `Pinning WhatsApp Web version …` still names the requested build.
-When a session reaches `ready`, OpenWA reads the build the page reports and logs it (action
+When a session reaches `ready`, Scalorus WA reads the build the page reports and logs it (action
 `web_version_running`); when a pin was requested and the page runs a different build, it logs a
 warning naming both (action `web_version_pin_not_applied`). The comparison ignores the registry's
 suffix such as `-alpha`, so a pin and the same bare build count as a match.
@@ -380,7 +380,7 @@ the pin did not cover that page load, and a session that works on that build nee
 Whether the service worker answers can differ from one page load to the next, so a later restart may
 load the pin. When you report a problem with the session, include both builds.
 
-If the session is still `authenticating` 90 s after the link, OpenWA stops waiting. If WhatsApp Web
+If the session is still `authenticating` 90 s after the link, Scalorus WA stops waiting. If WhatsApp Web
 reports the session connected but its event bridge never attached, the session is marked `failed` with
 the credentials kept (action `ready_reconcile_bridge_dead`), whether it was linked in that start or
 restored: restart it to relaunch the browser. Otherwise, a session linked by a QR or pairing code in
@@ -512,7 +512,7 @@ limit the instant before the failure — that tells you A vs B. If neither moves
 > **Engine:** This issue applies to the `whatsapp-web.js` engine only (Chromium/Puppeteer-based). It does not affect `ENGINE_TYPE=baileys`.
 
 **Symptoms:** A `whatsapp-web.js` session that was already authenticated fails within seconds of
-**Start** after upgrading OpenWA — no QR is produced — and the session's `lastError` / container log
+**Start** after upgrading Scalorus WA — no QR is produced — and the session's `lastError` / container log
 show:
 
 ```text
@@ -567,9 +567,9 @@ so the stop → start sequence alone is sufficient once the engine is gone.
 **Symptoms:** The session reaches `ready` normally, then at almost exactly five minutes WhatsApp Web
 reloads, briefly returns to `CONNECTED`/`hasSynced`, and navigates to
 `?post_logout=1&logout_reason=0`. The phone silently removes the companion from Linked devices and
-OpenWA returns to a fresh QR because `whatsapp-web.js` deletes LocalAuth credentials on `LOGOUT`.
+Scalorus WA returns to a fresh QR because `whatsapp-web.js` deletes LocalAuth credentials on `LOGOUT`.
 
-**Cause:** OpenWA used to backfill active WhatsApp Status posts immediately in its `ready` callback by
+**Cause:** Scalorus WA used to backfill active WhatsApp Status posts immediately in its `ready` callback by
 fetching `status@broadcast`. Some accounts tolerate that request, but affected accounts have the new
 companion revoked at WhatsApp Web's first scheduled reload. A minimal `whatsapp-web.js` client using
 the same container, browser, account and Web build remains linked when it does not perform this eager
@@ -594,11 +594,11 @@ and only gives up after five clicks that fail to land — at that point a human 
 once, so the session stops instead of being silently unlinked by WhatsApp about five minutes later.
 
 > **If the modal is not in English:** by default the detector matches only the English button label
-> (`Continue`) under the English heading ("What's new"). OpenWA appends `--lang=en-US` to the browser
+> (`Continue`) under the English heading ("What's new"). Scalorus WA appends `--lang=en-US` to the browser
 > flags unless `PUPPETEER_ARGS` already carries a `--lang`, but that sets the browser's language, and
 > WhatsApp Web may still render in the account's own language. For another language, add the modal's
 > confirm-button label to `WWEBJS_ONBOARDING_CONTINUE_LABELS` (for example `Continuar`) and restart
-> OpenWA itself: the value is read at boot, so stopping and starting the session is not enough. A
+> Scalorus WA itself: the value is read at boot, so stopping and starting the session is not enough. A
 > configured label is clicked
 > without the English heading check, but only on a button inside a visible dialog. If your deployment gets a
 > localised modal without a matching label, it is **not** auto-dismissed and the session never reaches
@@ -740,7 +740,7 @@ curl -H "X-API-Key: $API_KEY" \
   `The installed whatsapp-web.js carries only part of the message-id backport…` after an interrupted install
 
 **Cause:** WhatsApp Web 2.3000.x renamed the internal message-id property that whatsapp-web.js
-reads. OpenWA ships a backport that restores it, applied at install time by
+reads. Scalorus WA ships a backport that restores it, applied at install time by
 `scripts/patch-wwebjs-201832.js`. When the install cannot run it — neither GNU `patch` nor `git`
 available, or `npm install --ignore-scripts` — whatsapp-web.js stays unpatched and every operation
 that reads a message id fails. Source installs only; the Docker image always applies the backport.
@@ -768,13 +768,13 @@ rm -rf node_modules/whatsapp-web.js && npm ci
 
 **Symptoms:**
 
-- Startup logs contain `The installed whatsapp-web.js is missing N of OpenWA's install-time patches: …`,
+- Startup logs contain `The installed whatsapp-web.js is missing N of Scalorus WA's install-time patches: …`,
   or the same line naming `@whiskeysockets/baileys`
 - One capability fails while everything around it works: an unnamed `500` from a single route,
   block/unblock refusing every id, a status media send that never arrives, a group description that
   cannot be set, an app-state resync that never settles
 
-**Cause:** OpenWA applies twelve exact source transforms to its engine libraries at install time
+**Cause:** Scalorus WA applies twelve exact source transforms to its engine libraries at install time
 (docs/29 §29.3). The Docker image runs them without `--best-effort`, so a source shape a patcher
 cannot recognise fails the image build. A source install runs them through `scripts/postinstall.js`
 with `--best-effort`, where a patcher that cannot apply prints one line into a long `npm install`
@@ -864,7 +864,7 @@ MEDIA_DOWNLOAD_MAX_BYTES=52428800
 BODY_SIZE_LIMIT=25mb
 
 # Behind nginx, raise client_max_body_size to match: its default is 1m, so a base64 media send
-# is refused with nginx's own HTML 413 before OpenWA sees it. Behind ingress-nginx, set the
+# is refused with nginx's own HTML 413 before Scalorus WA sees it. Behind ingress-nginx, set the
 # nginx.ingress.kubernetes.io/proxy-body-size annotation (default 1m).
 
 # Note: send the body uncompressed. A request carrying Content-Encoding: gzip (or deflate/br)
@@ -1107,7 +1107,7 @@ sqlite3 ./data/openwa.sqlite ".timeout 30000"
 
 # Check WAL mode
 sqlite3 ./data/openwa.sqlite "PRAGMA journal_mode;"
-# Default is: delete (rollback journal) — OpenWA does not force WAL
+# Default is: delete (rollback journal) — Scalorus WA does not force WAL
 
 # Optionally enable WAL mode to reduce writer/reader lock contention
 sqlite3 ./data/openwa.sqlite "PRAGMA journal_mode=WAL;"
@@ -1237,9 +1237,9 @@ docker exec openwa-api curl http://host.docker.internal:8080
 
 ### General Questions
 
-**Q: Is OpenWA safe to use?**
+**Q: Is Scalorus WA safe to use?**
 
-> A: OpenWA uses unofficial WhatsApp Web API. While we implement best practices to avoid detection, there's inherent risk of account restrictions. We recommend:
+> A: Scalorus WA uses unofficial WhatsApp Web API. While we implement best practices to avoid detection, there's inherent risk of account restrictions. We recommend:
 >
 > - Use dedicated phone number (not personal)
 > - Don't send spam or bulk unsolicited messages
@@ -1276,7 +1276,7 @@ docker exec openwa-api curl http://host.docker.internal:8080
 
 **Q: Can I use WhatsApp Business account?**
 
-> A: Yes, OpenWA works with both personal and WhatsApp Business accounts. Note that WhatsApp Business API (official Meta API) is different and not supported.
+> A: Yes, Scalorus WA works with both personal and WhatsApp Business accounts. Note that WhatsApp Business API (official Meta API) is different and not supported.
 
 **Q: How to avoid getting banned?**
 
@@ -1338,8 +1338,8 @@ server {
     listen 443 ssl;
     server_name api.example.com;
 
-    # nginx refuses a request body over 1m by default, below the 25mb OpenWA itself accepts
-    # (BODY_SIZE_LIMIT), so base64 media sends would answer 413 before reaching OpenWA.
+    # nginx refuses a request body over 1m by default, below the 25mb Scalorus WA itself accepts
+    # (BODY_SIZE_LIMIT), so base64 media sends would answer 413 before reaching Scalorus WA.
     # Keep this at or above BODY_SIZE_LIMIT.
     client_max_body_size 25m;
 
@@ -1362,26 +1362,26 @@ server {
 }
 ```
 
-**Then set `TRUSTED_PROXIES` in your `.env`.** With it empty, OpenWA correctly refuses to trust the
+**Then set `TRUSTED_PROXIES` in your `.env`.** With it empty, Scalorus WA correctly refuses to trust the
 spoofable `X-Forwarded-For` header, which has a side effect worth knowing: every client appears as
 the proxy's address, so ALL traffic shares one rate-limit bucket (a single abuser rate-limits
 everyone) and per-key IP allowlists (`allowedIps`) evaluate the proxy for every caller. Name the
 proxy to key limits per client. For the bundled compose (whose published port traverses Docker's
 NAT, so the container sees the bridge gateway, not 127.0.0.1) use the compose network subnet, e.g.
 `TRUSTED_PROXIES=172.18.0.0/16`; a bare-metal nginx talking to the process directly can name
-`127.0.0.1`. OpenWA logs a one-time warning at the first proxied request when the header is present
+`127.0.0.1`. Scalorus WA logs a one-time warning at the first proxied request when the header is present
 but the list is empty.
 
 **Q: How to run behind Traefik / Coolify?**
 
-Traefik forwards WebSocket upgrades automatically, so OpenWA's single-port Socket.IO channel works with a normal HTTP router. Two things keep a public deployment stable:
+Traefik forwards WebSocket upgrades automatically, so Scalorus WA's single-port Socket.IO channel works with a normal HTTP router. Two things keep a public deployment stable:
 
-**1. Let Traefik reach the container over the Docker network — don't _also_ publish the host port.** This is the most common cause of intermittent `504`s on Coolify/Traefik. If OpenWA publishes its port to the host (`ports: ["2785:2785"]`) **and** Traefik also routes to it, every request additionally traverses Docker's userland `docker-proxy`. OpenWA holds a long-lived Socket.IO connection per client (HTTP long-poll → WebSocket upgrade), so those held-open connections accumulate across both hops and gradually exhaust the connection pool to the single upstream — the Dashboard, API, and real-time channel then `504` together "after some time", while `curl http://localhost:2785/api/health/ready` keeps returning `200`. Front it with Traefik on a shared network and **expose** the port internally instead of **publishing** it:
+**1. Let Traefik reach the container over the Docker network — don't _also_ publish the host port.** This is the most common cause of intermittent `504`s on Coolify/Traefik. If Scalorus WA publishes its port to the host (`ports: ["2785:2785"]`) **and** Traefik also routes to it, every request additionally traverses Docker's userland `docker-proxy`. Scalorus WA holds a long-lived Socket.IO connection per client (HTTP long-poll → WebSocket upgrade), so those held-open connections accumulate across both hops and gradually exhaust the connection pool to the single upstream — the Dashboard, API, and real-time channel then `504` together "after some time", while `curl http://localhost:2785/api/health/ready` keeps returning `200`. Front it with Traefik on a shared network and **expose** the port internally instead of **publishing** it:
 
 ```yaml
 services:
   openwa:
-    image: ghcr.io/rmyndharis/openwa:latest
+    image: ghcr.io/thisiswajdy-code/openwa:latest
     expose:
       - '2785' # internal only — drop any public `ports:` mapping when Traefik is on this network
     networks: [proxy]
@@ -1411,7 +1411,7 @@ entryPoints:
         idleTimeout: 600s
 ```
 
-Remember OpenWA is **single-port**: the Dashboard, REST API, and Socket.IO all share `:2785` behind one router, so a choked upstream takes all three down at once. A Dashboard stuck on "Connecting…" while `localhost` is healthy is the proxy hop, not the app.
+Remember Scalorus WA is **single-port**: the Dashboard, REST API, and Socket.IO all share `:2785` behind one router, so a choked upstream takes all three down at once. A Dashboard stuck on "Connecting…" while `localhost` is healthy is the proxy hop, not the app.
 
 **Q: How to backup sessions automatically?**
 
@@ -1560,7 +1560,7 @@ When creating GitHub issue, include:
 ````markdown
 ## Environment
 
-- OpenWA version: x.x.x
+- Scalorus WA version: x.x.x
 - Docker version: x.x.x
 - OS: Ubuntu 22.04 / macOS / Windows
 - Database: SQLite / PostgreSQL
@@ -1599,8 +1599,8 @@ When creating GitHub issue, include:
 
 ### Community Resources
 
-- **GitHub Issues**: [github.com/rmyndharis/OpenWA/issues](https://github.com/rmyndharis/OpenWA/issues)
-- **Discussions**: [github.com/rmyndharis/OpenWA/discussions](https://github.com/rmyndharis/OpenWA/discussions)
+- **GitHub Issues**: [github.com/thisiswajdy-code/OpenWA/issues](https://github.com/thisiswajdy-code/OpenWA/issues)
+- **Discussions**: [github.com/thisiswajdy-code/OpenWA/discussions](https://github.com/thisiswajdy-code/OpenWA/discussions)
 
 ---
 

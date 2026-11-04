@@ -675,8 +675,8 @@ describe('released images carry a verifiable build-provenance attestation', () =
   it('the operator checklist pins the release workflow and the tag it ran on', () => {
     const doc = fs.readFileSync(path.join(__dirname, '..', '..', 'docs', '04-security-design.md'), 'utf8');
     const command = /`(gh attestation verify [^`]*)`/.exec(doc)?.[1];
-    expect(command).toContain('oci://ghcr.io/rmyndharis/openwa:<version>');
-    expect(command).toContain('--signer-workflow rmyndharis/OpenWA/.github/workflows/release.yml');
+    expect(command).toContain('oci://ghcr.io/thisiswajdy-code/openwa:<version>');
+    expect(command).toContain('--signer-workflow thisiswajdy-code/OpenWA/.github/workflows/release.yml');
     expect(command).toContain('--source-ref refs/tags/v<version>');
   });
 

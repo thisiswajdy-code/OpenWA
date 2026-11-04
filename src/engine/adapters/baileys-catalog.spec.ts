@@ -8,7 +8,7 @@ import { EngineRefusedError } from '../../common/errors/engine-refused.error';
  * Baileys' query() resolves `undefined` when WhatsApp never answers (it catches its own 60s
  * timeout rather than throwing), and the catalog parsers are null-safe — so an unanswered
  * catalog IQ is byte-identical to a genuinely empty catalog. These tests pin the only thing
- * that can tell the two apart: OpenWA's own deadline.
+ * that can tell the two apart: Scalorus WA's own deadline.
  */
 
 type SockStub = {

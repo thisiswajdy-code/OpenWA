@@ -23,7 +23,7 @@ export class InfraDatabaseStatusDto {
 
   @ApiProperty({
     description:
-      "Whether OpenWA's own bundled container is actually running and backing this service, " +
+      "Whether Scalorus WA's own bundled container is actually running and backing this service, " +
       'detected live from the labelled container rather than read from the saved intent. Falls back ' +
       'to the saved flag when Docker is unavailable.',
     example: true,
@@ -44,7 +44,7 @@ export class InfraRedisStatusDto {
   @ApiProperty({ example: 6379 })
   port!: number;
 
-  @ApiProperty({ description: "Whether OpenWA's bundled Redis container is backing this.", example: true })
+  @ApiProperty({ description: "Whether Scalorus WA's bundled Redis container is backing this.", example: true })
   builtIn!: boolean;
 }
 
@@ -82,7 +82,7 @@ export class InfraStorageStatusDto {
   @ApiPropertyOptional({ description: 'Bucket name. Present only for `s3`.', example: 'openwa-media' })
   bucket?: string;
 
-  @ApiProperty({ description: "Whether OpenWA's bundled MinIO container is backing this.", example: false })
+  @ApiProperty({ description: "Whether Scalorus WA's bundled MinIO container is backing this.", example: false })
   builtIn!: boolean;
 
   @ApiPropertyOptional({ description: 'Whether the S3 endpoint answered a probe. Present only for `s3`.' })
@@ -228,7 +228,7 @@ export class InfraUpdateCheckResponseDto {
     type: String,
     nullable: true,
     description: 'Release notes page for `latest`.',
-    example: 'https://github.com/rmyndharis/OpenWA/releases/tag/v0.23.6',
+    example: 'https://github.com/thisiswajdy-code/OpenWA/releases/tag/v0.23.6',
   })
   releaseUrl!: string | null;
 }

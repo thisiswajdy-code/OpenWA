@@ -1,6 +1,6 @@
-"""Typed error hierarchy for the OpenWA Python SDK.
+"""Typed error hierarchy for the Scalorus WA Python SDK.
 
-The OpenWA API returns NestJS-default errors of the shape::
+The Scalorus WA API returns NestJS-default errors of the shape::
 
     {"statusCode": int, "message": str | list[str], "error": str}
 
@@ -87,7 +87,7 @@ class OpenWAApiError(OpenWAError):
             message_text = reason or "no response body"
         else:
             message_text = str(raw_message)
-        message = f"OpenWA API {status_code} — {context}: {message_text}"
+        message = f"Scalorus WA API {status_code} — {context}: {message_text}"
         return classify(status_code, message, body, envelope.get("error") if envelope else None, headers=headers)
 
 
