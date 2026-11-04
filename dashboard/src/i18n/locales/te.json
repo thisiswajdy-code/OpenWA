@@ -47,7 +47,9 @@
     "refresh": "రిఫ్రెష్",
     "errorGeneric": "ఒక లోపం సంభవించింది",
     "unknownError": "తెలియని లోపం",
-    "retry": "మళ్లీ ప్రయత్నించండి"
+    "retry": "మళ్లీ ప్రయత్నించండి",
+    "showPassword": "పాస్‌వర్డ్ చూపించు",
+    "hidePassword": "పాస్‌వర్డ్ దాచు"
   },
   "theme": {
     "light": "లైట్",
@@ -346,7 +348,18 @@
     "help": "సహాయం కావాలా?",
     "viewDocs": "డాక్యుమెంటేషన్ చూడండి",
     "footer": "Yudhi Armyndharis మరియు OpenWA కమ్యూనిటీ ద్వారా ❤️ తో తయారు చేయబడింది",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "ఇమెయిల్",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "మీ పాస్‌వర్డ్ నమోదు చేయండి",
+    "emailRequired": "ఇమెయిల్ అవసరం",
+    "passwordRequired": "పాస్‌వర్డ్ అవసరం",
+    "invalidCredentials": "ఇమెయిల్ లేదా పాస్‌వర్డ్ తప్పు",
+    "tooManyAttempts": "చాలా ఎక్కువ సైన్-ఇన్ ప్రయత్నాలు. దయచేసి ఒక నిమిషం వేచి ఉండి మళ్లీ ప్రయత్నించండి.",
+    "signIn": "సైన్ ఇన్",
+    "signingIn": "సైన్ ఇన్ అవుతోంది...",
+    "useApiKey": "బదులుగా API కీతో సైన్ ఇన్ చేయండి",
+    "usePassword": "బదులుగా ఇమెయిల్ మరియు పాస్‌వర్డ్‌తో సైన్ ఇన్ చేయండి"
   },
   "dashboard": {
     "title": "డ్యాష్‌బోర్డ్",

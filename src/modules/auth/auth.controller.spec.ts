@@ -62,6 +62,7 @@ describe('AuthController — API-key lifecycle audit logging', () => {
       keyPrefix: 'ow_',
       isActive: true,
       usageCount: 0,
+      userId: null,
       createdAt: new Date(),
     };
     authService = {
@@ -184,6 +185,7 @@ describe('AuthController: unparseable stored expiry', () => {
     role: 'user',
     isActive: true,
     usageCount: 0,
+    userId: null,
     createdAt: new Date('2026-01-01T00:00:00Z'),
     expiresAt: new Date('2026-W40-1'),
   } as unknown as ApiKey;

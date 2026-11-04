@@ -29,6 +29,8 @@ export const PUBLIC_PATHS = [
   '/api/health/live',
   '/api/health/ready',
   '/api/infra/health',
+  '/api/auth/login',
+  '/api/auth/login-options',
   '/api/ingress/{pluginId}/{instanceId}/{path}',
 ];
 

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add email and password sign-in to the dashboard, next to the API key: a sign-in mints a login API key with the user's role that lasts `LOGIN_SESSION_TTL_HOURS` (a day by default) and is deleted on logout. The first user is seeded from `ADMIN_EMAIL` + `ADMIN_PASSWORD`; more are managed under `/api/auth/users` (ADMIN). Login keys are left out of the key list and never count for the last-admin guard.
 - Add Number Checker page in dashboard for single and bulk WhatsApp recipient pre-validation, in every dashboard language.
 - Add the opt-in `message.receipt` event for per-recipient group and status receipts on Baileys (#1748).
 - Record plugin install, update, uninstall, enable, disable and configuration changes in the audit log.

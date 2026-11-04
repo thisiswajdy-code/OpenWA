@@ -447,6 +447,31 @@ describe('assertNoDefaultSecretsInProduction', () => {
   });
 });
 
+describe('assertNoDefaultSecretsInProduction — ADMIN_PASSWORD', () => {
+  it('is optional: unset seeds no user and passes', () => {
+    expect(() => assertNoDefaultSecretsInProduction({ nodeEnv: 'production' })).not.toThrow();
+  });
+
+  it('refuses a known placeholder, whatever its case', () => {
+    expect(() => assertNoDefaultSecretsInProduction({ nodeEnv: 'production', adminPassword: 'ChangeMe' })).toThrow(
+      /ADMIN_PASSWORD/,
+    );
+  });
+
+  it('refuses a value below 12 characters and accepts one at it', () => {
+    expect(() => assertNoDefaultSecretsInProduction({ nodeEnv: 'production', adminPassword: 'k'.repeat(11) })).toThrow(
+      /ADMIN_PASSWORD \(below the 12-character minimum\)/,
+    );
+    expect(() =>
+      assertNoDefaultSecretsInProduction({ nodeEnv: 'production', adminPassword: 'k'.repeat(12) }),
+    ).not.toThrow();
+  });
+
+  it('is not enforced outside production', () => {
+    expect(() => assertNoDefaultSecretsInProduction({ nodeEnv: 'development', adminPassword: 'short' })).not.toThrow();
+  });
+});
+
 describe('isMainDbSynchronizeInProduction', () => {
   it('is true only for an explicit MAIN_DATABASE_SYNCHRONIZE=true in production', () => {
     expect(isMainDbSynchronizeInProduction('production', 'true')).toBe(true);

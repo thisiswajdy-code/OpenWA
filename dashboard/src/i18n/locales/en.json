@@ -47,7 +47,9 @@
     "refresh": "Refresh",
     "errorGeneric": "An error occurred",
     "unknownError": "Unknown error",
-    "retry": "Retry"
+    "retry": "Retry",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "theme": {
     "light": "Light",
@@ -346,7 +348,18 @@
     "help": "Need help?",
     "viewDocs": "View Documentation",
     "footer": "Made with ❤️ by Yudhi Armyndharis and the OpenWA Community",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Enter your password",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "invalidCredentials": "Invalid email or password",
+    "tooManyAttempts": "Too many sign-in attempts. Please wait a minute and try again.",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "useApiKey": "Sign in with an API key instead",
+    "usePassword": "Sign in with email and password instead"
   },
   "dashboard": {
     "title": "Dashboard",

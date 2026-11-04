@@ -44,6 +44,7 @@ describe('AuthService update with an empty DTO', () => {
         allowedSessions: null,
         expiresAt: null,
         usageCount: 0,
+        userId: null,
       }),
     );
 

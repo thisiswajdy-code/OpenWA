@@ -49,7 +49,9 @@
     "unknownError": "Erro desconhecido",
     "showApiKey": "Mostrar chave API",
     "hideApiKey": "Ocultar chave API",
-    "retry": "Tentar novamente"
+    "retry": "Tentar novamente",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha"
   },
   "theme": {
     "light": "Claro",
@@ -351,7 +353,18 @@
     "help": "Precisa de ajuda?",
     "viewDocs": "Ver documentação",
     "footer": "Feito com ❤️ por Yudhi Armyndharis e a comunidade OpenWA",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "E-mail",
+    "emailPlaceholder": "voce@example.com",
+    "passwordPlaceholder": "Digite sua senha",
+    "emailRequired": "O e-mail é obrigatório",
+    "passwordRequired": "A senha é obrigatória",
+    "invalidCredentials": "E-mail ou senha inválidos",
+    "tooManyAttempts": "Muitas tentativas de login. Aguarde um minuto e tente novamente.",
+    "signIn": "Entrar",
+    "signingIn": "Entrando...",
+    "useApiKey": "Entrar com uma chave de API",
+    "usePassword": "Entrar com e-mail e senha"
   },
   "dashboard": {
     "title": "Painel",

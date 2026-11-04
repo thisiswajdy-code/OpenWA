@@ -9,6 +9,16 @@ export enum AuditAction {
   API_KEY_DELETED = 'api_key_deleted',
   API_KEY_AUTH_FAILED = 'api_key_auth_failed',
 
+  // Dashboard user events (email + password sign-in). A sign-in mints a login API key, so its
+  // success and failure are audited here instead of as API-key events; a failure that names no user
+  // is bounded per client IP like an unresolved API key. Lifecycle changes are ADMIN operations.
+  USER_CREATED = 'user_created',
+  USER_UPDATED = 'user_updated',
+  USER_DELETED = 'user_deleted',
+  USER_LOGIN = 'user_login',
+  USER_LOGIN_FAILED = 'user_login_failed',
+  USER_LOGOUT = 'user_logout',
+
   // Rate-limit enforcement (sampled: at most one row per subject+kind per minute — see
   // EventsGateway — so enforcing a limit never becomes an audit-write flood of its own).
   RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',

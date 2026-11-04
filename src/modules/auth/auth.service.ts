@@ -11,11 +11,12 @@ import {
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, UpdateQueryBuilder, DeleteQueryBuilder, type QueryDeepPartialEntity } from 'typeorm';
+import { In, IsNull, Repository, UpdateQueryBuilder, DeleteQueryBuilder, type QueryDeepPartialEntity } from 'typeorm';
 import { randomBytes } from 'crypto';
 import { ipMatches } from '../../common/utils/ip';
 import { hashApiKey } from './api-key-hash';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
+import type { User } from './entities/user.entity';
 import { CreateApiKeyDto, UpdateApiKeyDto } from './dto';
 import { createLogger } from '../../common/services/logger.service';
 import { setRequestActor } from '../../common/services/request-context';
@@ -72,6 +73,14 @@ export function bannerKeyLine(displayKey: string, isNewKey: boolean): string {
   if (isNewKey) return displayKey;
   if (displayKey.startsWith('(')) return displayKey;
   return `${displayKey.slice(0, 8)}… (full key in ${bootstrapKeyFilePath()})`;
+}
+
+/**
+ * The name of a login key, within the 100 characters of the column. It is what the audit trail and
+ * the WebSocket gateway show for the key, so it names the user, not the sign-in.
+ */
+export function loginKeyName(email: string): string {
+  return Array.from(`Dashboard login: ${email}`).slice(0, 100).join('');
 }
 
 @Injectable()
@@ -228,10 +237,78 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     return { apiKey: saved, rawKey };
   }
 
+  /** Every key except the login keys of dashboard users: those are sessions, not credentials to manage. */
   async findAll(): Promise<ApiKey[]> {
     return this.apiKeyRepository.find({
+      where: { userId: IsNull() },
       order: { createdAt: 'DESC' },
     });
+  }
+
+  /**
+   * Mint the key a password sign-in hands to the browser: the user's role, no IP, session or chat
+   * scope, owned by the user and expiring after `ttlMs`. The dashboard sends it like any other key.
+   */
+  async createLoginKey(
+    user: Pick<User, 'id' | 'email' | 'role'>,
+    ttlMs: number,
+  ): Promise<{ apiKey: ApiKey; rawKey: string }> {
+    const rawKey = `owa_k1_${randomBytes(32).toString('hex')}`;
+    const apiKey = this.apiKeyRepository.create({
+      name: loginKeyName(user.email),
+      keyHash: this.hashKey(rawKey),
+      keyPrefix: rawKey.substring(0, 12),
+      role: user.role,
+      allowedIps: null,
+      allowedSessions: null,
+      allowedChats: null,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + ttlMs),
+    });
+    const saved = await this.apiKeyRepository.save(apiKey);
+    this.keyIndex?.refreshSoon();
+    return { apiKey: saved, rawKey };
+  }
+
+  /**
+   * Delete the login key a logout presents. A key that is not a login key is left alone and false is
+   * returned: a logout must never destroy a credential created through the API. No last-admin guard,
+   * because a login key is never a usable admin (see usableAdminCondition).
+   */
+  async deleteLoginKey(apiKey: Pick<ApiKey, 'id' | 'userId'>): Promise<boolean> {
+    if (!apiKey.userId) return false;
+    const result = await this.apiKeyRepository.delete({ id: apiKey.id, userId: apiKey.userId });
+    if (!result.affected) return false;
+    this.forgetLoginKey(apiKey.id, 'deleted');
+    return true;
+  }
+
+  /** Delete every login key of a user: their password, role or active flag changed, or they are gone. */
+  async deleteLoginKeysOfUser(userId: string): Promise<number> {
+    const keys = await this.apiKeyRepository.find({ where: { userId }, select: { id: true } });
+    if (keys.length === 0) return 0;
+    await this.apiKeyRepository.delete({ userId });
+    for (const key of keys) this.forgetLoginKey(key.id, 'revoked');
+    return keys.length;
+  }
+
+  /** Drop login keys past their expiry; they can never authenticate again, so nothing is evicted. */
+  async purgeExpiredLoginKeys(): Promise<void> {
+    await this.apiKeyRepository
+      .createQueryBuilder()
+      .delete()
+      .from(ApiKey)
+      .where('"userId" IS NOT NULL AND "expiresAt" IS NOT NULL AND "expiresAt" < :now', {
+        now: AuthService.guardNowParam(),
+      })
+      .execute();
+    this.keyIndex?.refreshSoon();
+  }
+
+  private forgetLoginKey(id: string, reason: ApiKeyEvictionReason): void {
+    this.usageTracker.forget(id);
+    this.evictActiveSockets(id, reason);
+    this.keyIndex?.refreshSoon();
   }
 
   async findOne(id: string): Promise<ApiKey> {
@@ -363,8 +440,10 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
    * (AuthController), so a session-scoped admin can authenticate but can never manage keys —
    * counting it as a surviving admin would bless the removal of the last key that actually can, a
    * permanent management lockout with no in-band recovery (the boot seed only fires on an EMPTY
-   * table, not on zero unscoped admins). The simple-array column stores an empty array as '' (rows
-   * updated with allowedSessions: [] hold exactly that), so "no session scope" is NULL or ''.
+   * table, not on zero unscoped admins). A login key (`userId` set) never counts either: it expires
+   * within hours and vanishes on logout, so it cannot be the key that keeps management reachable, and
+   * it must be deletable whatever else exists. The simple-array column stores an empty array as ''
+   * (rows updated with allowedSessions: [] hold exactly that), so "no session scope" is NULL or ''.
    * Dates are stored as UTC "YYYY-MM-DD HH:mm:ss.SSS" strings, so :guardNow is bound in that exact
    * format (see guardNowParam) and the string comparison is chronological. Parameterized by column
    * prefix so one definition serves both the row being mutated (bare) and the EXISTS subquery's
@@ -373,7 +452,7 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   private static usableAdminCondition(prefix: string): string {
     const col = (name: string) => (prefix ? `"${prefix}"."${name}"` : `"${name}"`);
     return (
-      `${col('role')} = :adminRole AND ${col('isActive')} = 1 AND ` +
+      `${col('role')} = :adminRole AND ${col('isActive')} = 1 AND ${col('userId')} IS NULL AND ` +
       `(${col('expiresAt')} IS NULL OR ${col('expiresAt')} > :guardNow) AND ` +
       `(${col('allowedSessions')} = '' OR ${col('allowedSessions')} IS NULL) AND ` +
       `(${col('allowedChats')} = '' OR ${col('allowedChats')} IS NULL)`

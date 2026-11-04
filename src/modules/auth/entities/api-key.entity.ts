@@ -55,6 +55,12 @@ export class ApiKey {
   @Column({ type: 'int', default: 0 })
   usageCount!: number;
 
+  // The dashboard user a password sign-in minted this key for (see user.entity.ts), or NULL for a key
+  // created through the API or seeded at boot. A key with an owner is a login session: hidden from
+  // the key list, never a usable admin for the last-admin guard, deleted on logout or with its user.
+  @Column({ type: 'varchar', length: 36, nullable: true })
+  userId!: string | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

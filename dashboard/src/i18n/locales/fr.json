@@ -49,7 +49,9 @@
     "refresh": "Actualiser",
     "errorGeneric": "Une erreur est survenue",
     "unknownError": "Erreur inconnue",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe"
   },
   "theme": {
     "light": "Clair",
@@ -351,7 +353,18 @@
     "help": "Besoin d'aide ?",
     "viewDocs": "Voir la documentation",
     "footer": "Fait avec ❤️ par Yudhi Armyndharis et la communauté OpenWA",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "E-mail",
+    "emailPlaceholder": "vous@example.com",
+    "passwordPlaceholder": "Saisissez votre mot de passe",
+    "emailRequired": "L'e-mail est obligatoire",
+    "passwordRequired": "Le mot de passe est obligatoire",
+    "invalidCredentials": "E-mail ou mot de passe invalide",
+    "tooManyAttempts": "Trop de tentatives de connexion. Patientez une minute puis réessayez.",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion...",
+    "useApiKey": "Se connecter avec une clé API à la place",
+    "usePassword": "Se connecter avec e-mail et mot de passe à la place"
   },
   "dashboard": {
     "title": "Tableau de bord",

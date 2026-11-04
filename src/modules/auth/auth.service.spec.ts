@@ -4,7 +4,7 @@ jest.mock('fs', () => ({ __esModule: true, ...jest.requireActual<typeof import('
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, type QueryDeepPartialEntity } from 'typeorm';
+import { IsNull, Repository, type QueryDeepPartialEntity } from 'typeorm';
 import {
   BadRequestException,
   UnauthorizedException,
@@ -37,6 +37,7 @@ function createMockApiKey(overrides: Partial<ApiKey> = {}): ApiKey {
     expiresAt: null,
     lastUsedAt: null,
     usageCount: 0,
+    userId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
@@ -322,7 +323,8 @@ describe('AuthService', () => {
       const result = await service.findAll();
 
       expect(result).toHaveLength(2);
-      expect(repository.find).toHaveBeenCalledWith({ order: { createdAt: 'DESC' } });
+      // Login keys (owned by a dashboard user) are sessions, not credentials to manage: left out.
+      expect(repository.find).toHaveBeenCalledWith({ where: { userId: IsNull() }, order: { createdAt: 'DESC' } });
     });
   });
 

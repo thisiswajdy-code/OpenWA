@@ -47,7 +47,9 @@
     "refresh": "रीफ़्रेश करें",
     "errorGeneric": "एक त्रुटि हुई",
     "unknownError": "अज्ञात त्रुटि",
-    "retry": "पुनः प्रयास करें"
+    "retry": "पुनः प्रयास करें",
+    "showPassword": "पासवर्ड दिखाएँ",
+    "hidePassword": "पासवर्ड छिपाएँ"
   },
   "theme": {
     "light": "लाइट",
@@ -346,7 +348,18 @@
     "help": "मदद चाहिए?",
     "viewDocs": "दस्तावेज़ देखें",
     "footer": "Yudhi Armyndharis और OpenWA समुदाय द्वारा ❤️ से बनाया गया",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "ईमेल",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "अपना पासवर्ड दर्ज करें",
+    "emailRequired": "ईमेल आवश्यक है",
+    "passwordRequired": "पासवर्ड आवश्यक है",
+    "invalidCredentials": "ईमेल या पासवर्ड गलत है",
+    "tooManyAttempts": "साइन-इन के बहुत अधिक प्रयास। कृपया एक मिनट प्रतीक्षा करें और फिर से प्रयास करें।",
+    "signIn": "साइन इन करें",
+    "signingIn": "साइन इन हो रहा है...",
+    "useApiKey": "इसके बजाय API कुंजी से साइन इन करें",
+    "usePassword": "इसके बजाय ईमेल और पासवर्ड से साइन इन करें"
   },
   "dashboard": {
     "title": "डैशबोर्ड",

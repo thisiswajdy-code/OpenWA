@@ -55,7 +55,9 @@
     "refresh": "تحديث",
     "errorGeneric": "حدث خطأ",
     "unknownError": "خطأ غير معروف",
-    "retry": "إعادة المحاولة"
+    "retry": "إعادة المحاولة",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور"
   },
   "theme": {
     "light": "فاتح",
@@ -367,7 +369,18 @@
     "help": "هل تحتاج مساعدة؟",
     "viewDocs": "عرض التوثيق",
     "footer": "صُنع بـ ❤️ بواسطة Yudhi Armyndharis ومجتمع OpenWA",
-    "version": "v{{version}} · {{date}}"
+    "version": "v{{version}} · {{date}}",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "tooManyAttempts": "محاولات تسجيل دخول كثيرة جدًا. يرجى الانتظار دقيقة ثم المحاولة مرة أخرى.",
+    "signIn": "تسجيل الدخول",
+    "signingIn": "جارٍ تسجيل الدخول...",
+    "useApiKey": "تسجيل الدخول بمفتاح API بدلًا من ذلك",
+    "usePassword": "تسجيل الدخول بالبريد الإلكتروني وكلمة المرور بدلًا من ذلك"
   },
   "dashboard": {
     "title": "لوحة التحكم",
