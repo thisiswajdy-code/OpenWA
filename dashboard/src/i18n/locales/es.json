@@ -853,6 +853,22 @@
     "edit": {
       "title": "Editar usuario",
       "signOutNote": "Cambiar la contraseña, el rol o el estado activo cierra la sesión de este usuario en todas partes."
+    },
+    "plan": {
+      "title": "Plan de registro",
+      "subtitle": "Lo que se cobra a una cuenta nueva creada desde el sitio. El sitio muestra este precio.",
+      "amount": "Importe por mes",
+      "currency": "Moneda",
+      "months": "Número de meses",
+      "fallback": "Alternativa en ILS por mes",
+      "fallbackHint": "Solo se usa si el servicio de pago rechaza la moneda elegida; déjalo vacío para desactivarla.",
+      "description": "Descripción en la página de pago",
+      "total": "{{total}} en total durante {{months}} meses",
+      "save": "Guardar plan",
+      "saved": "Plan de registro guardado. Los nuevos registros pagarán el nuevo precio.",
+      "saveFailed": "No se pudo guardar el plan.",
+      "loadFailed": "No se pudo cargar el plan de registro.",
+      "disabledHint": "El registro está desactivado en esta pasarela: ARVY_API_TOKEN no está definido. El precio se guarda de todos modos."
     }
   },
   "logs": {

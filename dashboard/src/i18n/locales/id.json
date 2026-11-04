@@ -897,6 +897,22 @@
     "edit": {
       "title": "Edit pengguna",
       "signOutNote": "Mengubah kata sandi, peran, atau status aktif akan mengeluarkan pengguna ini di mana pun."
+    },
+    "plan": {
+      "title": "Paket pendaftaran",
+      "subtitle": "Biaya untuk akun baru yang dibuat lewat situs. Situs menampilkan harga ini.",
+      "amount": "Jumlah per bulan",
+      "currency": "Mata uang",
+      "months": "Jumlah bulan",
+      "fallback": "Cadangan ILS per bulan",
+      "fallbackHint": "Hanya dipakai jika layanan pembayaran menolak mata uang yang dipilih; kosongkan untuk menonaktifkan.",
+      "description": "Deskripsi di halaman pembayaran",
+      "total": "{{total}} total selama {{months}} bulan",
+      "save": "Simpan paket",
+      "saved": "Paket pendaftaran disimpan. Pendaftaran baru dikenakan harga baru.",
+      "saveFailed": "Paket tidak dapat disimpan.",
+      "loadFailed": "Paket pendaftaran tidak dapat dimuat.",
+      "disabledHint": "Pendaftaran dinonaktifkan di gateway ini: ARVY_API_TOKEN belum diatur. Harga tetap disimpan."
     }
   },
   "logs": {

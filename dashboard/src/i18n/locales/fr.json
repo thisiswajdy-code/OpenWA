@@ -903,6 +903,22 @@
     "edit": {
       "title": "Modifier l'utilisateur",
       "signOutNote": "Modifier le mot de passe, le rôle ou l'état actif déconnecte cet utilisateur partout."
+    },
+    "plan": {
+      "title": "Plan d'inscription",
+      "subtitle": "Ce qui est facturé à un nouveau compte créé depuis le site. Le site affiche ce prix.",
+      "amount": "Montant par mois",
+      "currency": "Devise",
+      "months": "Nombre de mois",
+      "fallback": "Montant de repli en ILS par mois",
+      "fallbackHint": "Utilisé seulement si le service de paiement refuse la devise choisie ; laisser vide pour désactiver.",
+      "description": "Description sur la page de paiement",
+      "total": "{{total}} au total sur {{months}} mois",
+      "save": "Enregistrer le plan",
+      "saved": "Plan d'inscription enregistré. Les nouvelles inscriptions paient le nouveau prix.",
+      "saveFailed": "Le plan n'a pas pu être enregistré.",
+      "loadFailed": "Le plan d'inscription n'a pas pu être chargé.",
+      "disabledHint": "L'inscription est désactivée sur cette passerelle : ARVY_API_TOKEN n'est pas défini. Le prix est quand même enregistré."
     }
   },
   "logs": {

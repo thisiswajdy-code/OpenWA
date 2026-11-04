@@ -10,7 +10,7 @@ const handler = (controller: object, name: string): object =>
   Object.getOwnPropertyDescriptor(controller, name)?.value as object;
 
 describe('SignupController — route markers', () => {
-  it.each(['register', 'status'] as const)('%s is public: a visitor has no key yet', name => {
+  it.each(['register', 'status', 'plan'] as const)('%s is public: a visitor has no key yet', name => {
     expect(Reflect.getMetadata(PUBLIC_KEY, handler(SignupController.prototype, name))).toBe(true);
   });
 
@@ -52,7 +52,12 @@ describe('SignupController — responses and audit trail', () => {
   beforeEach(() => {
     signupService = { register: jest.fn(), status: jest.fn() };
     auditService = { logInfo: jest.fn().mockResolvedValue(null) };
-    controller = new SignupController(signupService as never, auditService as never, { get: () => [] } as never);
+    controller = new SignupController(
+      signupService as never,
+      { get: () => Promise.resolve({}) } as never,
+      auditService as never,
+      { get: () => [] } as never,
+    );
   });
 
   it('answers the payment link and the plan, and audits the self-registration as a user creation', async () => {

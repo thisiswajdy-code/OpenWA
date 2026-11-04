@@ -853,6 +853,22 @@
     "edit": {
       "title": "Editar usuário",
       "signOutNote": "Alterar a senha, a função ou o status ativo encerra a sessão deste usuário em todos os lugares."
+    },
+    "plan": {
+      "title": "Plano de cadastro",
+      "subtitle": "O que é cobrado de uma conta nova criada pelo site. O site mostra este preço.",
+      "amount": "Valor por mês",
+      "currency": "Moeda",
+      "months": "Número de meses",
+      "fallback": "Alternativa em ILS por mês",
+      "fallbackHint": "Usada apenas se o serviço de pagamento recusar a moeda escolhida; deixe em branco para desativar.",
+      "description": "Descrição na página de pagamento",
+      "total": "{{total}} no total em {{months}} meses",
+      "save": "Salvar plano",
+      "saved": "Plano de cadastro salvo. Novos cadastros pagam o novo preço.",
+      "saveFailed": "Não foi possível salvar o plano.",
+      "loadFailed": "Não foi possível carregar o plano de cadastro.",
+      "disabledHint": "O cadastro está desativado neste gateway: ARVY_API_TOKEN não está definido. O preço é salvo mesmo assim."
     }
   },
   "logs": {

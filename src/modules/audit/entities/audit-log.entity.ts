@@ -18,6 +18,8 @@ export enum AuditAction {
   USER_LOGIN = 'user_login',
   USER_LOGIN_FAILED = 'user_login_failed',
   USER_LOGOUT = 'user_logout',
+  // The sign-up plan an admin sells through the site changed (signup-plan.controller.ts).
+  SIGNUP_PLAN_UPDATED = 'signup_plan_updated',
 
   // Rate-limit enforcement (sampled: at most one row per subject+kind per minute — see
   // EventsGateway — so enforcing a limit never becomes an audit-write flood of its own).

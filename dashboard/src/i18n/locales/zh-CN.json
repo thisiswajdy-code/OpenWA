@@ -897,6 +897,22 @@
     "edit": {
       "title": "编辑用户",
       "signOutNote": "更改密码、角色或活跃状态会使该用户在所有地方退出登录。"
+    },
+    "plan": {
+      "title": "注册套餐",
+      "subtitle": "通过网站创建的新账户所需支付的费用。网站会显示此价格。",
+      "amount": "每月金额",
+      "currency": "货币",
+      "months": "月数",
+      "fallback": "每月 ILS 备用金额",
+      "fallbackHint": "仅在支付服务拒绝所选货币时使用；留空则禁用。",
+      "description": "支付页面上的说明",
+      "total": "{{months}} 个月共 {{total}}",
+      "save": "保存套餐",
+      "saved": "注册套餐已保存。新注册将按新价格收费。",
+      "saveFailed": "无法保存套餐。",
+      "loadFailed": "无法加载注册套餐。",
+      "disabledHint": "此网关已禁用注册：未设置 ARVY_API_TOKEN。价格仍会保存。"
     }
   },
   "logs": {

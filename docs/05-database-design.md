@@ -630,6 +630,20 @@ CREATE UNIQUE INDEX "IDX_users_email" ON users(email);
 
 ---
 
+### 5.3.6a settings
+
+Named values an admin changes at runtime, stored as JSON text. Lives on the **main** connection. The first key is `signup.plan`, the plan a self-service sign-up is charged (`PUT /api/auth/signup-plan`); a missing row means the built-in default.
+
+```sql
+CREATE TABLE settings (
+    key VARCHAR(100) PRIMARY KEY,
+    value TEXT NOT NULL,                           -- JSON
+    "updatedAt" DATETIME NOT NULL DEFAULT (datetime('now'))
+);
+```
+
+---
+
 ### 5.3.6 audit_logs
 
 Consolidated audit trail for API-key, session, send-pacing, rate-limit, queue-dashboard, integration-instance and infrastructure events. This is the **only** audit table — there are no separate `session_logs`, `webhook_logs`, or `api_key_logs` tables. Lives on the **main** (always-SQLite) connection.
@@ -685,7 +699,7 @@ plugin instances (`integration_instance_created`, `integration_instance_updated`
 `integration_instance_secret_regenerated`, `integration_instance_deleted`,
 `integration_instance_redriven`), plugin management (`plugin_installed`, `plugin_updated`, `plugin_uninstalled`,
 `plugin_enabled`, `plugin_disabled`, `plugin_config_updated`, `plugin_sessions_updated`; metadata carries the plugin
-id, version, the host of the requested download URL and config field names, never config values), and ADMIN-only infrastructure operations (`infra_config_saved`,
+id, version, the host of the requested download URL and config field names, never config values), the sign-up plan (`signup_plan_updated`), and ADMIN-only infrastructure operations (`infra_config_saved`,
 `infra_restart_requested`, `infra_data_exported`, `infra_data_imported`, `infra_storage_exported`,
 `infra_storage_imported`).
 
@@ -910,7 +924,8 @@ src/database/migrations-main/      # main connection (auth + audit, SQLite)
 ├── 1786600000000-AddApiKeyAllowedChats.ts   # adds api_keys.allowedChats
 ├── 1786610000000-DropSynchronizeIndexDuplicates.ts  # drops synchronize-named duplicate indexes
 ├── 1791400000000-AddUsersAndLoginKeys.ts    # creates users, adds api_keys.userId (login keys)
-└── 1792000000000-AddUserPaymentLink.ts      # adds users.paymentLinkId (self-service sign-up)
+├── 1792000000000-AddUserPaymentLink.ts      # adds users.paymentLinkId (self-service sign-up)
+└── 1792100000000-AddSettings.ts             # creates settings (runtime admin values, e.g. the sign-up plan)
 
 src/database/migrations/           # data connection (pluggable)
 ├── 1770108659848-AddMessageStatus.ts

@@ -32,6 +32,7 @@ export const PUBLIC_PATHS = [
   '/api/auth/login',
   '/api/auth/login-options',
   '/api/auth/register',
+  '/api/auth/register/plan',
   '/api/auth/register/{id}',
   '/notify',
   '/api/ingress/{pluginId}/{instanceId}/{path}',

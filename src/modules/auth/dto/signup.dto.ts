@@ -1,7 +1,9 @@
-import { IsEmail, IsIn, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsInt, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, normalizeEmail } from './user.dto';
+import { ToStrictNumber } from '../../../common/utils/strict-boolean';
+import { SIGNUP_CURRENCIES, SIGNUP_PLAN_LIMITS, type SignupCurrency } from '../signup-plan.service';
 
 export const SIGNUP_LOCALES = ['he', 'en', 'ar'] as const;
 export type SignupLocale = (typeof SIGNUP_LOCALES)[number];
@@ -91,4 +93,84 @@ export class ArvyNotifyResponseDto {
     example: false,
   })
   ignored!: boolean;
+}
+
+export class SignupPlanDto {
+  @ApiProperty({
+    description: 'Shown on the payment page.',
+    maxLength: SIGNUP_PLAN_LIMITS.descriptionMax,
+    example: 'Scalorus WA — 12 months',
+  })
+  @Transform(({ value }): unknown => (typeof value === 'string' ? value.trim() : value))
+  @IsString()
+  @MinLength(1)
+  @MaxLength(SIGNUP_PLAN_LIMITS.descriptionMax)
+  description!: string;
+
+  @ApiProperty({ description: 'Charge per month.', minimum: SIGNUP_PLAN_LIMITS.amountMin, example: 30 })
+  @ToStrictNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(SIGNUP_PLAN_LIMITS.amountMin)
+  @Max(SIGNUP_PLAN_LIMITS.amountMax)
+  amount!: number;
+
+  @ApiProperty({ description: 'Currency of `amount`.', enum: SIGNUP_CURRENCIES, example: 'USD' })
+  @Transform(({ value }): unknown => (typeof value === 'string' ? value.trim().toUpperCase() : value))
+  @IsIn(SIGNUP_CURRENCIES)
+  currencyCode!: SignupCurrency;
+
+  @ApiProperty({
+    description: 'Number of monthly charges.',
+    minimum: SIGNUP_PLAN_LIMITS.paymentsMin,
+    maximum: SIGNUP_PLAN_LIMITS.paymentsMax,
+    example: 12,
+  })
+  @ToStrictNumber()
+  @IsInt()
+  @Min(SIGNUP_PLAN_LIMITS.paymentsMin)
+  @Max(SIGNUP_PLAN_LIMITS.paymentsMax)
+  paymentsNumber!: number;
+
+  @ApiPropertyOptional({
+    description:
+      'Monthly charge in ILS used when the payment service refuses `currencyCode`; null or absent disables the fallback.',
+    nullable: true,
+    example: 95,
+  })
+  @IsOptional()
+  @ToStrictNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(SIGNUP_PLAN_LIMITS.amountMin)
+  @Max(SIGNUP_PLAN_LIMITS.amountMax)
+  fallbackAmountIls?: number | null;
+}
+
+export class SignupPlanResponseDto {
+  @ApiProperty({ example: 'Scalorus WA — 12 months' })
+  description!: string;
+
+  @ApiProperty({ description: 'Charge per month.', example: 30 })
+  amount!: number;
+
+  @ApiProperty({ enum: SIGNUP_CURRENCIES, example: 'USD' })
+  currencyCode!: SignupCurrency;
+
+  @ApiProperty({ description: 'Number of monthly charges.', example: 12 })
+  paymentsNumber!: number;
+
+  @ApiProperty({ example: 'monthly' })
+  chargeFrequency!: 'monthly';
+
+  @ApiPropertyOptional({
+    description: 'ILS monthly charge used when the service refuses `currencyCode`.',
+    nullable: true,
+    example: 95,
+  })
+  fallbackAmountIls!: number | null;
+
+  @ApiProperty({ description: '`amount` × `paymentsNumber`.', example: 360 })
+  total!: number;
+
+  @ApiProperty({ description: 'Whether sign-up is enabled on this gateway (`ARVY_API_TOKEN` set).', example: true })
+  enabled!: boolean;
 }

@@ -897,6 +897,22 @@
     "edit": {
       "title": "Benutzer bearbeiten",
       "signOutNote": "Eine Änderung von Passwort, Rolle oder Aktiv-Status meldet diesen Benutzer überall ab."
+    },
+    "plan": {
+      "title": "Registrierungsplan",
+      "subtitle": "Was ein über die Website erstelltes neues Konto kostet. Die Website zeigt diesen Preis.",
+      "amount": "Betrag pro Monat",
+      "currency": "Währung",
+      "months": "Anzahl Monate",
+      "fallback": "ILS-Ersatzbetrag pro Monat",
+      "fallbackHint": "Nur verwendet, wenn der Zahlungsdienst die gewählte Währung ablehnt; leer lassen zum Deaktivieren.",
+      "description": "Beschreibung auf der Zahlungsseite",
+      "total": "{{total}} insgesamt über {{months}} Monate",
+      "save": "Plan speichern",
+      "saved": "Registrierungsplan gespeichert. Neue Registrierungen zahlen den neuen Preis.",
+      "saveFailed": "Der Plan konnte nicht gespeichert werden.",
+      "loadFailed": "Der Registrierungsplan konnte nicht geladen werden.",
+      "disabledHint": "Die Registrierung ist auf diesem Gateway deaktiviert: ARVY_API_TOKEN ist nicht gesetzt. Der Preis wird trotzdem gespeichert."
     }
   },
   "logs": {

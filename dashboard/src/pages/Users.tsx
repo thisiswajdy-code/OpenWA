@@ -14,6 +14,7 @@ import type { User } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useUsersQuery, useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation } from '../hooks/queries';
 import { PageHeader } from '../components/PageHeader';
+import { SignupPlanCard } from '../components/SignupPlanCard';
 import { Modal } from '../components/Modal';
 import { useToast } from '../hooks/useToast';
 import {
@@ -383,6 +384,8 @@ export function Users() {
           )}
         </Modal>
       )}
+
+      <SignupPlanCard />
 
       <div className="users-content">
         <div className="users-table-container">

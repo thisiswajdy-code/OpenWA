@@ -255,6 +255,7 @@ describe('PUBLIC_PATHS drift guard', () => {
         '/api/auth/login',
         '/api/auth/login-options',
         '/api/auth/register',
+        '/api/auth/register/plan',
         '/api/auth/register/{id}',
         '/api/health',
         '/api/health/live',

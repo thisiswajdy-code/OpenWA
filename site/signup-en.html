@@ -34,12 +34,12 @@
 
 <section id="step-account" class="su-step">
 <h1 class="su-title">Choose an account</h1>
-<p class="su-sub">One simple price. Cancel at the end of the 12 months.</p>
+<p class="su-sub" data-plan-template="One simple price. Cancel at the end of the {months} months.">One simple price. Cancel at the end of the 12 months.</p>
 <div class="su-accounts" role="radiogroup" aria-label="Account type">
 <div class="card-soft su-account" role="radio" tabindex="0" aria-checked="false" data-account="scalorus-wa">
 <p class="font-medium text-muted-foreground">Scalorus WA</p>
-<p class="su-price">$30<small> / month</small></p>
-<p class="text-sm text-muted-foreground">12 months · charged monthly · $360 in total</p>
+<p class="su-price"><span data-plan-amount>$30</span><small> / month</small></p>
+<p class="text-sm text-muted-foreground" data-plan-template="{months} months · charged monthly · {total} in total">12 months · charged monthly · $360 in total</p>
 <ul><li>Full WhatsApp Business API setup</li><li>Smart reply bot and messaging</li><li>Dashboard and analytics</li><li>Ongoing support</li></ul>
 </div>
 <div class="card-soft su-account" role="radio" tabindex="0" aria-checked="false" data-account="custom">
@@ -67,7 +67,7 @@
 
 <section id="step-pay" class="su-step">
 <h1 class="su-title">Save a payment method</h1>
-<p class="su-sub">The first charge is today, then monthly for 12 months.</p>
+<p class="su-sub" data-plan-template="The first charge is today, then monthly for {months} months.">The first charge is today, then monthly for 12 months.</p>
 <div class="card-soft su-pay">
 <div class="su-summary"><span>Account: <strong id="pay-email"></strong></span><span>Charge: <strong id="pay-amount"></strong></span><span>Total: <strong id="pay-total"></strong></span></div>
 <iframe id="pay-frame" title="Payment page" referrerpolicy="strict-origin-when-cross-origin"></iframe>
@@ -87,6 +87,7 @@
 </div>
 </footer>
 </div>
+<script src="plan.js"></script>
 <script src="signup.js"></script>
 </body>
 </html>

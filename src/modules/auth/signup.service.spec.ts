@@ -1,5 +1,6 @@
 import { BadGatewayException, ConflictException, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
-import { SIGNUP_PLAN, SignupService, todayInIsrael } from './signup.service';
+import { SignupService, todayInIsrael } from './signup.service';
+import { DEFAULT_SIGNUP_PLAN, type SignupPlan } from './signup-plan.service';
 import {
   ARVY_ACTIVE_EVENT,
   ArvyApiError,
@@ -23,7 +24,7 @@ const link = (overrides: Partial<ArvyLink> = {}): ArvyLink => ({
   payment_link: 'https://arvy.store/billing/setup/uuid',
   amount: 30,
   currency_code: 'USD',
-  description: SIGNUP_PLAN.description,
+  description: DEFAULT_SIGNUP_PLAN.description,
   charge_frequency: 'monthly',
   sto_payments_number: 12,
   first_charge_date: '2026-11-04',
@@ -57,8 +58,14 @@ function makeService(arvy: Partial<ArvyClient>, users: Partial<User>[] = []) {
       ),
     ),
   };
-  const service = new SignupService(repository as never, { enabled: true, sourceId: 1, ...arvy } as ArvyClient);
-  return { service, repository };
+  const planStore = { current: { ...DEFAULT_SIGNUP_PLAN } as SignupPlan };
+  const plans = { get: jest.fn(() => Promise.resolve(planStore.current)) };
+  const service = new SignupService(
+    repository as never,
+    { enabled: true, sourceId: 1, ...arvy } as ArvyClient,
+    plans as never,
+  );
+  return { service, repository, planStore };
 }
 
 describe('todayInIsrael', () => {
@@ -69,13 +76,23 @@ describe('todayInIsrael', () => {
   });
 });
 
-describe('SIGNUP_PLAN', () => {
+describe('DEFAULT_SIGNUP_PLAN', () => {
   it('sells twelve monthly charges of USD 30, falling back to ILS 95', () => {
-    expect(SIGNUP_PLAN.paymentsNumber).toBe(12);
-    expect(SIGNUP_PLAN.chargeFrequency).toBe('monthly');
-    expect(SIGNUP_PLAN.prices).toEqual([
-      { currencyCode: 'USD', amount: 30 },
-      { currencyCode: 'ILS', amount: 95 },
+    expect(DEFAULT_SIGNUP_PLAN).toEqual(
+      expect.objectContaining({ paymentsNumber: 12, chargeFrequency: 'monthly', amount: 30, currencyCode: 'USD' }),
+    );
+    expect(SignupService.attemptsFor(DEFAULT_SIGNUP_PLAN)).toEqual([
+      { amount: 30, currencyCode: 'USD' },
+      { amount: 95, currencyCode: 'ILS' },
+    ]);
+  });
+
+  it('tries only the plan price when it is already ILS or has no fallback', () => {
+    expect(SignupService.attemptsFor({ ...DEFAULT_SIGNUP_PLAN, currencyCode: 'ILS', amount: 95 })).toEqual([
+      { amount: 95, currencyCode: 'ILS' },
+    ]);
+    expect(SignupService.attemptsFor({ ...DEFAULT_SIGNUP_PLAN, fallbackAmountIls: null })).toEqual([
+      { amount: 30, currencyCode: 'USD' },
     ]);
   });
 });
@@ -124,6 +141,29 @@ describe('SignupService.register', () => {
     // The refusal is remembered: the second sign-up goes straight to ILS.
     expect(createLink).toHaveBeenCalledTimes(3);
     expect(createLink.mock.calls[2][0]).toEqual(expect.objectContaining({ currency_code: 'ILS' }));
+  });
+
+  it('charges whatever the saved plan says, and forgets a refusal once the plan changes', async () => {
+    const createLink = jest
+      .fn<Promise<ArvyLink>, [ArvyCreateLinkRequest]>()
+      .mockRejectedValueOnce(new ArvyApiError(422, {}))
+      .mockImplementation(body => Promise.resolve(link({ currency_code: body.currency_code, amount: body.amount })));
+    const { service, planStore } = makeService({ createLink });
+    planStore.current = {
+      ...DEFAULT_SIGNUP_PLAN,
+      amount: 40,
+      currencyCode: 'EUR',
+      paymentsNumber: 6,
+      description: 'Half year',
+    };
+    await service.register(dto);
+    expect(createLink.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ amount: 40, currency_code: 'EUR', sto_payments_number: 6, description: 'Half year' }),
+    );
+    expect(createLink.mock.calls[1][0]).toEqual(expect.objectContaining({ amount: 95, currency_code: 'ILS' }));
+    service.forgetRefusals();
+    await service.register({ ...dto, email: 'again@example.com' });
+    expect(createLink.mock.calls[2][0]).toEqual(expect.objectContaining({ currency_code: 'EUR' }));
   });
 
   it('deletes the user and answers 502 when the API refuses every currency', async () => {

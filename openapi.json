@@ -68,6 +68,7 @@
                 "user_login",
                 "user_login_failed",
                 "user_logout",
+                "signup_plan_updated",
                 "rate_limit_exceeded",
                 "queue_board_mutated",
                 "session_created",
@@ -1019,6 +1020,29 @@
         ]
       }
     },
+    "/api/auth/register/plan": {
+      "get": {
+        "operationId": "SignupController_plan",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The current plan and whether sign-up is enabled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignupPlanResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "What a sign-up is charged: the plan the site shows",
+        "tags": [
+          "auth"
+        ],
+        "security": []
+      }
+    },
     "/api/auth/register": {
       "post": {
         "operationId": "SignupController_register",
@@ -1138,6 +1162,108 @@
           "auth"
         ],
         "security": []
+      }
+    },
+    "/api/auth/signup-plan": {
+      "get": {
+        "operationId": "SignupPlanController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The current plan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignupPlanResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, unknown, revoked, or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key's role, session or chat scope, or IP allow-list does not allow this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "The sign-up plan: what a self-service sign-up is charged (admin only)",
+        "tags": [
+          "auth"
+        ]
+      },
+      "put": {
+        "operationId": "SignupPlanController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupPlanDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The plan as saved; later sign-ups are charged this.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignupPlanResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, or the body carries a field the DTO does not declare.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The API key is missing, unknown, revoked, or expired",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The API key's role, session or chat scope, or IP allow-list does not allow this operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Change the sign-up plan (admin only)",
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/sessions": {
@@ -19293,6 +19419,63 @@
           "expiresAt"
         ]
       },
+      "SignupPlanResponseDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "example": "Scalorus WA — 12 months"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Charge per month.",
+            "example": 30
+          },
+          "currencyCode": {
+            "type": "string",
+            "enum": [
+              "USD",
+              "ILS",
+              "EUR"
+            ],
+            "example": "USD"
+          },
+          "paymentsNumber": {
+            "type": "number",
+            "description": "Number of monthly charges.",
+            "example": 12
+          },
+          "chargeFrequency": {
+            "type": "string",
+            "example": "monthly"
+          },
+          "fallbackAmountIls": {
+            "type": "object",
+            "description": "ILS monthly charge used when the service refuses `currencyCode`.",
+            "nullable": true,
+            "example": 95
+          },
+          "total": {
+            "type": "number",
+            "description": "`amount` × `paymentsNumber`.",
+            "example": 360
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether sign-up is enabled on this gateway (`ARVY_API_TOKEN` set).",
+            "example": true
+          }
+        },
+        "required": [
+          "description",
+          "amount",
+          "currencyCode",
+          "paymentsNumber",
+          "chargeFrequency",
+          "total",
+          "enabled"
+        ]
+      },
       "RegisterDto": {
         "type": "object",
         "properties": {
@@ -19417,6 +19600,52 @@
           "event",
           "activated",
           "ignored"
+        ]
+      },
+      "SignupPlanDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Shown on the payment page.",
+            "maxLength": 255,
+            "example": "Scalorus WA — 12 months"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Charge per month.",
+            "minimum": 0.01,
+            "example": 30
+          },
+          "currencyCode": {
+            "type": "string",
+            "description": "Currency of `amount`.",
+            "enum": [
+              "USD",
+              "ILS",
+              "EUR"
+            ],
+            "example": "USD"
+          },
+          "paymentsNumber": {
+            "type": "number",
+            "description": "Number of monthly charges.",
+            "minimum": 2,
+            "maximum": 9999,
+            "example": 12
+          },
+          "fallbackAmountIls": {
+            "type": "object",
+            "description": "Monthly charge in ILS used when the payment service refuses `currencyCode`; null or absent disables the fallback.",
+            "nullable": true,
+            "example": 95
+          }
+        },
+        "required": [
+          "description",
+          "amount",
+          "currencyCode",
+          "paymentsNumber"
         ]
       },
       "CreateSessionDto": {

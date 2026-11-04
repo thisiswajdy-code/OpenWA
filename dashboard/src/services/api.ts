@@ -1266,6 +1266,35 @@ export const userApi = {
 };
 
 // =============================================================================
+// Sign-up plan API (what a self-service sign-up on the site is charged)
+// =============================================================================
+
+export type SignupCurrency = 'USD' | 'ILS' | 'EUR';
+
+export interface SignupPlan {
+  description: string;
+  amount: number;
+  currencyCode: SignupCurrency;
+  paymentsNumber: number;
+  chargeFrequency: 'monthly';
+  fallbackAmountIls: number | null;
+  total: number;
+  /** Whether sign-up is enabled on the gateway (ARVY_API_TOKEN set). */
+  enabled: boolean;
+}
+
+export type SignupPlanInput = Pick<
+  SignupPlan,
+  'description' | 'amount' | 'currencyCode' | 'paymentsNumber' | 'fallbackAmountIls'
+>;
+
+export const signupPlanApi = {
+  get: () => request<SignupPlan>('/auth/signup-plan'),
+  update: (data: SignupPlanInput) =>
+    request<SignupPlan>('/auth/signup-plan', { method: 'PUT', body: JSON.stringify(data) }),
+};
+
+// =============================================================================
 // Audit/Logs API
 // =============================================================================
 

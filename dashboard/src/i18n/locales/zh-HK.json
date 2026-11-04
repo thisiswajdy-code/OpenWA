@@ -897,6 +897,22 @@
     "edit": {
       "title": "編輯用戶",
       "signOutNote": "更改密碼、角色或活躍狀態會使該用戶在所有地方登出。"
+    },
+    "plan": {
+      "title": "註冊方案",
+      "subtitle": "透過網站建立的新帳戶所需支付的費用。網站會顯示此價格。",
+      "amount": "每月金額",
+      "currency": "貨幣",
+      "months": "月數",
+      "fallback": "每月 ILS 備用金額",
+      "fallbackHint": "僅在付款服務拒絕所選貨幣時使用；留空則停用。",
+      "description": "付款頁面上的說明",
+      "total": "{{months}} 個月共 {{total}}",
+      "save": "儲存方案",
+      "saved": "註冊方案已儲存。新註冊將按新價格收費。",
+      "saveFailed": "無法儲存方案。",
+      "loadFailed": "無法載入註冊方案。",
+      "disabledHint": "此閘道已停用註冊：未設定 ARVY_API_TOKEN。價格仍會儲存。"
     }
   },
   "logs": {

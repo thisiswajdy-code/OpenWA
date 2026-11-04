@@ -11,6 +11,7 @@ import { User } from './entities/user.entity';
 import { ApiKeyRole } from './entities/api-key.entity';
 import { hashPassword } from './password-hash';
 import { RegisterDto } from './dto';
+import { SignupPlanService, type SignupPlan } from './signup-plan.service';
 import {
   ARVY_ACTIVE_EVENT,
   ARVY_LANG_FOR_LOCALE,
@@ -20,21 +21,6 @@ import {
   type ArvyNotification,
 } from './arvy-client';
 import { createLogger } from '../../common/services/logger.service';
-
-/**
- * The one account the site sells: twelve monthly charges. Prices are tried in order — USD first,
- * and ILS when the payment API refuses USD with a 422 — and the refusal is remembered for the
- * process lifetime, so later sign-ups go straight to the currency the API accepts.
- */
-export const SIGNUP_PLAN = {
-  description: 'Scalorus WA — 12 months',
-  chargeFrequency: 'monthly' as const,
-  paymentsNumber: 12,
-  prices: [
-    { currencyCode: 'USD', amount: 30 },
-    { currencyCode: 'ILS', amount: 95 },
-  ],
-};
 
 /**
  * `first_charge_date` must be today or later as the payment API sees it, and it bills in Israel:
@@ -60,14 +46,32 @@ const PAID_STATUSES: ReadonlySet<string> = new Set(['active', 'completed']);
 @Injectable()
 export class SignupService {
   private readonly logger = createLogger('SignupService');
-  /** Index into SIGNUP_PLAN.prices of the first currency the API has not refused. */
-  private priceIndex = 0;
+  /**
+   * Currencies the payment service refused with a 422 since the plan was last saved, so later
+   * sign-ups go straight to the fallback instead of paying for the refusal again.
+   */
+  private readonly refusedCurrencies = new Set<string>();
 
   constructor(
     @InjectRepository(User, 'main')
     private readonly userRepository: Repository<User>,
     private readonly arvy: ArvyClient,
+    private readonly plans: SignupPlanService,
   ) {}
+
+  /** Called when the plan changes: a currency refused under the old plan gets another chance. */
+  forgetRefusals(): void {
+    this.refusedCurrencies.clear();
+  }
+
+  /** The prices to try for a plan, in order: the plan's own, then the ILS fallback when set. */
+  static attemptsFor(plan: SignupPlan): Array<{ amount: number; currencyCode: string }> {
+    const attempts = [{ amount: plan.amount, currencyCode: plan.currencyCode }];
+    if (plan.currencyCode !== 'ILS' && plan.fallbackAmountIls !== null) {
+      attempts.push({ amount: plan.fallbackAmountIls, currencyCode: 'ILS' });
+    }
+    return attempts;
+  }
 
   get enabled(): boolean {
     return this.arvy.enabled;
@@ -113,17 +117,20 @@ export class SignupService {
 
   /** The link is created under this gateway's source, with the user id as its reference. */
   private async createLink(dto: RegisterDto, reference: string): Promise<ArvyLink> {
-    const { prices } = SIGNUP_PLAN;
-    for (let i = this.priceIndex; i < prices.length; i++) {
-      const price = prices[i];
+    const plan = await this.plans.get();
+    const attempts = SignupService.attemptsFor(plan);
+    for (let i = 0; i < attempts.length; i++) {
+      const price = attempts[i];
+      const next = attempts[i + 1];
+      if (next && this.refusedCurrencies.has(price.currencyCode)) continue;
       try {
-        const link = await this.arvy.createLink({
+        return await this.arvy.createLink({
           amount: price.amount,
           currency_code: price.currencyCode,
-          charge_frequency: SIGNUP_PLAN.chargeFrequency,
-          description: SIGNUP_PLAN.description,
+          charge_frequency: plan.chargeFrequency,
+          description: plan.description,
           first_charge_date: todayInIsrael(),
-          sto_payments_number: SIGNUP_PLAN.paymentsNumber,
+          sto_payments_number: plan.paymentsNumber,
           source_id: this.arvy.sourceId,
           reference,
           customer_email: dto.email,
@@ -132,11 +139,9 @@ export class SignupService {
           lang: dto.locale ? ARVY_LANG_FOR_LOCALE[dto.locale] : undefined,
           locale: dto.locale,
         });
-        this.priceIndex = i;
-        return link;
       } catch (error) {
-        const next = prices[i + 1];
         if (!next || !(error instanceof ArvyApiError) || error.status !== 422) throw error;
+        this.refusedCurrencies.add(price.currencyCode);
         this.logger.warn(`Payment API refused ${price.currencyCode}; trying ${next.currencyCode}`, {
           body: error.body,
         });

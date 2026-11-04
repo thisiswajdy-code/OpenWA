@@ -897,6 +897,22 @@
     "edit": {
       "title": "Edit user",
       "signOutNote": "Changing the password, role or active state signs this user out everywhere."
+    },
+    "plan": {
+      "title": "Sign-up plan",
+      "subtitle": "What a new account created through the site is charged. The site shows this price.",
+      "amount": "Amount per month",
+      "currency": "Currency",
+      "months": "Number of months",
+      "fallback": "ILS fallback per month",
+      "fallbackHint": "Used only if the payment service refuses the chosen currency; leave empty to disable.",
+      "description": "Description on the payment page",
+      "total": "{{total}} in total over {{months}} months",
+      "save": "Save plan",
+      "saved": "Sign-up plan saved. New sign-ups are charged the new price.",
+      "saveFailed": "The plan could not be saved.",
+      "loadFailed": "The sign-up plan could not be loaded.",
+      "disabledHint": "Sign-up is disabled on this gateway: ARVY_API_TOKEN is not set. The price is saved anyway."
     }
   },
   "logs": {

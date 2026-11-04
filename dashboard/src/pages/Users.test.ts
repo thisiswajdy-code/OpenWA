@@ -29,6 +29,17 @@ let createBody: Record<string, unknown> | undefined;
 let createStatus = 201;
 let updateBodies: Record<string, unknown>[] = [];
 let deleted: string[] = [];
+let planBodies: Record<string, unknown>[] = [];
+const plan = {
+  description: 'Scalorus WA — 12 months',
+  amount: 30,
+  currencyCode: 'USD',
+  paymentsNumber: 12,
+  chargeFrequency: 'monthly',
+  fallbackAmountIls: 95,
+  total: 360,
+  enabled: true,
+};
 
 function installFetchStub(): void {
   globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
@@ -49,6 +60,14 @@ function installFetchStub(): void {
     if (init?.method === 'DELETE' && path.startsWith('/api/auth/users/')) {
       deleted.push(path.slice('/api/auth/users/'.length));
       return Promise.resolve(new Response(null, { status: 204 }));
+    }
+    if (path === '/api/auth/signup-plan') {
+      if (init?.method === 'PUT') {
+        planBodies.push(JSON.parse(String(init.body)));
+        const body = JSON.parse(String(init.body)) as Record<string, number>;
+        return Promise.resolve(jsonResponse({ ...plan, ...body, total: body.amount * body.paymentsNumber }));
+      }
+      return Promise.resolve(jsonResponse(plan));
     }
     if (path === '/api/auth/users') {
       if (listStatus !== 200) {
@@ -86,6 +105,7 @@ afterEach(() => {
   createStatus = 201;
   updateBodies = [];
   deleted = [];
+  planBodies = [];
 });
 
 function renderUsers(): void {
@@ -316,4 +336,36 @@ test('isValidEmail wants a local part, a domain and a top-level label, within 25
   // '@example.com' is 12 characters, so 242 in the local part reach the 254 the gateway stores.
   assert.equal(isValidEmail(`${'a'.repeat(242)}@example.com`), true);
   assert.equal(isValidEmail(`${'a'.repeat(243)}@example.com`), false);
+});
+
+// The sign-up plan card: an admin changes what a self-service sign-up on the site is charged.
+test('the sign-up plan card shows the saved plan and saves only a changed, valid plan', async () => {
+  renderUsers();
+  const amount = (await rtl.screen.findByLabelText('Amount per month')) as HTMLInputElement;
+  assert.equal(amount.value, '30');
+  const months = rtl.screen.getByLabelText('Number of months') as HTMLInputElement;
+  assert.equal(months.value, '12');
+  const save = rtl.screen.getByRole('button', { name: 'Save plan' }) as HTMLButtonElement;
+  assert.equal(save.disabled, true, 'an unchanged plan can be saved');
+
+  rtl.fireEvent.change(amount, { target: { value: '45' } });
+  rtl.fireEvent.change(months, { target: { value: '6' } });
+  await rtl.waitFor(() => assert.equal(save.disabled, false));
+  assert.ok(rtl.screen.getByText(/\$270/), 'the total does not follow the draft');
+
+  rtl.fireEvent.change(months, { target: { value: '1' } });
+  await rtl.waitFor(() => assert.equal(save.disabled, true, 'fewer than two charges can be saved'));
+  rtl.fireEvent.change(months, { target: { value: '6' } });
+  await rtl.waitFor(() => assert.equal(save.disabled, false));
+
+  rtl.fireEvent.click(save);
+  await rtl.waitFor(() => assert.equal(planBodies.length, 1));
+  assert.deepEqual(planBodies[0], {
+    description: 'Scalorus WA — 12 months',
+    amount: 45,
+    currencyCode: 'USD',
+    paymentsNumber: 6,
+    fallbackAmountIls: 95,
+  });
+  await rtl.screen.findByText('Sign-up plan saved. New sign-ups are charged the new price.');
 });

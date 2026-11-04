@@ -17,6 +17,8 @@ import {
   type StatsPeriod,
   type CreateInstanceInput,
   type UpdateInstanceInput,
+  signupPlanApi,
+  type SignupPlanInput,
 } from '../services/api';
 
 // ── Query Keys ────────────────────────────────────────────────────────
@@ -30,6 +32,7 @@ export const queryKeys = {
   templates: (sessionId: string) => ['sessions', sessionId, 'templates'] as const,
   apiKeys: ['apiKeys'] as const,
   users: ['users'] as const,
+  signupPlan: ['signup-plan'] as const,
   logs: (params: { severity?: string; page: number; limit: number }) => ['logs', params] as const,
   infraStatus: ['infra', 'status'] as const,
   plugins: ['plugins'] as const,
@@ -426,5 +429,23 @@ export function useStatsMessagesQuery(period: StatsPeriod) {
     queryFn: () => statsApi.getMessages(period),
     staleTime: 30_000,
     retry: false,
+  });
+}
+
+export function useSignupPlanQuery() {
+  return useQuery({
+    queryKey: queryKeys.signupPlan,
+    queryFn: signupPlanApi.get,
+    staleTime: 30_000,
+  });
+}
+
+export function useUpdateSignupPlanMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: SignupPlanInput) => signupPlanApi.update(data),
+    onSuccess: plan => {
+      queryClient.setQueryData(queryKeys.signupPlan, plan);
+    },
   });
 }

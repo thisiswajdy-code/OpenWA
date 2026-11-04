@@ -903,6 +903,22 @@
     "edit": {
       "title": "Modifica utente",
       "signOutNote": "Cambiare password, ruolo o stato attivo disconnette questo utente ovunque."
+    },
+    "plan": {
+      "title": "Piano di registrazione",
+      "subtitle": "Quanto viene addebitato a un nuovo account creato dal sito. Il sito mostra questo prezzo.",
+      "amount": "Importo al mese",
+      "currency": "Valuta",
+      "months": "Numero di mesi",
+      "fallback": "Importo alternativo in ILS al mese",
+      "fallbackHint": "Usato solo se il servizio di pagamento rifiuta la valuta scelta; lascia vuoto per disattivarlo.",
+      "description": "Descrizione nella pagina di pagamento",
+      "total": "{{total}} in totale in {{months}} mesi",
+      "save": "Salva piano",
+      "saved": "Piano di registrazione salvato. Le nuove registrazioni pagano il nuovo prezzo.",
+      "saveFailed": "Impossibile salvare il piano.",
+      "loadFailed": "Impossibile caricare il piano di registrazione.",
+      "disabledHint": "La registrazione è disattivata su questo gateway: ARVY_API_TOKEN non è impostato. Il prezzo viene comunque salvato."
     }
   },
   "logs": {

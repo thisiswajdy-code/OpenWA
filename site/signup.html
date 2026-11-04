@@ -34,12 +34,12 @@
 
 <section id="step-account" class="su-step">
 <h1 class="su-title">בחרו חשבון</h1>
-<p class="su-sub">מחיר אחד, פשוט. אפשר לבטל בסיום 12 החודשים.</p>
+<p class="su-sub" data-plan-template="מחיר אחד, פשוט. אפשר לבטל בסיום {months} החודשים.">מחיר אחד, פשוט. אפשר לבטל בסיום 12 החודשים.</p>
 <div class="su-accounts" role="radiogroup" aria-label="סוג חשבון">
 <div class="card-soft su-account" role="radio" tabindex="0" aria-checked="false" data-account="scalorus-wa">
 <p class="font-medium text-muted-foreground" dir="ltr">Scalorus WA</p>
-<p class="su-price" dir="ltr">$30<small> / לחודש</small></p>
-<p class="text-sm text-muted-foreground">12 חודשים · חיוב חודשי · סה"כ $360</p>
+<p class="su-price" dir="ltr"><span data-plan-amount>$30</span><small> / לחודש</small></p>
+<p class="text-sm text-muted-foreground" data-plan-template="{months} חודשים · חיוב חודשי · סה&quot;כ {total}">12 חודשים · חיוב חודשי · סה"כ $360</p>
 <ul><li>הטמעה מלאה של WhatsApp Business API</li><li>בוט תשובות חכם והודעות</li><li>לוח בקרה וניתוח</li><li>תמיכה שוטפת</li></ul>
 </div>
 <div class="card-soft su-account" role="radio" tabindex="0" aria-checked="false" data-account="custom">
@@ -67,7 +67,7 @@
 
 <section id="step-pay" class="su-step">
 <h1 class="su-title">שמירת אמצעי תשלום</h1>
-<p class="su-sub">החיוב הראשון מתבצע היום, ואחריו חיוב חודשי במשך 12 חודשים.</p>
+<p class="su-sub" data-plan-template="החיוב הראשון מתבצע היום, ואחריו חיוב חודשי במשך {months} חודשים.">החיוב הראשון מתבצע היום, ואחריו חיוב חודשי במשך 12 חודשים.</p>
 <div class="card-soft su-pay">
 <div class="su-summary"><span>חשבון: <strong id="pay-email" dir="ltr"></strong></span><span>חיוב: <strong id="pay-amount" dir="ltr"></strong></span><span>סה"כ: <strong id="pay-total" dir="ltr"></strong></span></div>
 <iframe id="pay-frame" title="עמוד תשלום" referrerpolicy="strict-origin-when-cross-origin"></iframe>
@@ -87,6 +87,7 @@
 </div>
 </footer>
 </div>
+<script src="plan.js"></script>
 <script src="signup.js"></script>
 </body>
 </html>

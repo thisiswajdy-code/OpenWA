@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import { ApiKey } from './entities/api-key.entity';
 import { User } from './entities/user.entity';
+import { Setting } from './entities/setting.entity';
 import { AuthService } from './auth.service';
 import { ApiKeyUsageTracker } from './api-key-usage-tracker.service';
 import { ChatScopeService } from './chat-scope.service';
@@ -14,6 +15,8 @@ import { UserController } from './user.controller';
 import { UserLoginController } from './user-login.controller';
 import { SignupController } from './signup.controller';
 import { ArvyNotifyController } from './arvy-notify.controller';
+import { SignupPlanController } from './signup-plan.controller';
+import { SignupPlanService } from './signup-plan.service';
 import { SignupService } from './signup.service';
 import { ArvyClient } from './arvy-client';
 import { ApiKeyGuard } from './guards/api-key.guard';
@@ -21,7 +24,7 @@ import { ProxyAwareThrottlerGuard } from '../../common/security/proxy-aware-thro
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([ApiKey, User], 'main')],
+  imports: [TypeOrmModule.forFeature([ApiKey, User, Setting], 'main')],
   controllers: [
     AuthController,
     AuthValidateController,
@@ -29,11 +32,13 @@ import { ProxyAwareThrottlerGuard } from '../../common/security/proxy-aware-thro
     UserLoginController,
     SignupController,
     ArvyNotifyController,
+    SignupPlanController,
   ],
   providers: [
     AuthService,
     UserService,
     SignupService,
+    SignupPlanService,
     ArvyClient,
     ApiKeyUsageTracker,
     ChatScopeService,

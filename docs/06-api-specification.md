@@ -5256,7 +5256,7 @@ Self-service sign-up from the site (`/signup.html`): create a dashboard user and
 
 `name` (optional, ≤ 120) and `locale` (optional, `he` | `en` | `ar`) go to the payment page. `email` is trimmed and lower-cased; `password` is 8 to 128 characters.
 
-The link is 12 monthly charges of **USD 30**; when the payment service refuses USD (`422`), it is created as **ILS 95** instead and that choice is remembered for the process lifetime. The first charge date is today in Israel time. It is created under this gateway's source (`ARVY_SOURCE_ID`) with the user id as `reference`, so the service notifies `POST /notify` when the card is saved.
+The link follows the sign-up plan (`GET /api/auth/register/plan`; by default 12 monthly charges of **USD 30**); when the payment service refuses the plan's currency (`422`) and the plan names an ILS fallback (**95** by default), the link is created in ILS at that amount instead, and the refusal is remembered until the plan is saved again. The first charge date is today in Israel time. It is created under this gateway's source (`ARVY_SOURCE_ID`) with the user id as `reference`, so the service notifies `POST /notify` when the card is saved.
 
 **Response** `201`
 
@@ -5276,6 +5276,27 @@ The link is 12 monthly charges of **USD 30**; when the payment service refuses U
 
 **Errors:** `400` malformed body or an undeclared field · `409` a user with this email already exists · `429` too many attempts from this client IP · `502` the payment service refused or did not answer (the user is not kept, so the email stays free) · `503` sign-up is not enabled
 
+#### GET /api/auth/register/plan
+
+The plan a sign-up is charged, as the site shows it: the monthly `amount` and `currencyCode`, the number of monthly charges (`paymentsNumber`), the `description` the payment page shows, the ILS `fallbackAmountIls` used when the service refuses the currency, `total` (`amount` × `paymentsNumber`) and `enabled` (whether `ARVY_API_TOKEN` is set).
+
+**Auth:** public (the site reads it before anyone signs up).
+
+**Response** `200`
+
+```json
+{
+  "description": "Scalorus WA — 12 months",
+  "amount": 30,
+  "currencyCode": "USD",
+  "paymentsNumber": 12,
+  "chargeFrequency": "monthly",
+  "fallbackAmountIls": 95,
+  "total": 360,
+  "enabled": true
+}
+```
+
 #### GET /api/auth/register/:id
 
 Where a sign-up's payment stands. Reads the link from the payment service; the first time it reports `active` (or `completed`) the user is activated, so the sign-up page polls this until `active` is true and then sends the customer to the dashboard.
@@ -5285,6 +5306,38 @@ Where a sign-up's payment stands. Reads the link from the payment service; the f
 **Response** `200` — the same body as `POST /api/auth/register`, with the current `status` and `active`.
 
 **Errors:** `404` no sign-up with this id · `502` the payment service did not answer
+
+#### GET /api/auth/signup-plan
+
+The same plan, for the dashboard's Users page.
+
+**Auth:** API key (ADMIN, no session or chat scope — fenced like user management, since the plan is what every self-service sign-up is charged)
+
+**Response** `200` — the body of `GET /api/auth/register/plan`.
+
+#### PUT /api/auth/signup-plan
+
+Change the plan. Later sign-ups are charged the new price; links already created keep theirs. A currency the payment service refused under the old plan is tried again. Audited as `signup_plan_updated` with the plan before and after.
+
+**Auth:** API key (ADMIN, no session or chat scope)
+
+**Request body**
+
+```json
+{
+  "description": "Scalorus WA — 12 months",
+  "amount": 30,
+  "currencyCode": "USD",
+  "paymentsNumber": 12,
+  "fallbackAmountIls": 95
+}
+```
+
+`amount` ≥ 0.01 with at most two decimals; `currencyCode` is `USD`, `ILS` or `EUR` (what the payment service accepts on a recurring link); `paymentsNumber` is 2 to 9999; `description` ≤ 255; `fallbackAmountIls` is optional and `null` disables the fallback (it is ignored when the currency is already ILS).
+
+**Response** `200` — the saved plan, as `GET /api/auth/register/plan` returns it.
+
+**Errors:** `400` malformed body or an undeclared field
 
 #### POST /notify
 

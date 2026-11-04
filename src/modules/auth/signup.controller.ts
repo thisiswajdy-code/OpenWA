@@ -4,8 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { SignupService } from './signup.service';
+import { SignupPlanService } from './signup-plan.service';
+import { toSignupPlanResponse } from './signup-plan.controller';
 import { Public } from './decorators/auth.decorators';
-import { RegisterDto, RegisterResponseDto } from './dto';
+import { RegisterDto, RegisterResponseDto, SignupPlanResponseDto } from './dto';
 import type { User } from './entities/user.entity';
 import type { ArvyLink } from './arvy-client';
 import { AuditService } from '../audit/audit.service';
@@ -22,9 +24,23 @@ import { resolveClientIp } from '../../common/utils/ip';
 export class SignupController {
   constructor(
     private readonly signupService: SignupService,
+    private readonly plans: SignupPlanService,
     private readonly auditService: AuditService,
     private readonly configService: ConfigService,
   ) {}
+
+  // Declared before `:id` so the literal segment wins.
+  @Get('plan')
+  @Public()
+  @ApiOperation({ summary: 'What a sign-up is charged: the plan the site shows' })
+  @ApiResponse({
+    status: 200,
+    description: 'The current plan and whether sign-up is enabled.',
+    type: SignupPlanResponseDto,
+  })
+  async plan(): Promise<SignupPlanResponseDto> {
+    return toSignupPlanResponse(await this.plans.get(), this.signupService.enabled);
+  }
 
   @Post()
   @Public()
