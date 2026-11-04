@@ -33,6 +33,7 @@ export const PUBLIC_PATHS = [
   '/api/auth/login-options',
   '/api/auth/register',
   '/api/auth/register/{id}',
+  '/notify',
   '/api/ingress/{pluginId}/{instanceId}/{path}',
 ];
 
@@ -81,6 +82,29 @@ export function dropUnexpressibleOperations(document: OpenAPIObject): OpenAPIObj
         delete (item as Record<string, unknown>)[field];
       }
     }
+  }
+  return document;
+}
+
+/**
+ * Routes excluded from the global prefix (app-validation.ts GLOBAL_PREFIX_EXCLUDE). `@nestjs/swagger`
+ * documents every route under the prefix regardless of the exclusion, so the document is corrected
+ * here; listed by their real path.
+ */
+export const UNPREFIXED_PATHS = ['/notify'];
+
+/**
+ * Move the operations of routes that really live outside `/api` to their real paths, so the
+ * document publishes the URL a client calls. Runs before the public-path exemption, which names
+ * the real path. Mutates and returns the document.
+ */
+export function relocateUnprefixedPaths(document: OpenAPIObject): OpenAPIObject {
+  for (const path of UNPREFIXED_PATHS) {
+    const prefixed = `/api${path}`;
+    const item = document.paths?.[prefixed];
+    if (!item) continue;
+    document.paths[path] = item;
+    delete document.paths[prefixed];
   }
   return document;
 }

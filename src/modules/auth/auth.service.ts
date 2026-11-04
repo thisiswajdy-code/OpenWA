@@ -121,8 +121,8 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
 
     // Always show the welcome banner on startup
     const apiBaseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 2785}`;
-    // The dashboard is served by NestJS at the same origin as the API now, so default to it.
-    const dashboardUrl = process.env.DASHBOARD_URL || apiBaseUrl;
+    // The dashboard is served by NestJS at the same origin as the API, under /app (the site owns /).
+    const dashboardUrl = process.env.DASHBOARD_URL || `${apiBaseUrl}/app`;
 
     this.logger.log('');
     this.logger.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

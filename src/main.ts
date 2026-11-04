@@ -20,6 +20,7 @@ import {
   createSwaggerConfig,
   documentErrorResponses,
   dropUnexpressibleOperations,
+  relocateUnprefixedPaths,
   exemptPublicOperations,
 } from './config/swagger.config';
 import { registerUncaughtExceptionMonitor, registerUnhandledRejectionHandler } from './config/process-error-monitor';
@@ -227,6 +228,7 @@ async function bootstrap() {
     // TWO places — here for the live /api/docs and there for the committed snapshot — and fixing only
     // the snapshot leaves a running gateway serving a document that fails schema validation.
     dropUnexpressibleOperations(document);
+    relocateUnprefixedPaths(document);
     exemptPublicOperations(document);
     documentErrorResponses(document);
     SwaggerModule.setup('api/docs', app, document);

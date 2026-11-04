@@ -23,6 +23,16 @@
  */
 export const BLANK_SHADOWED_ENV_KEYS: string[] = [
   'ENGINE_TYPE',
+  // Dashboard sign-in seed and session length, and the payment service for self-service sign-up.
+  // Blank-forwarded by compose like everything else here, so an operator who sets nothing must not
+  // have an empty string hide a value in .env / data/.env.generated.
+  'ADMIN_EMAIL',
+  'ADMIN_PASSWORD',
+  'LOGIN_SESSION_TTL_HOURS',
+  'ARVY_API_TOKEN',
+  'ARVY_API_URL',
+  'ARVY_SOURCE_ID',
+  'ARVY_SOURCE_SECRET',
   // Inbound-media knobs. Not dashboard-managed, but every blank compose forward must be cleared or
   // the empty value shadows .env / data/.env.generated — which is why the gate above requires an
   // entry for each one.

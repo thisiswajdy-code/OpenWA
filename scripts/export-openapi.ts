@@ -12,10 +12,12 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { GLOBAL_PREFIX_EXCLUDE } from '../src/config/app-validation';
 import {
   createSwaggerConfig,
   documentErrorResponses,
   dropUnexpressibleOperations,
+  relocateUnprefixedPaths,
   exemptPublicOperations,
 } from '../src/config/swagger.config';
 
@@ -63,11 +65,12 @@ async function main() {
   // Errors/warns only — bootstrap is chatty and we only need the document.
   const app = await NestFactory.create(AppModule, { logger: ['error', 'warn'] });
   // Mirror main.ts: the global /api prefix is part of the real route paths the docs publish.
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: GLOBAL_PREFIX_EXCLUDE });
   try {
     const doc = SwaggerModule.createDocument(app, createSwaggerConfig());
     // Before the exemption pass, so it never spends work on an operation about to be removed.
     dropUnexpressibleOperations(doc);
+    relocateUnprefixedPaths(doc);
     exemptPublicOperations(doc);
     documentErrorResponses(doc);
     writeFileSync(out, JSON.stringify(doc, null, 2) + '\n');

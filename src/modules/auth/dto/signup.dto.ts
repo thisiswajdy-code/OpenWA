@@ -75,3 +75,20 @@ export class RegisterResponseDto {
   @ApiProperty({ description: 'Whether the user can sign in: true once a card was saved.', example: false })
   active!: boolean;
 }
+
+export class ArvyNotifyResponseDto {
+  @ApiProperty({ example: true })
+  received!: boolean;
+
+  @ApiProperty({ description: 'The event the notification carried.', example: 'recurring_payment.active' })
+  event!: string;
+
+  @ApiProperty({ description: 'Whether this notification activated the user.', example: true })
+  activated!: boolean;
+
+  @ApiProperty({
+    description: 'True for an event other than `recurring_payment.active`, which is acknowledged and ignored.',
+    example: false,
+  })
+  ignored!: boolean;
+}

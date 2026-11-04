@@ -13,6 +13,7 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserLoginController } from './user-login.controller';
 import { SignupController } from './signup.controller';
+import { ArvyNotifyController } from './arvy-notify.controller';
 import { SignupService } from './signup.service';
 import { ArvyClient } from './arvy-client';
 import { ApiKeyGuard } from './guards/api-key.guard';
@@ -21,7 +22,14 @@ import { ProxyAwareThrottlerGuard } from '../../common/security/proxy-aware-thro
 @Global()
 @Module({
   imports: [TypeOrmModule.forFeature([ApiKey, User], 'main')],
-  controllers: [AuthController, AuthValidateController, UserController, UserLoginController, SignupController],
+  controllers: [
+    AuthController,
+    AuthValidateController,
+    UserController,
+    UserLoginController,
+    SignupController,
+    ArvyNotifyController,
+  ],
   providers: [
     AuthService,
     UserService,

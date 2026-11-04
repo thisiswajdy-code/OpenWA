@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
+import { createHmac } from 'node:crypto';
+import { constantTimeEqual } from '../../common/security/constantTimeEqual';
 
 /**
- * The recurring-payment-links API that bills a Scalorus WA account (`ARVY_API_URL`, authenticated
- * with the admin token in `ARVY_API_TOKEN`). A link is created per sign-up; billing starts once the
- * customer saves a card on its `payment_link` page, and `GET` reports where that stands.
+ * The recurring-payments API that bills a Scalorus WA account (`ARVY_API_URL`, authenticated with
+ * the admin token in `ARVY_API_TOKEN`). A link is created per sign-up under this gateway's source
+ * (`ARVY_SOURCE_ID`); billing starts once the customer saves a card on its `payment_link` page, at
+ * which point the API POSTs a signed notification to the source's notify URL (`/notify` here,
+ * verified with `ARVY_SOURCE_SECRET`), and `GET` reports where the payment stands.
  */
 export const ARVY_DEFAULT_API_URL = 'https://arvy.store/api/v1';
+/** The source Arvy notifies for this gateway, unless `ARVY_SOURCE_ID` says otherwise. */
+export const ARVY_DEFAULT_SOURCE_ID = 1;
+/** The one event the notify URL receives: the customer saved a card and billing is active. */
+export const ARVY_ACTIVE_EVENT = 'recurring_payment.active';
 const TIMEOUT_MS = 15_000;
 
 export type ArvyLinkStatus = 'pending_card' | 'active' | 'completed' | 'cancelled';
@@ -22,6 +30,10 @@ export interface ArvyCreateLinkRequest {
   first_charge_date: string;
   /** Number of charges, 2 to 9999. */
   sto_payments_number: number;
+  /** Source to notify when the payment is active. */
+  source_id?: number;
+  /** Our own id (max 255), sent back in the notification. */
+  reference?: string;
   customer_name?: string;
   customer_email?: string;
   customer_phone?: string;
@@ -42,7 +54,60 @@ export interface ArvyLink {
   charge_frequency: ArvyChargeFrequency;
   sto_payments_number: number;
   first_charge_date: string;
+  source_id: number | null;
+  reference: string | null;
+  /** Set once the source was notified successfully. */
+  source_notified_at: string | null;
   charges_completed: number;
+}
+
+/** The body Arvy POSTs to the source's notify URL when a recurring payment becomes active. */
+export interface ArvyNotification {
+  event: string;
+  sent_at?: string;
+  source?: { id: number; name: string };
+  recurring_payment: {
+    id: number;
+    status: ArvyLinkStatus;
+    reference: string | null;
+    amount: number;
+    currency_code: string;
+    description: string;
+    charge_frequency: ArvyChargeFrequency;
+    sto_payments_number: number;
+    first_charge_date: string;
+    customer_name: string | null;
+    customer_email: string | null;
+    customer_phone: string | null;
+    card_last4?: string | null;
+    tranzila_sto_id?: string | null;
+  };
+}
+
+/**
+ * Whether `X-Arvy-Signature` (`sha256=<hex HMAC-SHA256 of the raw body, keyed with the source
+ * secret>`) signs `rawBody`. Compared in constant time, so neither the value nor its length leaks.
+ */
+export function verifyArvySignature(rawBody: string | Buffer, header: string | undefined, secret: string): boolean {
+  if (!header) return false;
+  const expected = `sha256=${createHmac('sha256', secret).update(rawBody).digest('hex')}`;
+  return constantTimeEqual(header.trim(), expected);
+}
+
+/** Shape-check a parsed notification body; the signature already proves it came from Arvy. */
+export function parseArvyNotification(raw: string): ArvyNotification | null {
+  let body: unknown;
+  try {
+    body = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  if (typeof body !== 'object' || body === null) return null;
+  const { event, recurring_payment: payment } = body as { event?: unknown; recurring_payment?: unknown };
+  if (typeof event !== 'string' || typeof payment !== 'object' || payment === null) return null;
+  const { id, status } = payment as { id?: unknown; status?: unknown };
+  if (typeof id !== 'number' || typeof status !== 'string') return null;
+  return body as ArvyNotification;
 }
 
 /** A non-2xx answer, with the parsed body (`errors` on a 422). */
@@ -59,13 +124,27 @@ export class ArvyApiError extends Error {
 export interface ArvyConfig {
   token?: string;
   baseUrl: string;
+  /** The source every link is created under, so Arvy notifies this gateway. */
+  sourceId: number;
+  /** The source's secret, which signs the notifications; unset refuses every notification. */
+  sourceSecret?: string;
 }
 
-/** `ARVY_API_TOKEN` enables sign-up; `ARVY_API_URL` overrides the API base (default arvy.store). */
+/**
+ * `ARVY_API_TOKEN` enables sign-up; `ARVY_API_URL` overrides the API base (default arvy.store);
+ * `ARVY_SOURCE_ID` names the source (default 1); `ARVY_SOURCE_SECRET` verifies its notifications.
+ */
 export function resolveArvyConfig(env: NodeJS.ProcessEnv = process.env): ArvyConfig {
   const token = env.ARVY_API_TOKEN?.trim();
   const baseUrl = (env.ARVY_API_URL?.trim() || ARVY_DEFAULT_API_URL).replace(/\/+$/, '');
-  return { token: token || undefined, baseUrl };
+  const sourceId = Number(env.ARVY_SOURCE_ID?.trim());
+  const sourceSecret = env.ARVY_SOURCE_SECRET?.trim();
+  return {
+    token: token || undefined,
+    baseUrl,
+    sourceId: Number.isInteger(sourceId) && sourceId > 0 ? sourceId : ARVY_DEFAULT_SOURCE_ID,
+    sourceSecret: sourceSecret || undefined,
+  };
 }
 
 /** Origin of the payment pages the API links to, for the sign-up page's `frame-src`. */
@@ -87,6 +166,22 @@ export class ArvyClient {
   /** Sign-up is offered only when a token is configured. */
   get enabled(): boolean {
     return this.config.token !== undefined;
+  }
+
+  get sourceId(): number {
+    return this.config.sourceId;
+  }
+
+  /** Whether a notification carries a valid signature from this gateway's source. */
+  verifyNotification(rawBody: string | Buffer, signatureHeader: string | undefined): boolean {
+    return (
+      this.config.sourceSecret !== undefined && verifyArvySignature(rawBody, signatureHeader, this.config.sourceSecret)
+    );
+  }
+
+  /** Notifications can be verified only once the source secret is configured. */
+  get notificationsEnabled(): boolean {
+    return this.config.sourceSecret !== undefined;
   }
 
   createLink(body: ArvyCreateLinkRequest): Promise<ArvyLink> {

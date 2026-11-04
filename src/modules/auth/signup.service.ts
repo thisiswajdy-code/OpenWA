@@ -11,7 +11,7 @@ import { User } from './entities/user.entity';
 import { ApiKeyRole } from './entities/api-key.entity';
 import { hashPassword } from './password-hash';
 import { RegisterDto } from './dto';
-import { ArvyApiError, ArvyClient, type ArvyLink } from './arvy-client';
+import { ARVY_ACTIVE_EVENT, ArvyApiError, ArvyClient, type ArvyLink, type ArvyNotification } from './arvy-client';
 import { createLogger } from '../../common/services/logger.service';
 
 /**
@@ -81,7 +81,7 @@ export class SignupService {
     );
     let link: ArvyLink;
     try {
-      link = await this.createLink(dto);
+      link = await this.createLink(dto, user.id);
     } catch (error) {
       // No link, no account: the email stays free for another attempt.
       await this.userRepository.delete(user.id);
@@ -104,7 +104,8 @@ export class SignupService {
     return { user, link };
   }
 
-  private async createLink(dto: RegisterDto): Promise<ArvyLink> {
+  /** The link is created under this gateway's source, with the user id as its reference. */
+  private async createLink(dto: RegisterDto, reference: string): Promise<ArvyLink> {
     const { prices } = SIGNUP_PLAN;
     for (let i = this.priceIndex; i < prices.length; i++) {
       const price = prices[i];
@@ -116,6 +117,8 @@ export class SignupService {
           description: SIGNUP_PLAN.description,
           first_charge_date: todayInIsrael(),
           sto_payments_number: SIGNUP_PLAN.paymentsNumber,
+          source_id: this.arvy.sourceId,
+          reference,
           customer_email: dto.email,
           customer_name: dto.name,
           locale: dto.locale,
@@ -131,6 +134,34 @@ export class SignupService {
       }
     }
     throw new Error('No price to try');
+  }
+
+  /**
+   * Apply Arvy's notification for the source: the payment it names became active, so its user is
+   * activated. Found by the link id, or by the reference (the user id) when the id is unknown. Any
+   * other event is acknowledged and ignored.
+   */
+  async activateFromNotification(
+    notification: ArvyNotification,
+  ): Promise<{ user: User | null; activated: boolean; ignored: boolean }> {
+    if (notification.event !== ARVY_ACTIVE_EVENT) return { user: null, activated: false, ignored: true };
+    const payment = notification.recurring_payment;
+    const user =
+      (await this.userRepository.findOne({ where: { paymentLinkId: String(payment.id) } })) ??
+      (payment.reference ? await this.userRepository.findOne({ where: { id: payment.reference } }) : null);
+    if (!user) throw new NotFoundException(`No sign-up for payment link ${payment.id}`);
+    let activated = false;
+    if (!user.isActive && PAID_STATUSES.has(payment.status)) {
+      user.isActive = true;
+      await this.userRepository.update(user.id, { isActive: true });
+      activated = true;
+      this.logger.log(`User activated by payment notification: ${user.email}`, {
+        userId: user.id,
+        paymentLinkId: String(payment.id),
+        action: 'user_activated',
+      });
+    }
+    return { user, activated, ignored: false };
   }
 
   /** Where the sign-up's payment stands; activates the user the first time a card is reported saved. */

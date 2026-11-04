@@ -5256,7 +5256,7 @@ Self-service sign-up from the site (`/signup.html`): create a dashboard user and
 
 `name` (optional, ≤ 120) and `locale` (optional, `he` | `en` | `ar`) go to the payment page. `email` is trimmed and lower-cased; `password` is 8 to 128 characters.
 
-The link is 12 monthly charges of **USD 30**; when the payment service refuses USD (`422`), it is created as **ILS 95** instead and that choice is remembered for the process lifetime. The first charge date is today in Israel time.
+The link is 12 monthly charges of **USD 30**; when the payment service refuses USD (`422`), it is created as **ILS 95** instead and that choice is remembered for the process lifetime. The first charge date is today in Israel time. It is created under this gateway's source (`ARVY_SOURCE_ID`) with the user id as `reference`, so the service notifies `POST /notify` when the card is saved.
 
 **Response** `201`
 
@@ -5285,6 +5285,31 @@ Where a sign-up's payment stands. Reads the link from the payment service; the f
 **Response** `200` — the same body as `POST /api/auth/register`, with the current `status` and `active`.
 
 **Errors:** `404` no sign-up with this id · `502` the payment service did not answer
+
+#### POST /notify
+
+The notify URL registered with the payment service for this gateway's source (outside the `/api` prefix: `https://wa.scalorus.com/notify`). The service POSTs here **once**, when a sign-up's card is saved and the recurring payment becomes active, with `X-Arvy-Event: recurring_payment.active` and `X-Arvy-Signature: sha256=<hex HMAC-SHA256 of the raw body, keyed with the source secret>`. The user the payment belongs to (by link id, or by `reference`, which is the user id) is activated; any other event is acknowledged and ignored.
+
+**Auth:** public, but every body is verified against `ARVY_SOURCE_SECRET` over the exact bytes received before it is read.
+
+**Request body** (from the payment service)
+
+```json
+{
+  "event": "recurring_payment.active",
+  "sent_at": "2026-11-10T09:12:00+00:00",
+  "source": { "id": 1, "name": "Scalorus WA" },
+  "recurring_payment": { "id": 42, "status": "active", "reference": "0a941dac-…", "amount": 30, "currency_code": "USD" }
+}
+```
+
+**Response** `200`
+
+```json
+{ "received": true, "event": "recurring_payment.active", "activated": true, "ignored": false }
+```
+
+**Errors:** `400` the body is not a notification · `401` missing or invalid signature · `404` no sign-up matches the payment · `503` notifications are not configured (`ARVY_SOURCE_SECRET` unset)
 
 #### POST /api/auth/users
 

@@ -3,12 +3,20 @@ import {
   BadRequestException,
   INestApplication,
   PipeTransform,
+  RequestMethod,
   ValidationPipe,
   ValidationPipeOptions,
 } from '@nestjs/common';
 import { isValidationErrorDetailEnabled } from './bootstrap-security';
 import { containsNul } from '../common/validation/no-nul-character';
 import { ImportDataDto } from '../modules/infra/dto/import-data.dto';
+
+/**
+ * Routes that sit outside the `/api` prefix. `/notify` is the URL registered with the payment
+ * service as this gateway's notification endpoint (arvy-notify.controller.ts). Swagger still
+ * documents them under the prefix, so swagger.config relocates them (UNPREFIXED_PATHS).
+ */
+export const GLOBAL_PREFIX_EXCLUDE = [{ path: 'notify', method: RequestMethod.POST }];
 
 /**
  * The DTO validation contract itself, without the one option that depends on the environment.
@@ -46,7 +54,7 @@ export class NulBodyPipe implements PipeTransform {
 
 /** Apply the HTTP prefix and DTO validation contract shared by production and e2e applications. */
 export function applyGlobalValidation(app: INestApplication): void {
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: GLOBAL_PREFIX_EXCLUDE });
   app.useGlobalPipes(
     new ValidationPipe({
       ...GLOBAL_VALIDATION_OPTIONS,

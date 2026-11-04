@@ -1,13 +1,18 @@
 import { BadGatewayException, ConflictException, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { SIGNUP_PLAN, SignupService, todayInIsrael } from './signup.service';
 import {
+  ARVY_ACTIVE_EVENT,
   ArvyApiError,
   ArvyClient,
   arvyOrigin,
+  parseArvyNotification,
   resolveArvyConfig,
+  verifyArvySignature,
   type ArvyCreateLinkRequest,
   type ArvyLink,
+  type ArvyNotification,
 } from './arvy-client';
+import { createHmac } from 'node:crypto';
 import { ApiKeyRole } from './entities/api-key.entity';
 import type { User } from './entities/user.entity';
 import type { RegisterDto } from './dto';
@@ -22,6 +27,9 @@ const link = (overrides: Partial<ArvyLink> = {}): ArvyLink => ({
   charge_frequency: 'monthly',
   sto_payments_number: 12,
   first_charge_date: '2026-11-04',
+  source_id: 1,
+  reference: 'new-user',
+  source_notified_at: null,
   charges_completed: 0,
   ...overrides,
 });
@@ -44,10 +52,12 @@ function makeService(arvy: Partial<ArvyClient>, users: Partial<User>[] = []) {
     update: jest.fn(() => Promise.resolve()),
     delete: jest.fn(() => Promise.resolve()),
     findOne: jest.fn(({ where }: { where: Partial<User> }) =>
-      Promise.resolve(rows.find(r => r.id === where.id) ?? null),
+      Promise.resolve(
+        rows.find(r => (where.id !== undefined ? r.id === where.id : r.paymentLinkId === where.paymentLinkId)) ?? null,
+      ),
     ),
   };
-  const service = new SignupService(repository as never, { enabled: true, ...arvy } as ArvyClient);
+  const service = new SignupService(repository as never, { enabled: true, sourceId: 1, ...arvy } as ArvyClient);
   return { service, repository };
 }
 
@@ -85,6 +95,8 @@ describe('SignupService.register', () => {
         currency_code: 'USD',
         charge_frequency: 'monthly',
         sto_payments_number: 12,
+        source_id: 1,
+        reference: 'new-user',
         customer_email: dto.email,
         customer_name: 'Dana',
         locale: 'he',
@@ -184,19 +196,119 @@ describe('SignupService.status', () => {
   });
 });
 
-describe('Arvy configuration', () => {
-  it('is enabled only with a token, defaults the base URL, and strips a trailing slash', () => {
-    expect(resolveArvyConfig({})).toEqual({ token: undefined, baseUrl: 'https://arvy.store/api/v1' });
-    expect(resolveArvyConfig({ ARVY_API_TOKEN: ' t ', ARVY_API_URL: 'https://pay.example.com/api/v1/' })).toEqual({
-      token: 't',
-      baseUrl: 'https://pay.example.com/api/v1',
+describe('SignupService.activateFromNotification', () => {
+  const notification = (overrides: Partial<ArvyNotification['recurring_payment']> = {}, event = ARVY_ACTIVE_EVENT) =>
+    ({
+      event,
+      recurring_payment: {
+        id: 42,
+        status: 'active',
+        reference: 'u1',
+        amount: 30,
+        currency_code: 'USD',
+        description: 'x',
+        charge_frequency: 'monthly',
+        sto_payments_number: 12,
+        first_charge_date: '2026-11-04',
+        customer_name: null,
+        customer_email: null,
+        customer_phone: null,
+        ...overrides,
+      },
+    }) as ArvyNotification;
+
+  it('activates the user the link belongs to, once', async () => {
+    const { service, repository } = makeService({}, [{ id: 'u1', email: dto.email, paymentLinkId: '42' }]);
+    const first = await service.activateFromNotification(notification());
+    expect(first).toEqual(expect.objectContaining({ activated: true, ignored: false }));
+    expect(first.user?.isActive).toBe(true);
+    expect(repository.update).toHaveBeenCalledWith('u1', { isActive: true });
+    const second = await service.activateFromNotification(notification());
+    expect(second.activated).toBe(false);
+    expect(repository.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to the reference (the user id) when the link id is unknown', async () => {
+    const { service, repository } = makeService({}, [{ id: 'u1', email: dto.email, paymentLinkId: '7' }]);
+    const result = await service.activateFromNotification(notification({ id: 99, reference: 'u1' }));
+    expect(result.activated).toBe(true);
+    expect(repository.update).toHaveBeenCalledWith('u1', { isActive: true });
+  });
+
+  it('acknowledges and ignores any other event without touching users', async () => {
+    const { service, repository } = makeService({}, [{ id: 'u1', email: dto.email, paymentLinkId: '42' }]);
+    const result = await service.activateFromNotification(notification({}, 'recurring_payment.renewed'));
+    expect(result).toEqual({ user: null, activated: false, ignored: true });
+    expect(repository.findOne).not.toHaveBeenCalled();
+  });
+
+  it('404s a payment no sign-up matches', async () => {
+    const { service } = makeService({}, []);
+    await expect(service.activateFromNotification(notification({ reference: null }))).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+});
+
+describe('Arvy notification signature', () => {
+  const secret = 'ZycW-test-secret';
+  const body = '{"event":"recurring_payment.active","recurring_payment":{"id":42,"status":"active"}}';
+  const sign = (raw: string, key = secret) => `sha256=${createHmac('sha256', key).update(raw).digest('hex')}`;
+
+  it('accepts the hex HMAC-SHA256 of the raw body under the source secret, and nothing else', () => {
+    expect(verifyArvySignature(body, sign(body), secret)).toBe(true);
+    expect(verifyArvySignature(Buffer.from(body), ` ${sign(body)} `, secret)).toBe(true);
+    expect(verifyArvySignature(body, sign(body, 'other'), secret)).toBe(false);
+    expect(verifyArvySignature(body + ' ', sign(body), secret)).toBe(false);
+    expect(verifyArvySignature(body, undefined, secret)).toBe(false);
+    expect(verifyArvySignature(body, sign(body).slice(7), secret)).toBe(false);
+  });
+
+  it('the client refuses every notification until a source secret is configured', () => {
+    const without = ArvyClient.withConfig({ baseUrl: 'https://arvy.store/api/v1', sourceId: 1 });
+    expect(without.notificationsEnabled).toBe(false);
+    expect(without.verifyNotification(body, sign(body))).toBe(false);
+    const withSecret = ArvyClient.withConfig({
+      baseUrl: 'https://arvy.store/api/v1',
+      sourceId: 1,
+      sourceSecret: secret,
     });
+    expect(withSecret.notificationsEnabled).toBe(true);
+    expect(withSecret.verifyNotification(body, sign(body))).toBe(true);
+  });
+
+  it('parses a notification only when it has an event and a payment with id and status', () => {
+    expect(parseArvyNotification(body)?.recurring_payment.id).toBe(42);
+    expect(parseArvyNotification('not json')).toBeNull();
+    expect(parseArvyNotification('[]')).toBeNull();
+    expect(parseArvyNotification('{"event":"x"}')).toBeNull();
+    expect(parseArvyNotification('{"event":"x","recurring_payment":{"id":"42","status":"active"}}')).toBeNull();
+  });
+});
+
+describe('Arvy configuration', () => {
+  it('is enabled only with a token, defaults the base URL and source, and strips a trailing slash', () => {
+    expect(resolveArvyConfig({})).toEqual({
+      token: undefined,
+      baseUrl: 'https://arvy.store/api/v1',
+      sourceId: 1,
+      sourceSecret: undefined,
+    });
+    expect(
+      resolveArvyConfig({
+        ARVY_API_TOKEN: ' t ',
+        ARVY_API_URL: 'https://pay.example.com/api/v1/',
+        ARVY_SOURCE_ID: '7',
+        ARVY_SOURCE_SECRET: ' s ',
+      }),
+    ).toEqual({ token: 't', baseUrl: 'https://pay.example.com/api/v1', sourceId: 7, sourceSecret: 's' });
+    expect(resolveArvyConfig({ ARVY_SOURCE_ID: 'x' }).sourceId).toBe(1);
     expect(ArvyClient.withConfig(resolveArvyConfig({})).enabled).toBe(false);
     expect(ArvyClient.withConfig(resolveArvyConfig({ ARVY_API_TOKEN: 't' })).enabled).toBe(true);
   });
 
   it('derives the payment page origin for the site CSP from the API base', () => {
-    expect(arvyOrigin({ baseUrl: 'https://arvy.store/api/v1' })).toBe('https://arvy.store');
+    expect(arvyOrigin({ baseUrl: 'https://arvy.store/api/v1', sourceId: 1 })).toBe('https://arvy.store');
   });
 });
 
@@ -212,7 +324,7 @@ describe('ArvyClient.request', () => {
       .mockResolvedValueOnce({ ok: true, status: 201, text: () => Promise.resolve(JSON.stringify(link())) })
       .mockResolvedValueOnce({ ok: false, status: 422, text: () => Promise.resolve('{"errors":{"amount":["min"]}}') });
     global.fetch = fetchMock;
-    const client = ArvyClient.withConfig({ token: 'secret', baseUrl: 'https://arvy.store/api/v1' });
+    const client = ArvyClient.withConfig({ token: 'secret', baseUrl: 'https://arvy.store/api/v1', sourceId: 1 });
     const created = await client.createLink({
       amount: 30,
       charge_frequency: 'monthly',

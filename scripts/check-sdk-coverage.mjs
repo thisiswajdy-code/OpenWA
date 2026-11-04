@@ -39,7 +39,7 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 
 /** Every interpolation form collapses to the same wildcard as an OpenAPI `{param}`. */
-const normalize = (path) =>
+const normalize = path =>
   path
     .replace(/\$\{[^}]*\}/g, '*')
     .replace(/\{[^}]*\}/g, '*')
@@ -53,7 +53,7 @@ const walk = (dir, exts, out = []) => {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
       if (!SKIP_DIRS.has(entry)) walk(full, exts, out);
-    } else if (exts.some((e) => entry.endsWith(e))) {
+    } else if (exts.some(e => entry.endsWith(e))) {
       out.push(full);
     }
   }
@@ -61,7 +61,7 @@ const walk = (dir, exts, out = []) => {
 };
 
 /** Comments describe routes in prose and in `:id` notation, which is not the contract's `{id}`. */
-const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*(\/\/|#).*$/gm, '');
+const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*(\/\/|#).*$/gm, '');
 
 // A chain term is a string literal, a call, or a bare identifier. Identifiers matter: Go builds
 // `…/membership-requests/" + verb`, and stopping the chain at the variable would truncate the path
@@ -97,14 +97,14 @@ function harvestFile(source, baseValue, families = new Set()) {
   for (const m of flat.matchAll(CHAIN)) {
     const parts = m[0]
       .split('+')
-      .map((t) => t.trim())
-      .map((t) => {
+      .map(t => t.trim())
+      .map(t => {
         const literal = /^(?:"([^"]*)"|`([^`]*)`)$/.exec(t);
         if (literal) return literal[1] ?? literal[2];
         if (/\.\w*[Bb]ase\(/.test(t)) return baseValue;
         return '*';
       });
-    if (parts.some((p) => p == null)) continue;
+    if (parts.some(p => p == null)) continue;
     const path = parts.join('');
     if (!path.startsWith('/api/')) continue;
     const shape = normalize(path);
@@ -141,15 +141,15 @@ function harvestFile(source, baseValue, families = new Set()) {
 function harvestGo(dir) {
   const exact = new Set();
   const families = new Set();
-  for (const file of walk(dir, ['.go']).filter((f) => !f.endsWith('_test.go'))) {
+  for (const file of walk(dir, ['.go']).filter(f => !f.endsWith('_test.go'))) {
     const source = strip(readFileSync(file, 'utf8'));
     const bases = [null];
     for (const helper of source.matchAll(/func \(s \*\w+Service\) \w+\([^)]*\) string \{\s*return ([^\n]+)\n/g)) {
       const base = normalize(
         helper[1]
           .split('+')
-          .map((t) => t.trim())
-          .map((t) => /^"([^"]*)"$/.exec(t)?.[1] ?? '*')
+          .map(t => t.trim())
+          .map(t => /^"([^"]*)"$/.exec(t)?.[1] ?? '*')
           .join(''),
       );
       if (base.startsWith('/api/')) bases.push(base);
@@ -176,16 +176,23 @@ function excludedResources() {
   const start = readme.indexOf('Deliberately **not** exposed');
   const end = readme.indexOf('Everything else the gateway publishes', start);
   if (start < 0 || end < 0) {
-    throw new Error('sdk/README.md: could not find the "Deliberately not exposed" paragraph — the gate cannot derive its exclusion list.');
+    throw new Error(
+      'sdk/README.md: could not find the "Deliberately not exposed" paragraph — the gate cannot derive its exclusion list.',
+    );
   }
-  const names = [...readme.slice(start, end).matchAll(/`([^`]+)`/g)].map((m) => m[1].split('/')[0].trim());
-  if (names.length < 8) throw new Error(`sdk/README.md: parsed only ${names.length} excluded resources, expected the full list.`);
+  const names = [...readme.slice(start, end).matchAll(/`([^`]+)`/g)].map(m => m[1].split('/')[0].trim());
+  if (names.length < 8)
+    throw new Error(`sdk/README.md: parsed only ${names.length} excluded resources, expected the full list.`);
   return new Set(names);
 }
 
-// The resource a path belongs to: the segment after `/api/`, or after a session id.
-const resourceOf = (path) =>
-  /^\/api\/sessions\/\*\/([^/]+)/.exec(path)?.[1] ?? /^\/api\/([^/*]+)/.exec(path)?.[1] ?? '';
+// The resource a path belongs to: the segment after `/api/`, or after a session id. A route the
+// gateway mounts outside the prefix (`/notify`) is its own first segment.
+const resourceOf = path =>
+  /^\/api\/sessions\/\*\/([^/]+)/.exec(path)?.[1] ??
+  /^\/api\/([^/*]+)/.exec(path)?.[1] ??
+  /^\/([^/*]+)/.exec(path)?.[1] ??
+  '';
 
 /**
  * A harvested path whose final segment is a wildcard MAY cover its concrete siblings: the client
@@ -199,7 +206,7 @@ const resourceOf = (path) =>
  * wildcard is that route's path parameter and covers nothing but it (which `exact` already does).
  * `…/messages/*` is published by no route, so a wildcard there can only be a verb.
  */
-const isRouteNameFamily = (family) => !contractShapes.has(family);
+const isRouteNameFamily = family => !contractShapes.has(family);
 const covers = (built, path) => {
   if (built.exact.has(path)) return true;
   const family = path.replace(/\/[^/]+$/, '/*');
@@ -207,11 +214,13 @@ const covers = (built, path) => {
 };
 
 const excluded = excludedResources();
-const contract = [...new Set(Object.keys(JSON.parse(readFileSync(join(root, 'openapi.json'), 'utf8')).paths).map(normalize))];
+const contract = [
+  ...new Set(Object.keys(JSON.parse(readFileSync(join(root, 'openapi.json'), 'utf8')).paths).map(normalize)),
+];
 /** Every shape the contract publishes, including the excluded resources — a wildcard is explained by
  *  a by-id route whether or not the SDKs are asked to expose it. */
 const contractShapes = new Set(contract);
-const inScope = contract.filter((p) => {
+const inScope = contract.filter(p => {
   const resource = resourceOf(p);
   return !excluded.has(resource) && !excluded.has(resource.replace(/-rules$/, ''));
 });
@@ -226,7 +235,8 @@ for (const sdk of SDKS) {
     : (() => {
         const exact = new Set();
         const families = new Set();
-        for (const file of walk(dir, sdk.exts)) for (const p of harvestFile(readFileSync(file, 'utf8'), null, families)) exact.add(p);
+        for (const file of walk(dir, sdk.exts))
+          for (const p of harvestFile(readFileSync(file, 'utf8'), null, families)) exact.add(p);
         return { exact, families };
       })();
 
@@ -235,17 +245,18 @@ for (const sdk of SDKS) {
   // handful would instead report most of the contract as missing and read as a catastrophe rather
   // than a broken scan. Fail here, naming the client, before any coverage claim is made from it.
   if (built[sdk.name].exact.size < 40) {
-    errors.push(`${sdk.name}: harvested only ${built[sdk.name].exact.size} route shapes from ${sdk.dir} — the scan has drifted, so its coverage cannot be trusted.`);
+    errors.push(
+      `${sdk.name}: harvested only ${built[sdk.name].exact.size} route shapes from ${sdk.dir} — the scan has drifted, so its coverage cannot be trusted.`,
+    );
   }
 }
 
 if (!errors.length) {
   for (const path of inScope.sort()) {
-    const missing = SDKS.map((s) => s.name).filter((name) => !covers(built[name], path));
+    const missing = SDKS.map(s => s.name).filter(name => !covers(built[name], path));
     if (missing.length) errors.push(`${path} — published by the gateway, built by no method in: ${missing.join(', ')}`);
   }
 }
-
 
 // ─── Verb layer ──────────────────────────────────────────────────────────────────────────────
 // The path layer above proves each client REACHES a route; a shared path can still miss a VERB
@@ -260,7 +271,7 @@ if (!errors.length) {
 const VERBS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
 /** Join a concatenated path expression: literals verbatim, code between them becomes a `*`. */
-const literalsToPath = (expr) => {
+const literalsToPath = expr => {
   let path = '';
   let last = 0;
   for (const m of expr.matchAll(/["'`](\/[^"'`\n]*)["'`]/g)) {
@@ -277,14 +288,18 @@ const literalsToPath = (expr) => {
 };
 
 /** Go resolves its base() helpers so `s.base(sessionID)+"/picture"` reattaches to a real path. */
-const goVerbPairs = (dir) => {
+const goVerbPairs = dir => {
   const pairs = new Set();
-  for (const file of walk(dir, ['.go']).filter((f) => !f.endsWith('_test.go'))) {
+  for (const file of walk(dir, ['.go']).filter(f => !f.endsWith('_test.go'))) {
     const source = strip(readFileSync(file, 'utf8'));
     const bases = new Map();
     for (const helper of source.matchAll(/func \(s \*\w+Service\) (\w+)\([^)]*\) string \{\s*return ([^\n]+)\n/g)) {
       const base = normalize(
-        helper[2].split('+').map((t) => t.trim()).map((t) => /^"([^"]*)"$/.exec(t)?.[1] ?? '*').join(''),
+        helper[2]
+          .split('+')
+          .map(t => t.trim())
+          .map(t => /^"([^"]*)"$/.exec(t)?.[1] ?? '*')
+          .join(''),
       );
       if (base.startsWith('/api/')) bases.set(helper[1], base);
     }
@@ -292,17 +307,21 @@ const goVerbPairs = (dir) => {
     // so the do() site only sees a variable. Harvest the verb + suffix literal from the wrapper call
     // and pair it with the file's service bases (base+suffix and base/*+suffix), same generosity as
     // the path layer's helper-argument rule.
-    for (const m of source.matchAll(/\.\w+\(\s*ctx\s*,\s*"(GET|POST|PUT|PATCH|DELETE)"\s*,[^)]*?"(\/[a-z0-9][\w.\/-]*)"/g)) {
+    for (const m of source.matchAll(
+      /\.\w+\(\s*ctx\s*,\s*"(GET|POST|PUT|PATCH|DELETE)"\s*,[^)]*?"(\/[a-z0-9][\w.\/-]*)"/g,
+    )) {
       for (const base of bases.values()) {
         pairs.add(`${m[1]} ${normalize(base + m[2])}`);
         pairs.add(`${m[1]} ${normalize(`${base}/*${m[2]}`)}`);
       }
     }
-    for (const m of source.matchAll(/\.do\(\s*ctx\s*,\s*"(GET|POST|PUT|PATCH|DELETE)"\s*,\s*([^\n]+?),\s*(?:nil|[A-Za-z_&])/g)) {
+    for (const m of source.matchAll(
+      /\.do\(\s*ctx\s*,\s*"(GET|POST|PUT|PATCH|DELETE)"\s*,\s*([^\n]+?),\s*(?:nil|[A-Za-z_&])/g,
+    )) {
       const expr = m[2]
         .split('+')
-        .map((t) => t.trim())
-        .map((t) => {
+        .map(t => t.trim())
+        .map(t => {
           const lit = /^"([^"]*)"$/.exec(t)?.[1];
           if (lit !== undefined) return lit;
           const helper = /^s\.(\w+)\(/.exec(t)?.[1];
@@ -320,7 +339,7 @@ const goVerbPairs = (dir) => {
  * Python splits one path across adjacent literals (`f"/api/sessions/{a}/groups/{b}"` then
  * `"/membership-requests/approve"`), which it concatenates implicitly; join them.
  */
-export const joinPythonLiterals = (expr) => [...expr.matchAll(/"([^"]*)"/g)].map((m) => m[1]).join('');
+export const joinPythonLiterals = expr => [...expr.matchAll(/"([^"]*)"/g)].map(m => m[1]).join('');
 
 /** The `VERB path` pairs a client builds on a contract path that does not declare that verb. */
 export function undeclaredVerbPairs(sdkName, pairs, specByPath) {
@@ -328,12 +347,13 @@ export function undeclaredVerbPairs(sdkName, pairs, specByPath) {
   for (const pair of pairs) {
     const [verb, path] = pair.split(' ');
     const operations = specByPath.get(path);
-    if (operations && !operations[verb.toLowerCase()]) out.push(`${verb} ${path}: built by ${sdkName}, not declared by the contract`);
+    if (operations && !operations[verb.toLowerCase()])
+      out.push(`${verb} ${path}: built by ${sdkName}, not declared by the contract`);
   }
   return out;
 }
 
-const verbPairsOf = (sdk) => {
+const verbPairsOf = sdk => {
   if (sdk.name === 'go') return goVerbPairs(join(root, sdk.dir));
   const pairs = new Set();
   for (const file of walk(join(root, sdk.dir), sdk.exts)) {
@@ -348,7 +368,8 @@ const verbPairsOf = (sdk) => {
             : [/HttpMethod\.(GET|POST|PUT|PATCH|DELETE)\s*,\s*([\s\S]{2,400}?)\s*,\s*\n?\s*(?:null|new |[a-z]\w)/g];
     for (const re of patterns) {
       for (const m of src.matchAll(re)) {
-        const path = sdk.name === 'java' ? literalsToPath(m[2]) : sdk.name === 'python' ? joinPythonLiterals(m[2]) : m[2];
+        const path =
+          sdk.name === 'java' ? literalsToPath(m[2]) : sdk.name === 'python' ? joinPythonLiterals(m[2]) : m[2];
         if (path && path.startsWith('/api/')) pairs.add(`${m[1]} ${normalize(path)}`);
       }
     }
@@ -364,17 +385,19 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
   const specByPath = new Map(Object.entries(spec).map(([k, v]) => [normalize(k), v]));
   const multi = [];
   for (const raw of inScope) {
-    const verbs = VERBS.filter((v) => specByPath.get(raw)?.[v.toLowerCase()]);
+    const verbs = VERBS.filter(v => specByPath.get(raw)?.[v.toLowerCase()]);
     if (verbs.length > 1) multi.push({ path: raw, verbs });
   }
   const verbErrors = [];
   for (const sdk of SDKS) {
     const pairs = verbPairsOf(sdk);
     // Non-vacuity: a regex that stopped matching yields an empty set and the layer goes blind.
-    if (pairs.size < 60) verbErrors.push(`${sdk.name}: harvested only ${pairs.size} verb/path pairs — the verb scan has drifted.`);
+    if (pairs.size < 60)
+      verbErrors.push(`${sdk.name}: harvested only ${pairs.size} verb/path pairs — the verb scan has drifted.`);
     for (const { path, verbs } of multi) {
       for (const verb of verbs) {
-        if (!pairs.has(`${verb} ${path}`)) verbErrors.push(`${verb} ${path} — declared by the contract, built by no ${sdk.name} method`);
+        if (!pairs.has(`${verb} ${path}`))
+          verbErrors.push(`${verb} ${path} — declared by the contract, built by no ${sdk.name} method`);
       }
     }
     // Checked against the whole contract: a client that builds an excluded route still owes it a real verb.
@@ -397,5 +420,7 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
     console.error('Add the client method, or add the resource to that list with a reason.\n');
     process.exit(1);
   }
-  console.log(`✓ SDK contract coverage OK (${inScope.length} in-scope contract paths reachable from all ${SDKS.length} clients).`);
+  console.log(
+    `✓ SDK contract coverage OK (${inScope.length} in-scope contract paths reachable from all ${SDKS.length} clients).`,
+  );
 }

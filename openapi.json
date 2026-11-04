@@ -1105,6 +1105,41 @@
         "security": []
       }
     },
+    "/notify": {
+      "post": {
+        "operationId": "ArvyNotifyController_notify",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Received. `activated` says whether this call activated the user; other events are ignored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArvyNotifyResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not a notification."
+          },
+          "401": {
+            "description": "Missing or invalid `X-Arvy-Signature`."
+          },
+          "404": {
+            "description": "No sign-up matches the payment link or its reference."
+          },
+          "503": {
+            "description": "Notifications are not configured (`ARVY_SOURCE_SECRET` unset)."
+          }
+        },
+        "summary": "Payment-service notification: a sign-up’s recurring payment became active",
+        "tags": [
+          "auth"
+        ],
+        "security": []
+      }
+    },
     "/api/sessions": {
       "post": {
         "operationId": "SessionController_create",
@@ -19352,6 +19387,36 @@
           "paymentsNumber",
           "status",
           "active"
+        ]
+      },
+      "ArvyNotifyResponseDto": {
+        "type": "object",
+        "properties": {
+          "received": {
+            "type": "boolean",
+            "example": true
+          },
+          "event": {
+            "type": "string",
+            "description": "The event the notification carried.",
+            "example": "recurring_payment.active"
+          },
+          "activated": {
+            "type": "boolean",
+            "description": "Whether this notification activated the user.",
+            "example": true
+          },
+          "ignored": {
+            "type": "boolean",
+            "description": "True for an event other than `recurring_payment.active`, which is acknowledged and ignored.",
+            "example": false
+          }
+        },
+        "required": [
+          "received",
+          "event",
+          "activated",
+          "ignored"
         ]
       },
       "CreateSessionDto": {

@@ -40,6 +40,9 @@ describe('SignupController — responses and audit trail', () => {
     charge_frequency: 'monthly',
     sto_payments_number: 12,
     first_charge_date: '2026-11-04',
+    source_id: 1,
+    reference: 'u1',
+    source_notified_at: null,
     charges_completed: 0,
   };
   let signupService: { register: jest.Mock; status: jest.Mock };

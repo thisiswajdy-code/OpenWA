@@ -212,6 +212,7 @@ describe('documentErrorResponses', () => {
 // requirement) rather than a PUBLIC_PATHS security: [] exemption.
 describe('PUBLIC_PATHS drift guard', () => {
   const EXPECTED_PUBLIC_CONTROLLERS = [
+    'src/modules/auth/arvy-notify.controller.ts',
     'src/modules/auth/signup.controller.ts',
     'src/modules/auth/user-login.controller.ts',
     'src/modules/health/health.controller.ts',
@@ -260,6 +261,7 @@ describe('PUBLIC_PATHS drift guard', () => {
         '/api/health/ready',
         '/api/infra/health',
         '/api/ingress/{pluginId}/{instanceId}/{path}',
+        '/notify',
       ].sort(),
     );
   });
