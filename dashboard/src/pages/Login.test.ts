@@ -205,3 +205,15 @@ test('the switch moves between the two forms and clears the error', async () => 
   fireEvent.click(screen.getByRole('button', { name: 'Sign in with email and password instead' }));
   assert.ok(screen.getByLabelText('Password'));
 });
+
+test("the page offers sign-up on the site instead of documentation, in the reader's language", async () => {
+  loginOptions = { password: true };
+  const { screen } = rtl;
+  rtl.render(createElement(Login, { onLogin: () => undefined }));
+  await screen.findByLabelText('Email');
+  assert.equal(screen.queryByText('Need help?'), null);
+  const signUp = screen.getByRole('link', { name: 'Sign up now' });
+  assert.equal(signUp.getAttribute('href'), '/signup-en.html');
+  assert.equal(signUp.getAttribute('target'), null, 'the sign-up page is the same site, not a new tab');
+  assert.ok(screen.getByText('New account?'));
+});

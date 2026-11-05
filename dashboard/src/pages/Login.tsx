@@ -275,11 +275,11 @@ export function Login({ onLogin }: LoginProps) {
           )}
         </form>
 
+        {/* The site's sign-up (choose a plan, register, pay) is served next to the dashboard, in the
+            site's two languages; Hebrew readers get the Hebrew page, everyone else the English one. */}
         <p className="login-help">
-          {t('login.help')}{' '}
-          <a href="https://wa.scalorus.com" target="_blank" rel="noopener noreferrer">
-            {t('login.viewDocs')}
-          </a>
+          {t('login.newAccount')}{' '}
+          <a href={currentLang === 'he' ? '/signup.html' : '/signup-en.html'}>{t('login.signUpNow')}</a>
         </p>
       </div>{' '}
     </div>
