@@ -60,12 +60,14 @@ function makeService(arvy: Partial<ArvyClient>, users: Partial<User>[] = []) {
   };
   const planStore = { current: { ...DEFAULT_SIGNUP_PLAN } as SignupPlan };
   const plans = { get: jest.fn(() => Promise.resolve(planStore.current)) };
+  const emails = { sendRegistered: jest.fn(), sendSubscriptionActive: jest.fn() };
   const service = new SignupService(
     repository as never,
     { enabled: true, sourceId: 1, ...arvy } as ArvyClient,
     plans as never,
+    emails as never,
   );
-  return { service, repository, planStore };
+  return { service, repository, planStore, emails };
 }
 
 describe('todayInIsrael', () => {
@@ -100,10 +102,16 @@ describe('DEFAULT_SIGNUP_PLAN', () => {
 describe('SignupService.register', () => {
   it('creates an inactive operator and a USD link when the API accepts USD', async () => {
     const createLink = jest.fn<Promise<ArvyLink>, [ArvyCreateLinkRequest]>(() => Promise.resolve(link()));
-    const { service, repository } = makeService({ createLink });
+    const { service, repository, emails } = makeService({ createLink });
     const result = await service.register(dto);
     expect(repository.create).toHaveBeenCalledWith(
       expect.objectContaining({ email: dto.email, role: ApiKeyRole.OPERATOR, isActive: false }),
+    );
+    // The welcome mail goes out once the link exists, with the payment page and the customer's name.
+    expect(emails.sendRegistered).toHaveBeenCalledWith(
+      expect.objectContaining({ email: dto.email }),
+      expect.objectContaining({ payment_link: link().payment_link }),
+      'Dana',
     );
     expect(createLink).toHaveBeenCalledTimes(1);
     expect(createLink.mock.calls[0][0]).toEqual(
@@ -199,16 +207,21 @@ describe('SignupService.register', () => {
 describe('SignupService.status', () => {
   it('activates the user the first time the link reports a saved card', async () => {
     const getLink = jest.fn(() => Promise.resolve(link({ status: 'active' })));
-    const { service, repository } = makeService({ getLink }, [{ id: 'u1', email: dto.email, paymentLinkId: '42' }]);
+    const { service, repository, emails } = makeService({ getLink }, [
+      { id: 'u1', email: dto.email, paymentLinkId: '42' },
+    ]);
     const first = await service.status('u1');
     expect(getLink).toHaveBeenCalledWith('42');
     expect(first.activated).toBe(true);
     expect(first.user.isActive).toBe(true);
     expect(repository.update).toHaveBeenCalledWith('u1', { isActive: true });
+    expect(emails.sendSubscriptionActive).toHaveBeenCalledWith(expect.objectContaining({ id: 'u1', email: dto.email }));
 
     const second = await service.status('u1');
     expect(second.activated).toBe(false);
     expect(repository.update).toHaveBeenCalledTimes(1);
+    // One activation, one mail.
+    expect(emails.sendSubscriptionActive).toHaveBeenCalledTimes(1);
   });
 
   it('leaves the user inactive while the card is pending or the link is cancelled', async () => {
@@ -259,7 +272,7 @@ describe('SignupService.activateFromNotification', () => {
     }) as ArvyNotification;
 
   it('activates the user the link belongs to, once', async () => {
-    const { service, repository } = makeService({}, [{ id: 'u1', email: dto.email, paymentLinkId: '42' }]);
+    const { service, repository, emails } = makeService({}, [{ id: 'u1', email: dto.email, paymentLinkId: '42' }]);
     const first = await service.activateFromNotification(notification());
     expect(first).toEqual(expect.objectContaining({ activated: true, ignored: false }));
     expect(first.user?.isActive).toBe(true);
@@ -267,6 +280,7 @@ describe('SignupService.activateFromNotification', () => {
     const second = await service.activateFromNotification(notification());
     expect(second.activated).toBe(false);
     expect(repository.update).toHaveBeenCalledTimes(1);
+    expect(emails.sendSubscriptionActive).toHaveBeenCalledTimes(1);
   });
 
   it('falls back to the reference (the user id) when the link id is unknown', async () => {

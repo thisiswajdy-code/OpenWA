@@ -12,6 +12,7 @@ import { ApiKeyRole } from './entities/api-key.entity';
 import { hashPassword } from './password-hash';
 import { RegisterDto } from './dto';
 import { SignupPlanService, type SignupPlan } from './signup-plan.service';
+import { SignupEmailService } from './signup-email.service';
 import {
   ARVY_ACTIVE_EVENT,
   ARVY_LANG_FOR_LOCALE,
@@ -57,6 +58,7 @@ export class SignupService {
     private readonly userRepository: Repository<User>,
     private readonly arvy: ArvyClient,
     private readonly plans: SignupPlanService,
+    private readonly emails: SignupEmailService,
   ) {}
 
   /** Called when the plan changes: a currency refused under the old plan gets another chance. */
@@ -112,6 +114,8 @@ export class SignupService {
       currency: link.currency_code,
       action: 'user_signed_up',
     });
+    // The welcome mail carries the payment page, so a closed tab does not lose the sign-up.
+    this.emails.sendRegistered(user, link, dto.name);
     return { user, link };
   }
 
@@ -174,6 +178,7 @@ export class SignupService {
         paymentLinkId: String(payment.id),
         action: 'user_activated',
       });
+      this.emails.sendSubscriptionActive(user);
     }
     return { user, activated, ignored: false };
   }
@@ -198,6 +203,7 @@ export class SignupService {
       await this.userRepository.update(user.id, { isActive: true });
       activated = true;
       this.logger.log(`User activated by payment: ${user.email}`, { userId: user.id, action: 'user_activated' });
+      this.emails.sendSubscriptionActive(user);
     }
     return { user, link, activated };
   }

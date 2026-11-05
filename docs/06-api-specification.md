@@ -5275,7 +5275,9 @@ Self-service sign-up from the site (`/signup.html`): create a dashboard user and
 { "name": "Dana", "email": "dana@example.com", "password": "correct horse battery staple", "locale": "he" }
 ```
 
-`name` (optional, ≤ 120) and `locale` (optional, `he` | `en` | `ar`) go to the payment page. `email` is trimmed and lower-cased; `password` is 8 to 128 characters.
+`name` (optional, ≤ 120) and `locale` (optional, `he` | `en` | `ar`) go to the payment page.
+
+When `EMAIL_API_KEY` is set, the new address is emailed at once (through the Scalorus CRM, `EMAIL_API_URL`) with the payment page and the price, bilingual Hebrew and English; the mail is best-effort and never fails the sign-up. A second email, that the subscription is active and the account awaits approval, goes out when the user is activated by `POST /notify` or `GET /api/auth/register/:id`, with a copy to `SIGNUP_NOTIFY_EMAIL` when set. `email` is trimmed and lower-cased; `password` is 8 to 128 characters.
 
 The link follows the sign-up plan (`GET /api/auth/register/plan`; by default 12 monthly charges of **USD 30**); when the payment service refuses the plan's currency (`422`) and the plan names an ILS fallback (**95** by default), the link is created in ILS at that amount instead, and the refusal is remembered until the plan is saved again. The first charge date is today in Israel time. It is created under this gateway's source (`ARVY_SOURCE_ID`) with the user id as `reference`, so the service notifies `POST /notify` when the card is saved.
 

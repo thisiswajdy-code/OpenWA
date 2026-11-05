@@ -33,6 +33,13 @@ export const BLANK_SHADOWED_ENV_KEYS: string[] = [
   'ARVY_API_URL',
   'ARVY_SOURCE_ID',
   'ARVY_SOURCE_SECRET',
+  // Transactional mail for sign-up (through the Scalorus CRM) and the operator address it tells.
+  'EMAIL_API_KEY',
+  'EMAIL_API_URL',
+  'EMAIL_FROM',
+  'EMAIL_FROM_NAME',
+  'EMAIL_SMTP_ID',
+  'SIGNUP_NOTIFY_EMAIL',
   // Inbound-media knobs. Not dashboard-managed, but every blank compose forward must be cleared or
   // the empty value shadows .env / data/.env.generated — which is why the gate above requires an
   // entry for each one.
