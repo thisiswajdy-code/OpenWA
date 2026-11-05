@@ -16,7 +16,7 @@ import { randomBytes } from 'crypto';
 import { ipMatches } from '../../common/utils/ip';
 import { hashApiKey } from './api-key-hash';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
-import type { User } from './entities/user.entity';
+import { User } from './entities/user.entity';
 import { CreateApiKeyDto, UpdateApiKeyDto } from './dto';
 import { createLogger } from '../../common/services/logger.service';
 import { setRequestActor } from '../../common/services/request-context';
@@ -83,6 +83,9 @@ export function loginKeyName(email: string): string {
   return Array.from(`Dashboard login: ${email}`).slice(0, 100).join('');
 }
 
+/** The 403 a login key gets while its user awaits approval; the dashboard shows the lock on it. */
+export const PENDING_APPROVAL_MESSAGE = 'Account pending approval';
+
 @Injectable()
 export class AuthService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = createLogger('AuthService');
@@ -90,6 +93,9 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @InjectRepository(ApiKey, 'main')
     private readonly apiKeyRepository: Repository<ApiKey>,
+    // Read only for a login key (userId set), to refuse one whose user awaits approval.
+    @InjectRepository(User, 'main')
+    private readonly userRepository: Repository<User>,
     private readonly usageTracker: ApiKeyUsageTracker,
     private readonly moduleRef: ModuleRef,
     @Optional() private readonly keyIndex?: ActiveKeyIndex,
@@ -574,11 +580,26 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     return this.apiKeyRepository.findBy({ id: In(ids) });
   }
 
+  /**
+   * Whether a key belongs to a dashboard user an admin has not approved yet. A key with no owner
+   * (created through the API or seeded) is never pending. The user is re-read on every call rather
+   * than cached, so an approval unlocks the dashboard the user is already signed in to at once.
+   */
+  async isPendingApproval(apiKey: Pick<ApiKey, 'userId'>): Promise<boolean> {
+    if (!apiKey.userId) return false;
+    const user = await this.userRepository.findOne({
+      where: { id: apiKey.userId },
+      select: { id: true, approvedAt: true },
+    });
+    // A login key whose user is gone fails closed; the user's keys are deleted with it anyway.
+    return !user || user.approvedAt === null;
+  }
+
   async validateApiKey(
     rawKey: string,
     clientIp?: string,
     sessionId?: string,
-    { recordUsage = true }: { recordUsage?: boolean } = {},
+    { recordUsage = true, allowPendingUser = false }: { recordUsage?: boolean; allowPendingUser?: boolean } = {},
   ): Promise<ApiKey> {
     // Trim before hashing so every surface agrees on what the credential is. HTTP already strips
     // surrounding whitespace from header values, so a pasted key with a stray space/newline
@@ -630,6 +651,14 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
       if (!apiKey.allowedSessions.includes(sessionId)) {
         throw new ForbiddenException('API key not authorized for this session');
       }
+    }
+
+    // A paid sign-up signs in before an admin approves it, and until then its login key reaches
+    // only the routes marked @AllowPendingApproval (the HTTP guard passes `allowPendingUser` for
+    // those); every other surface — REST, WebSocket, MCP, Bull Board — refuses it. 403 like the
+    // other scope refusals: the key is valid, so the dashboard must not discard it.
+    if (!allowPendingUser && (await this.isPendingApproval(apiKey))) {
+      throw new ForbiddenException(PENDING_APPROVAL_MESSAGE);
     }
 
     // Advisory stats only; the tracker coalesces the write and never throws. A caller that validates

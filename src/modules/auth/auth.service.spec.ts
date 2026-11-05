@@ -14,7 +14,14 @@ import {
 } from '@nestjs/common';
 import { createHash, createHmac } from 'crypto';
 import * as fs from 'fs';
-import { AuthService, resolveSeedApiKey, bannerKeyLine, UnresolvedApiKeyException } from './auth.service';
+import {
+  AuthService,
+  resolveSeedApiKey,
+  bannerKeyLine,
+  UnresolvedApiKeyException,
+  PENDING_APPROVAL_MESSAGE,
+} from './auth.service';
+import { User } from './entities/user.entity';
 import { ApiKeyUsageTracker } from './api-key-usage-tracker.service';
 import { getRequestActor, runWithRequestId } from '../../common/services/request-context';
 import { ActiveKeyIndex } from './active-key-index';
@@ -133,9 +140,11 @@ describe('AuthService', () => {
   /** The raw AND-fragment the last-admin guard binds, so the SQL predicate itself is asserted. */
   let lastAdminFragments: string[];
   let keyIndex: { refreshSoon: jest.Mock };
+  let userRepository: { findOne: jest.Mock };
 
   beforeEach(async () => {
     keyIndex = { refreshSoon: jest.fn() };
+    userRepository = { findOne: jest.fn().mockResolvedValue(null) };
     repository = {
       count: jest.fn(),
       find: jest.fn(),
@@ -157,6 +166,7 @@ describe('AuthService', () => {
           provide: getRepositoryToken(ApiKey, 'main'),
           useValue: repository,
         },
+        { provide: getRepositoryToken(User, 'main'), useValue: userRepository },
         { provide: ActiveKeyIndex, useValue: keyIndex },
       ],
     }).compile();
@@ -860,6 +870,51 @@ describe('AuthService', () => {
       (repository.findOne as jest.Mock).mockResolvedValue(null);
 
       await expect(service.validateApiKey('wrong-key')).rejects.toThrow(UnauthorizedException);
+    });
+
+    describe('a login key whose user awaits approval', () => {
+      const rawKey = 'pending-key';
+      beforeEach(() => {
+        (repository.findOne as jest.Mock).mockResolvedValue(
+          createMockApiKey({ keyHash: hashKey(rawKey), userId: 'u1' }),
+        );
+        (repository.save as jest.Mock).mockImplementation(k => Promise.resolve(k));
+      });
+
+      it('is refused with 403 by default, the message the dashboard shows the lock on', async () => {
+        userRepository.findOne.mockResolvedValue({ id: 'u1', approvedAt: null });
+        await expect(service.validateApiKey(rawKey)).rejects.toThrow(new ForbiddenException(PENDING_APPROVAL_MESSAGE));
+        expect(userRepository.findOne).toHaveBeenCalledWith({
+          where: { id: 'u1' },
+          select: { id: true, approvedAt: true },
+        });
+      });
+
+      it('is admitted where the caller allows a pending user', async () => {
+        userRepository.findOne.mockResolvedValue({ id: 'u1', approvedAt: null });
+        await expect(
+          service.validateApiKey(rawKey, undefined, undefined, { allowPendingUser: true }),
+        ).resolves.toMatchObject({ userId: 'u1' });
+      });
+
+      it('passes once the user is approved, read fresh on every call so an approval unlocks at once', async () => {
+        userRepository.findOne.mockResolvedValue({ id: 'u1', approvedAt: new Date() });
+        await expect(service.validateApiKey(rawKey)).resolves.toMatchObject({ userId: 'u1' });
+      });
+
+      it('fails closed when the user is gone', async () => {
+        userRepository.findOne.mockResolvedValue(null);
+        await expect(service.validateApiKey(rawKey)).rejects.toThrow(ForbiddenException);
+      });
+    });
+
+    it('never reads the user for a key with no owner', async () => {
+      const key = createMockApiKey({ keyHash: hashKey('plain'), userId: null });
+      (repository.findOne as jest.Mock).mockResolvedValue(key);
+      (repository.save as jest.Mock).mockImplementation(k => Promise.resolve(k));
+      await expect(service.validateApiKey('plain')).resolves.toMatchObject({ id: key.id });
+      await expect(service.isPendingApproval(key)).resolves.toBe(false);
+      expect(userRepository.findOne).not.toHaveBeenCalled();
     });
 
     it('should throw UnauthorizedException for revoked key', async () => {

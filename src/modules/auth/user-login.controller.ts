@@ -1,12 +1,12 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Post, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
-import { CurrentApiKey, Public, RequireUnscopedKey } from './decorators/auth.decorators';
-import { LoginDto, LoginOptionsResponseDto, LoginResponseDto } from './dto';
+import { AllowPendingApproval, CurrentApiKey, Public, RequireUnscopedKey } from './decorators/auth.decorators';
+import { CurrentUserResponseDto, LoginDto, LoginOptionsResponseDto, LoginResponseDto } from './dto';
 import type { ApiKey } from './entities/api-key.entity';
 import { EngineFactory } from '../../engine/engine.factory';
 import { AuditService } from '../audit/audit.service';
@@ -77,6 +77,7 @@ export class UserLoginController {
         engineType: this.engineFactory.getCurrentEngine(),
         scoped: false,
         expiresAt: apiKey.expiresAt as Date,
+        pendingApproval: user.approvedAt === null,
       };
     } catch (err) {
       // A refused sign-in costs the caller nothing, so its audit row is bounded per client IP like a
@@ -92,8 +93,27 @@ export class UserLoginController {
     }
   }
 
+  @Get('me')
+  @RequireUnscopedKey()
+  @AllowPendingApproval()
+  @ApiOperation({ summary: 'The dashboard user behind the presented login key, and whether it awaits approval' })
+  @ApiResponse({ status: 200, description: 'The signed-in user.', type: CurrentUserResponseDto })
+  @ApiResponse({ status: 404, description: 'The key is not a login key: no dashboard user signed in with it.' })
+  async me(@CurrentApiKey() apiKey?: ApiKey): Promise<CurrentUserResponseDto> {
+    if (!apiKey?.userId) throw new NotFoundException('No dashboard user signed in with this key');
+    const user = await this.userService.findOne(apiKey.userId);
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      pendingApproval: user.approvedAt === null,
+      approvedAt: user.approvedAt ?? undefined,
+    };
+  }
+
   @Post('logout')
   @RequireUnscopedKey()
+  @AllowPendingApproval()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'End a password sign-in by deleting its login key' })
   @ApiResponse({

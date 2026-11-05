@@ -892,7 +892,8 @@
     },
     "actions": {
       "edit": "編輯用戶",
-      "delete": "刪除"
+      "delete": "刪除",
+      "approve": "審批帳戶"
     },
     "edit": {
       "title": "編輯用戶",
@@ -913,7 +914,22 @@
       "saveFailed": "無法儲存方案。",
       "loadFailed": "無法載入註冊方案。",
       "disabledHint": "此閘道已停用註冊：未設定 ARVY_API_TOKEN。價格仍會儲存。"
-    }
+    },
+    "state": {
+      "active": "活躍",
+      "inactive": "未啟用",
+      "pendingApproval": "等待審批",
+      "awaitingPayment": "等待付款"
+    },
+    "approvedTitle": "帳戶已審批",
+    "pendingBanner": "等待你審批的帳戶：{{count}} 個。審批前他們看到的是鎖定的控制台。"
+  },
+  "pending": {
+    "title": "等待審批",
+    "body": "已收到你的付款。管理員會審核每個新帳戶；你的帳戶通過審批後，此頁面會自動解鎖。",
+    "signedInAs": "目前登入：{{email}}",
+    "check": "再次檢查",
+    "loadFailed": "無法讀取審批狀態，頁面將會重試。"
   },
   "logs": {
     "title": "審計記錄",

@@ -55,6 +55,8 @@ function renderSidebar(
     setEngineType: () => undefined,
     scoped: false,
     setScoped: () => undefined,
+    pendingApproval: false,
+    setPendingApproval: () => undefined,
   };
   const query = { isLoading: false, error: null, data: channels.all } as unknown as UseQueryResult<Channel[], Error>;
   return rtl.render(

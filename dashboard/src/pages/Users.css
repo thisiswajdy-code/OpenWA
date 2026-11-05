@@ -99,6 +99,44 @@
   color: var(--error-text);
 }
 
+/* A paid sign-up waiting for an admin, and one that has not saved a card yet. */
+.users-page .status-badge.pendingApproval {
+  background: rgba(245, 158, 11, 0.16);
+  color: var(--warning-text, #b45309);
+}
+
+.users-page .status-badge.awaitingPayment {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--text-secondary);
+}
+
+.users-page .pending-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--text-primary);
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.users-page .pending-banner svg {
+  color: var(--warning-text, #b45309);
+  flex-shrink: 0;
+}
+
+.users-page .icon-btn.approve {
+  color: var(--primary-text);
+  border-color: rgba(37, 211, 102, 0.4);
+}
+
+.users-page .icon-btn.approve:hover:not(:disabled) {
+  background: rgba(37, 211, 102, 0.12);
+}
+
 .users-page .last-sign-in {
   color: var(--text-secondary);
   white-space: nowrap;

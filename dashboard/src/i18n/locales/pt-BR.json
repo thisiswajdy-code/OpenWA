@@ -848,7 +848,8 @@
     },
     "actions": {
       "edit": "Editar usuário",
-      "delete": "Excluir"
+      "delete": "Excluir",
+      "approve": "Aprovar conta"
     },
     "edit": {
       "title": "Editar usuário",
@@ -869,7 +870,22 @@
       "saveFailed": "Não foi possível salvar o plano.",
       "loadFailed": "Não foi possível carregar o plano de cadastro.",
       "disabledHint": "O cadastro está desativado neste gateway: ARVY_API_TOKEN não está definido. O preço é salvo mesmo assim."
-    }
+    },
+    "state": {
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "pendingApproval": "Aguardando aprovação",
+      "awaitingPayment": "Aguardando pagamento"
+    },
+    "approvedTitle": "Conta aprovada",
+    "pendingBanner": "Contas aguardando sua aprovação: {{count}}. Elas veem um painel bloqueado até a aprovação."
+  },
+  "pending": {
+    "title": "Aguardando aprovação",
+    "body": "Seu pagamento foi recebido. Um administrador analisa cada nova conta; esta página será desbloqueada sozinha assim que a sua for aprovada.",
+    "signedInAs": "Conectado como {{email}}",
+    "check": "Verificar novamente",
+    "loadFailed": "Não foi possível ler o status de aprovação. A página tentará novamente."
   },
   "logs": {
     "title": "Registros de auditoria",

@@ -848,7 +848,8 @@
     },
     "actions": {
       "edit": "Editar usuario",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "approve": "Aprobar cuenta"
     },
     "edit": {
       "title": "Editar usuario",
@@ -869,7 +870,22 @@
       "saveFailed": "No se pudo guardar el plan.",
       "loadFailed": "No se pudo cargar el plan de registro.",
       "disabledHint": "El registro está desactivado en esta pasarela: ARVY_API_TOKEN no está definido. El precio se guarda de todos modos."
-    }
+    },
+    "state": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "pendingApproval": "Pendiente de aprobación",
+      "awaitingPayment": "Pendiente de pago"
+    },
+    "approvedTitle": "Cuenta aprobada",
+    "pendingBanner": "Cuentas que esperan tu aprobación: {{count}}. Ven un panel bloqueado hasta que se aprueben."
+  },
+  "pending": {
+    "title": "Pendiente de aprobación",
+    "body": "Hemos recibido tu pago. Un administrador revisa cada cuenta nueva; esta página se desbloqueará sola cuando aprueben la tuya.",
+    "signedInAs": "Sesión iniciada como {{email}}",
+    "check": "Comprobar de nuevo",
+    "loadFailed": "No se pudo leer el estado de aprobación. La página lo intentará de nuevo."
   },
   "logs": {
     "title": "Registros de auditoría",

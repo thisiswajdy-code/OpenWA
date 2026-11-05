@@ -27,6 +27,7 @@ const MessageTester = lazy(() => import('./pages/MessageTester').then(m => ({ de
 const NumberChecker = lazy(() => import('./pages/NumberChecker').then(m => ({ default: m.NumberChecker })));
 const Infrastructure = lazy(() => import('./pages/Infrastructure').then(m => ({ default: m.Infrastructure })));
 const Plugins = lazy(() => import('./pages/Plugins'));
+const PendingApproval = lazy(() => import('./pages/PendingApproval').then(m => ({ default: m.PendingApproval })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,7 +47,7 @@ function AppContent() {
   const [savedKey] = useState(() => sessionStorage.getItem('openwa_api_key'));
   const [isAuthenticated, setIsAuthenticated] = useState(!!savedKey);
   const [, setApiKey] = useState(savedKey || '');
-  const { setRole, role, setEngineType, setScoped, scoped } = useRole();
+  const { setRole, role, setEngineType, setScoped, scoped, pendingApproval, setPendingApproval } = useRole();
 
   const handleLogin = (
     key: string,
@@ -54,6 +55,7 @@ function AppContent() {
     engineType?: string,
     scoped = false,
     method: LoginMethod = 'apiKey',
+    pendingApproval = false,
   ) => {
     setApiKey(key);
     sessionStorage.setItem('openwa_api_key', key);
@@ -66,6 +68,7 @@ function AppContent() {
     setRole(isUserRole(validatedRole) ? validatedRole : 'viewer');
     setEngineType(engineType ?? null);
     setScoped(scoped);
+    setPendingApproval(pendingApproval);
 
     setIsAuthenticated(true);
   };
@@ -83,13 +86,14 @@ function AppContent() {
     setRole(null);
     setEngineType(null);
     setScoped(false);
+    setPendingApproval(false);
     sessionStorage.removeItem('openwa_api_key');
     sessionStorage.removeItem('openwa_login_method');
     // Wipe the React Query cache too: it is keyed by resource, not actor, so without a full
     // clear a logout → login in the same tab with a different key/scope shows the previous
     // actor's sessions/messages/apiKeys/audit rows.
     clearActorState(queryClient);
-  }, [setRole, setEngineType, setScoped]);
+  }, [setRole, setEngineType, setScoped, setPendingApproval]);
 
   // Re-validate and refresh the role on mount if already authenticated
   useEffect(() => {
@@ -110,6 +114,7 @@ function AppContent() {
         } else if (decision.action === 'role') {
           setRole(decision.role);
           setScoped(decision.scoped);
+          setPendingApproval(decision.pendingApproval);
           if (decision.engineType) setEngineType(decision.engineType);
         }
       })
@@ -117,7 +122,7 @@ function AppContent() {
         // Network failure (API unreachable): keep the cached role so a transient outage at
         // page load doesn't eject the user — an explicit 401/403 above still logs out.
       });
-  }, [savedKey, setRole, setEngineType, setScoped, handleLogout]);
+  }, [savedKey, setRole, setEngineType, setScoped, setPendingApproval, handleLogout]);
 
   const loadingFallback = (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
@@ -130,6 +135,25 @@ function AppContent() {
       <Suspense fallback={loadingFallback}>
         <Login onLogin={handleLogin} />
       </Suspense>
+    );
+  }
+
+  // A paid sign-up an admin has not approved yet sees the dashboard locked: the gateway refuses its
+  // key on every page's reads, so every path draws the pending screen, which polls until approval.
+  if (pendingApproval) {
+    return (
+      <ToastProvider>
+        <BrowserRouter basename={BASE_PATH}>
+          <Suspense fallback={loadingFallback}>
+            <Routes>
+              <Route path="/" element={<Layout onLogout={handleLogout} userRole={role} />}>
+                <Route index element={<PendingApproval />} />
+                <Route path="*" element={<PendingApproval />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </ToastProvider>
     );
   }
 

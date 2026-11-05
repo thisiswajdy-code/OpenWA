@@ -113,6 +113,7 @@ export class SignupController {
       paymentsNumber: link.sto_payments_number,
       status: link.status,
       active: user.isActive,
+      approved: user.approvedAt !== null,
     };
   }
 

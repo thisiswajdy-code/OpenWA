@@ -892,7 +892,8 @@
     },
     "actions": {
       "edit": "Edit user",
-      "delete": "Delete"
+      "delete": "Delete",
+      "approve": "Approve account"
     },
     "edit": {
       "title": "Edit user",
@@ -913,7 +914,22 @@
       "saveFailed": "The plan could not be saved.",
       "loadFailed": "The sign-up plan could not be loaded.",
       "disabledHint": "Sign-up is disabled on this gateway: ARVY_API_TOKEN is not set. The price is saved anyway."
-    }
+    },
+    "state": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pendingApproval": "Pending approval",
+      "awaitingPayment": "Awaiting payment"
+    },
+    "approvedTitle": "Account approved",
+    "pendingBanner": "Accounts awaiting your approval: {{count}}. They see a locked dashboard until approved."
+  },
+  "pending": {
+    "title": "Pending approval",
+    "body": "Your payment was received. An administrator reviews every new account; this page unlocks on its own once yours is approved.",
+    "signedInAs": "Signed in as {{email}}",
+    "check": "Check again",
+    "loadFailed": "The approval status could not be read. The page will try again."
   },
   "logs": {
     "title": "Audit Logs",

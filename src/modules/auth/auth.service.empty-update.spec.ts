@@ -49,7 +49,7 @@ describe('AuthService update with an empty DTO', () => {
     );
 
     const tracker = { record: jest.fn(), forget: jest.fn() } as unknown as ApiKeyUsageTracker;
-    const service = new AuthService(repo, tracker, {} as never);
+    const service = new AuthService(repo, {} as never, tracker, {} as never);
     const before = await repo.findOneByOrFail({ id: saved.id });
 
     const emptyDto = {} as UpdateApiKeyDto;

@@ -41,6 +41,18 @@ export function isValidPassword(password: string): boolean {
   return length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH;
 }
 
+/** What the status badge says: approval and activity (a saved card, for a sign-up) read together. */
+export type UserState = 'active' | 'inactive' | 'pendingApproval' | 'awaitingPayment';
+
+/**
+ * A user an admin created is approved at once, so inactive + pending can only be a self-service
+ * sign-up that has not saved a card yet; active + pending is one that paid and waits for approval.
+ */
+export function userState(user: Pick<User, 'isActive' | 'pendingApproval'>): UserState {
+  if (user.isActive) return user.pendingApproval ? 'pendingApproval' : 'active';
+  return user.pendingApproval ? 'awaitingPayment' : 'inactive';
+}
+
 export function userDraft(user: User): UserDraft {
   return { email: user.email, role: user.role, isActive: user.isActive, password: '' };
 }

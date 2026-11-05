@@ -16,6 +16,7 @@ function makeUser(overrides: Partial<User> = {}): User {
     isActive: true,
     lastLoginAt: null,
     paymentLinkId: null,
+    approvedAt: new Date('2026-01-01T00:00:00.000Z'),
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
@@ -93,6 +94,8 @@ describe('UserService', () => {
       const saved = (repo.save.mock.calls[0] as [User])[0];
       expect(saved.email).toBe('admin@example.com');
       expect(saved.role).toBe(ApiKeyRole.ADMIN);
+      // The seed is the approval: the first admin must not sign in to a locked dashboard.
+      expect(saved.approvedAt).toBeInstanceOf(Date);
       await expect(verifyPassword('correct horse battery staple', saved.passwordHash)).resolves.toBe(true);
     });
 
@@ -134,6 +137,32 @@ describe('UserService', () => {
       );
       expect(authService.createLoginKey).not.toHaveBeenCalled();
       expect(repo.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('approval', () => {
+    it('create approves the user at once: an admin creating a user is the approval', async () => {
+      const created = await service.create({ email: 'ops@example.com', password: 'correct horse battery staple' });
+      expect(created.approvedAt).toBeInstanceOf(Date);
+    });
+
+    it('approve stamps approvedAt once and leaves an approved user unchanged', async () => {
+      repo.findOne.mockResolvedValue(makeUser({ approvedAt: null }));
+      const first = await service.approve('user-1');
+      expect(first.approved).toBe(true);
+      expect(first.user.approvedAt).toBeInstanceOf(Date);
+      expect(repo.update).toHaveBeenCalledWith('user-1', { approvedAt: expect.any(Date) as Date });
+
+      repo.update.mockClear();
+      repo.findOne.mockResolvedValue(makeUser());
+      const again = await service.approve('user-1');
+      expect(again.approved).toBe(false);
+      expect(repo.update).not.toHaveBeenCalled();
+    });
+
+    it('approve answers 404 for an unknown id', async () => {
+      repo.findOne.mockResolvedValue(null);
+      await expect(service.approve('nope')).rejects.toThrow(NotFoundException);
     });
   });
 

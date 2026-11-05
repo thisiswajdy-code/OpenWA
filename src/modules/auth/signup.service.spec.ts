@@ -43,7 +43,7 @@ const dto: RegisterDto = {
 };
 
 function makeService(arvy: Partial<ArvyClient>, users: Partial<User>[] = []) {
-  const rows = users.map(u => ({ id: 'u1', isActive: false, paymentLinkId: null, ...u }) as User);
+  const rows = users.map(u => ({ id: 'u1', isActive: false, paymentLinkId: null, approvedAt: null, ...u }) as User);
   const repository = {
     exists: jest.fn(({ where }: { where: Partial<User> }) =>
       Promise.resolve(rows.some(r => (where.email ? r.email === where.email : false))),

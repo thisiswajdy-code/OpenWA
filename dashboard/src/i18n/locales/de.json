@@ -892,7 +892,8 @@
     },
     "actions": {
       "edit": "Benutzer bearbeiten",
-      "delete": "Löschen"
+      "delete": "Löschen",
+      "approve": "Konto freigeben"
     },
     "edit": {
       "title": "Benutzer bearbeiten",
@@ -913,7 +914,22 @@
       "saveFailed": "Der Plan konnte nicht gespeichert werden.",
       "loadFailed": "Der Registrierungsplan konnte nicht geladen werden.",
       "disabledHint": "Die Registrierung ist auf diesem Gateway deaktiviert: ARVY_API_TOKEN ist nicht gesetzt. Der Preis wird trotzdem gespeichert."
-    }
+    },
+    "state": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "pendingApproval": "Freigabe ausstehend",
+      "awaitingPayment": "Zahlung ausstehend"
+    },
+    "approvedTitle": "Konto freigegeben",
+    "pendingBanner": "Konten, die auf Ihre Freigabe warten: {{count}}. Sie sehen bis zur Freigabe ein gesperrtes Dashboard."
+  },
+  "pending": {
+    "title": "Freigabe ausstehend",
+    "body": "Ihre Zahlung ist eingegangen. Ein Administrator prüft jedes neue Konto; diese Seite wird automatisch freigeschaltet, sobald Ihres freigegeben ist.",
+    "signedInAs": "Angemeldet als {{email}}",
+    "check": "Erneut prüfen",
+    "loadFailed": "Der Freigabestatus konnte nicht gelesen werden. Die Seite versucht es erneut."
   },
   "logs": {
     "title": "Audit-Protokolle",

@@ -154,7 +154,7 @@ test('with a dashboard user the email form is the default and signs in with the 
   await waitFor(() => assert.equal(logins.length, 1));
   assert.deepEqual(loginBody, { email: 'Admin@Example.com', password: 'correct horse battery staple' });
   assert.equal(sentKey, null, 'the password form sends no API key header');
-  assert.deepEqual(logins, [['owa_k1_login', 'operator', 'baileys', false, 'password']]);
+  assert.deepEqual(logins, [['owa_k1_login', 'operator', 'baileys', false, 'password', false]]);
 });
 
 test('a refused password shows the dashboard wording, not the gateway message, and a 429 names the throttle', async () => {
@@ -196,7 +196,7 @@ test('the switch moves between the two forms and clears the error', async () => 
   fireEvent.change(screen.getByLabelText('API Key'), { target: { value: 'owa_k1_secret' } });
   fireEvent.click(screen.getByRole('button', { name: 'Connect' }));
   await rtl.waitFor(() => assert.equal(logins.length, 1));
-  assert.deepEqual(logins, [['owa_k1_secret', 'admin', undefined, false, 'apiKey']]);
+  assert.deepEqual(logins, [['owa_k1_secret', 'admin', undefined, false, 'apiKey', false]]);
 
   rtl.cleanup();
   rtl.render(createElement(Login, { onLogin: () => undefined }));

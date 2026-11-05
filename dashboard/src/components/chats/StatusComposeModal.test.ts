@@ -65,6 +65,8 @@ before(async () => {
     setEngineType: () => undefined,
     scoped: false,
     setScoped: () => undefined,
+    pendingApproval: false,
+    setPendingApproval: () => undefined,
   });
   render = (engineType = 'whatsapp-web.js') =>
     rtl.render(

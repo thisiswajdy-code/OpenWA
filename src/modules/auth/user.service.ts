@@ -57,7 +57,12 @@ export class UserService implements OnModuleInit {
     if (typeof email !== 'string' || !email || !password) return;
     if (await this.userRepository.exists({ where: { email } })) return;
     await this.userRepository.save(
-      this.userRepository.create({ email, passwordHash: await hashPassword(password), role: ApiKeyRole.ADMIN }),
+      this.userRepository.create({
+        email,
+        passwordHash: await hashPassword(password),
+        role: ApiKeyRole.ADMIN,
+        approvedAt: new Date(),
+      }),
     );
     this.logger.log(`Seeded dashboard admin user from ADMIN_EMAIL: ${email}`, { action: 'user_seeded' });
   }
@@ -94,6 +99,8 @@ export class UserService implements OnModuleInit {
       email: dto.email,
       passwordHash: await hashPassword(dto.password),
       role: dto.role ?? ApiKeyRole.OPERATOR,
+      // An admin creating a user is the approval; only a self-service sign-up waits for one.
+      approvedAt: new Date(),
     });
     const saved = await this.userRepository.save(user);
     this.logger.log(`User created: ${saved.email}`, { userId: saved.id, role: saved.role, action: 'user_created' });
@@ -131,6 +138,20 @@ export class UserService implements OnModuleInit {
     const saved = await this.userRepository.save(user);
     if (revokesLogins) await this.authService.deleteLoginKeysOfUser(id);
     return saved;
+  }
+
+  /**
+   * Approve a self-service sign-up: from now on its login keys reach every route its role allows,
+   * including the one the user is already signed in with (validateApiKey re-reads the user). An
+   * already approved user is returned unchanged.
+   */
+  async approve(id: string): Promise<{ user: User; approved: boolean }> {
+    const user = await this.findOne(id);
+    if (user.approvedAt !== null) return { user, approved: false };
+    user.approvedAt = new Date();
+    await this.userRepository.update(id, { approvedAt: user.approvedAt });
+    this.logger.log(`User approved: ${user.email}`, { userId: id, action: 'user_approved' });
+    return { user, approved: true };
   }
 
   async delete(id: string): Promise<User> {

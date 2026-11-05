@@ -37,6 +37,12 @@ export class User {
   @Column({ type: 'varchar', length: 64, nullable: true })
   paymentLinkId!: string | null;
 
+  // When an admin approved the account. A user an admin creates (or the boot seeds) is approved at
+  // once; a self-service sign-up is not, and its login key is refused everywhere but the routes
+  // marked @AllowPendingApproval until an admin approves it (POST /api/auth/users/:id/approve).
+  @Column({ type: 'datetime', nullable: true })
+  approvedAt!: Date | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

@@ -28,7 +28,7 @@
   data-err-disabled="Sign-up is not available right now. Write to hello@scalorus.ai."
   data-err-generic="Something went wrong. Please try again."
   data-status-pending="Waiting for the card to be saved on the payment page…"
-  data-status-active="Card saved. Your account is active."
+  data-status-active="Card saved. Your account awaits an administrator's approval; you can sign in to the dashboard and follow its status."
   data-status-cancelled="The payment was cancelled. Write to hello@scalorus.ai.">
 <div class="su-steps"><span data-step="account" data-n="1">Account</span><span data-step="register" data-n="2">Details</span><span data-step="pay" data-n="3">Payment</span></div>
 
@@ -62,7 +62,7 @@
 <p id="register-error" class="su-error" role="alert"></p>
 <div class="su-actions"><button id="register-back" class="btn-ghost" type="button">Back</button><button class="btn-primary" type="submit">Continue to payment</button></div>
 </form>
-<p class="su-note">The account is activated once a payment method is saved. Already registered? <a href="/app" class="text-primary">Sign in</a>.</p>
+<p class="su-note">Once a payment method is saved, the account awaits an administrator's approval; you will be told when it is approved. Already registered? <a href="/app" class="text-primary">Sign in</a>.</p>
 </section>
 
 <section id="step-pay" class="su-step">
@@ -73,7 +73,7 @@
 <iframe id="pay-frame" title="Payment page" referrerpolicy="strict-origin-when-cross-origin"></iframe>
 <p id="pay-status" class="su-status"><span class="dot"></span><span id="pay-status-text"></span></p>
 <div id="pay-pending" class="su-actions"><a id="pay-open" class="btn-ghost" target="_blank" rel="noopener noreferrer" href="#">Open the payment page in a new tab</a></div>
-<div id="pay-done" class="su-actions" hidden><a class="btn-primary" href="/app">Go to the dashboard</a></div>
+<div id="pay-done" class="su-actions" hidden><a class="btn-primary" href="/app">Sign in to the dashboard</a></div>
 </div>
 </section>
 </main>

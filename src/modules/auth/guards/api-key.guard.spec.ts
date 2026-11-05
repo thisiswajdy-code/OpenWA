@@ -8,7 +8,12 @@ import { ChatScopeService } from '../chat-scope.service';
 import { ApiKey, ApiKeyRole } from '../entities/api-key.entity';
 import { AuditService } from '../../audit/audit.service';
 import { AuditAction } from '../../audit/entities/audit-log.entity';
-import { CHAT_QUOTED_ALLOWED_KEY, CHAT_SCOPED_KEY, REQUIRED_ROLE_KEY } from '../decorators/auth.decorators';
+import {
+  CHAT_QUOTED_ALLOWED_KEY,
+  CHAT_SCOPED_KEY,
+  PENDING_APPROVAL_ALLOWED_KEY,
+  REQUIRED_ROLE_KEY,
+} from '../decorators/auth.decorators';
 
 function createMockApiKey(overrides: Partial<ApiKey> = {}): ApiKey {
   return {
@@ -128,6 +133,23 @@ describe('ApiKeyGuard', () => {
 
     expect(result).toBe(true);
     expect(authService.validateApiKey).toHaveBeenCalledWith('my-key', '127.0.0.1', undefined);
+  });
+
+  it('admits a pending-approval login key only where the handler is marked, by telling the service', async () => {
+    const apiKey = createMockApiKey();
+    (authService.validateApiKey as jest.Mock).mockResolvedValue(apiKey);
+
+    // Marked: the service is asked to let a pending user through.
+    metadata = { [PENDING_APPROVAL_ALLOWED_KEY]: true };
+    await expect(guard.canActivate(createMockContext({ 'x-api-key': 'my-key' }))).resolves.toBe(true);
+    expect(authService.validateApiKey).toHaveBeenLastCalledWith('my-key', '127.0.0.1', undefined, {
+      allowPendingUser: true,
+    });
+
+    // Unmarked: the default call, which refuses a pending user inside the service.
+    metadata = {};
+    await expect(guard.canActivate(createMockContext({ 'x-api-key': 'my-key' }))).resolves.toBe(true);
+    expect(authService.validateApiKey).toHaveBeenLastCalledWith('my-key', '127.0.0.1', undefined);
   });
 
   it('should accept Authorization Bearer header', async () => {
@@ -303,6 +325,7 @@ describe('ApiKeyGuard', () => {
       .mockReturnValueOnce(false) // not public
       .mockReturnValueOnce(ApiKeyRole.ADMIN) // required role = ADMIN
       .mockReturnValueOnce(undefined) // not @SessionScoped
+      .mockReturnValueOnce(undefined) // not @AllowPendingApproval
       .mockReturnValueOnce(true); // @RequireUnscopedKey
 
     const apiKey = createMockApiKey({ role: ApiKeyRole.ADMIN, allowedSessions: ['sess-A'] });
@@ -356,6 +379,7 @@ describe('ApiKeyGuard', () => {
           .mockReturnValueOnce(false)
           .mockReturnValueOnce(ApiKeyRole.ADMIN)
           .mockReturnValueOnce(undefined)
+          .mockReturnValueOnce(undefined) // not @AllowPendingApproval
           .mockReturnValueOnce(true);
       }, apiKey);
 

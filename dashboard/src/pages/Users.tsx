@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
   useTable,
@@ -9,10 +9,26 @@ import {
   flexRender,
   type ColumnVisibilityState,
 } from '@tanstack/react-table';
-import { Plus, Trash2, Loader2, Users as UsersIcon, AlertTriangle, AlertCircle, Pencil } from 'lucide-react';
+import {
+  Plus,
+  Trash2,
+  Loader2,
+  Users as UsersIcon,
+  AlertTriangle,
+  AlertCircle,
+  Pencil,
+  UserCheck,
+  Clock,
+} from 'lucide-react';
 import type { User } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import { useUsersQuery, useCreateUserMutation, useUpdateUserMutation, useDeleteUserMutation } from '../hooks/queries';
+import {
+  useUsersQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
+  useApproveUserMutation,
+} from '../hooks/queries';
 import { PageHeader } from '../components/PageHeader';
 import { SignupPlanCard } from '../components/SignupPlanCard';
 import { Modal } from '../components/Modal';
@@ -25,6 +41,7 @@ import {
   passwordLength,
   userDraft,
   userPatch,
+  userState,
   type UserDraft,
 } from '../utils/users';
 import './Users.css';
@@ -58,6 +75,7 @@ export function Users() {
   const createMutation = useCreateUserMutation();
   const updateMutation = useUpdateUserMutation();
   const deleteMutation = useDeleteUserMutation();
+  const approveMutation = useApproveUserMutation();
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState(emptyUserForm);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -148,6 +166,24 @@ export function Users() {
     setConfirmDelete(null);
   };
 
+  const { mutateAsync: approveUser, isPending: approving } = approveMutation;
+  const handleApprove = useCallback(
+    async (user: User) => {
+      try {
+        const approved = await approveUser(user.id);
+        toast.success(t('users.approvedTitle'), approved.email);
+      } catch (err) {
+        console.error('Failed to approve user:', err);
+        toast.error(t('users.actions.approve'), err instanceof Error ? err.message : t('common.unknownError'));
+      }
+    },
+    [approveUser, toast, t],
+  );
+
+  // Paid sign-ups waiting for an admin: the ones the banner counts, since an unpaid one has nothing
+  // to approve yet.
+  const awaitingApproval = users.filter(user => user.pendingApproval && user.isActive).length;
+
   const columns = useMemo(
     () =>
       columnHelper.columns([
@@ -161,11 +197,10 @@ export function Users() {
         }),
         columnHelper.accessor('isActive', {
           header: () => t('users.columns.status'),
-          cell: info => (
-            <span className={`status-badge ${info.getValue() ? 'active' : 'inactive'}`}>
-              {info.getValue() ? t('common.active') : t('common.inactive')}
-            </span>
-          ),
+          cell: info => {
+            const state = userState(info.row.original);
+            return <span className={`status-badge ${state}`}>{t(`users.state.${state}`)}</span>;
+          },
         }),
         columnHelper.accessor('lastLoginAt', {
           id: 'lastSignIn',
@@ -183,6 +218,17 @@ export function Users() {
             const user = info.row.original;
             return (
               <span className="actions-cell">
+                {user.pendingApproval && (
+                  <button
+                    className="icon-btn approve"
+                    onClick={() => void handleApprove(user)}
+                    disabled={approving}
+                    title={t('users.actions.approve')}
+                    aria-label={t('users.actions.approve')}
+                  >
+                    <UserCheck size={16} />
+                  </button>
+                )}
                 <button className="icon-btn" onClick={() => openEdit(user)} title={t('users.actions.edit')}>
                   <Pencil size={16} />
                 </button>
@@ -198,7 +244,7 @@ export function Users() {
           },
         }),
       ]),
-    [t],
+    [t, approving, handleApprove],
   );
 
   const table = useTable({
@@ -386,6 +432,13 @@ export function Users() {
       )}
 
       <SignupPlanCard />
+
+      {awaitingApproval > 0 && (
+        <div className="pending-banner" role="status">
+          <Clock size={18} />
+          <span>{t('users.pendingBanner', { count: awaitingApproval })}</span>
+        </div>
+      )}
 
       <div className="users-content">
         <div className="users-table-container">

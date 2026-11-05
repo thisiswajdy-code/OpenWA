@@ -19,7 +19,12 @@ const property = (dto: object, name: string) =>
 describe('API key DTO contract', () => {
   it('describes keyPrefix with the length the service stores', async () => {
     const repository = { create: (row: ApiKey) => row, save: (row: ApiKey) => Promise.resolve(row) };
-    const service = new AuthService(repository as unknown as Repository<ApiKey>, {} as ApiKeyUsageTracker, {} as never);
+    const service = new AuthService(
+      repository as unknown as Repository<ApiKey>,
+      {} as never,
+      {} as ApiKeyUsageTracker,
+      {} as never,
+    );
     const { apiKey } = await service.createApiKey({ name: 'probe' });
 
     expect(property(ApiKeyResponseDto.prototype, 'keyPrefix').description).toContain(

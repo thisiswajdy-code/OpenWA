@@ -164,6 +164,14 @@ export class ValidateApiKeyResponseDto {
     example: false,
   })
   scoped?: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'True for the login key of a dashboard user an admin has not approved yet; present only when valid. ' +
+      'Such a key is refused on every route but this one, `GET /api/auth/me` and `POST /api/auth/logout`.',
+    example: false,
+  })
+  pendingApproval?: boolean;
 }
 
 export class UpdateApiKeyDto {

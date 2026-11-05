@@ -18,6 +18,7 @@ import {
   type CreateInstanceInput,
   type UpdateInstanceInput,
   signupPlanApi,
+  currentUserApi,
   type SignupPlanInput,
 } from '../services/api';
 
@@ -32,6 +33,7 @@ export const queryKeys = {
   templates: (sessionId: string) => ['sessions', sessionId, 'templates'] as const,
   apiKeys: ['apiKeys'] as const,
   users: ['users'] as const,
+  currentUser: ['current-user'] as const,
   signupPlan: ['signup-plan'] as const,
   logs: (params: { severity?: string; page: number; limit: number }) => ['logs', params] as const,
   infraStatus: ['infra', 'status'] as const,
@@ -298,6 +300,29 @@ export function useDeleteUserMutation() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.users });
     },
+  });
+}
+
+export function useApproveUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => userApi.approve(id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.users });
+    },
+  });
+}
+
+/**
+ * The user behind the stored login key. The locked dashboard polls it until the admin approves the
+ * account; nothing else reads it, so it is fetched only where mounted.
+ */
+export function useCurrentUserQuery(refetchInterval: number | false = false) {
+  return useQuery({
+    queryKey: queryKeys.currentUser,
+    queryFn: currentUserApi.get,
+    staleTime: 0,
+    refetchInterval,
   });
 }
 

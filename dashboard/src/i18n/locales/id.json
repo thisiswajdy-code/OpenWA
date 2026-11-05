@@ -892,7 +892,8 @@
     },
     "actions": {
       "edit": "Edit pengguna",
-      "delete": "Hapus"
+      "delete": "Hapus",
+      "approve": "Setujui akun"
     },
     "edit": {
       "title": "Edit pengguna",
@@ -913,7 +914,22 @@
       "saveFailed": "Paket tidak dapat disimpan.",
       "loadFailed": "Paket pendaftaran tidak dapat dimuat.",
       "disabledHint": "Pendaftaran dinonaktifkan di gateway ini: ARVY_API_TOKEN belum diatur. Harga tetap disimpan."
-    }
+    },
+    "state": {
+      "active": "Aktif",
+      "inactive": "Tidak aktif",
+      "pendingApproval": "Menunggu persetujuan",
+      "awaitingPayment": "Menunggu pembayaran"
+    },
+    "approvedTitle": "Akun disetujui",
+    "pendingBanner": "Akun yang menunggu persetujuan Anda: {{count}}. Mereka melihat dasbor terkunci sampai disetujui."
+  },
+  "pending": {
+    "title": "Menunggu persetujuan",
+    "body": "Pembayaran Anda telah diterima. Administrator meninjau setiap akun baru; halaman ini akan terbuka sendiri begitu akun Anda disetujui.",
+    "signedInAs": "Masuk sebagai {{email}}",
+    "check": "Periksa lagi",
+    "loadFailed": "Status persetujuan tidak dapat dibaca. Halaman akan mencoba lagi."
   },
   "logs": {
     "title": "Log Audit",

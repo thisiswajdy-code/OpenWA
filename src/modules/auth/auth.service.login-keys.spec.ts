@@ -4,6 +4,7 @@ import { ModuleRef } from '@nestjs/core';
 import { createHash } from 'crypto';
 import { IsNull } from 'typeorm';
 import { AuthService, loginKeyName } from './auth.service';
+import { User } from './entities/user.entity';
 import { ApiKeyUsageTracker } from './api-key-usage-tracker.service';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
 
@@ -50,6 +51,7 @@ describe('AuthService — login keys', () => {
       providers: [
         AuthService,
         { provide: getRepositoryToken(ApiKey, 'main'), useValue: repo },
+        { provide: getRepositoryToken(User, 'main'), useValue: { findOne: jest.fn() } },
         { provide: ApiKeyUsageTracker, useValue: usageTracker },
         {
           provide: ModuleRef,

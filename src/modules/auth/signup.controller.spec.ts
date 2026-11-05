@@ -29,7 +29,14 @@ describe('SignupController — responses and audit trail', () => {
     path: '/auth/register',
     socket: { remoteAddress: '203.0.113.7' },
   } as unknown as Request;
-  const user = { id: 'u1', email: 'dana@example.com', role: 'operator', isActive: false, paymentLinkId: '42' } as User;
+  const user = {
+    id: 'u1',
+    email: 'dana@example.com',
+    role: 'operator',
+    isActive: false,
+    paymentLinkId: '42',
+    approvedAt: null,
+  } as User;
   const link: ArvyLink = {
     id: 42,
     status: 'pending_card',
@@ -73,6 +80,7 @@ describe('SignupController — responses and audit trail', () => {
       paymentsNumber: 12,
       status: 'pending_card',
       active: false,
+      approved: false,
     });
     expect(auditService.logInfo).toHaveBeenCalledWith(
       AuditAction.USER_CREATED,

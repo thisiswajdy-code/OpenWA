@@ -5178,10 +5178,12 @@ Validate the supplied `X-API-Key` and report its validity, its role, and the eng
 
 The key is read from the `X-API-Key` header, not the body; send an empty body. This route sits behind the global guard (it is not `@Public`), so a missing/invalid/revoked/expired key is rejected with `401` at the guard before the handler runs, and a key refused by its `allowedIps` with `403`. On success it returns the caller's role and `engineType`, the engine the process resolved at boot (`whatsapp-web.js` or `baileys`). The engine is reported to every role because `GET /api/infra/engines/current` is ADMIN-only. It also returns `scoped`, true when the key is restricted to selected sessions (a non-empty `allowedSessions`). A key restricted with `allowedChats` is refused with `403 "API key is restricted to selected chats"`: the route is not open to a chat-scoped key.
 
+The login key of a dashboard user an admin has not approved yet is admitted here (it is refused with `403 "Account pending approval"` on every route not marked for it: this one, `GET /api/auth/me` and `POST /api/auth/logout`), and answers `pendingApproval: true`, on which the dashboard shows its locked screen.
+
 **Response** `200`
 
 ```json
-{ "valid": true, "role": "operator", "engineType": "whatsapp-web.js", "scoped": false }
+{ "valid": true, "role": "operator", "engineType": "whatsapp-web.js", "scoped": false, "pendingApproval": false }
 ```
 
 **Errors:** `401` missing/invalid/revoked/expired key (raised by the global guard before the handler); `403` a key refused by its `allowedIps` (blocked or undeterminable client IP), or one restricted with `allowedChats`
@@ -5190,7 +5192,9 @@ The key is read from the `X-API-Key` header, not the body; send an empty body. T
 
 #### Dashboard users and password sign-in
 
-A dashboard user is an email and password that signs in to the dashboard without pasting an API key. A user is not a credential the API accepts: signing in exchanges the password for a **login key**, an ordinary API key owned by the user (`api_keys.userId`) with the user's role, no IP, session or chat scope, and an expiry (`LOGIN_SESSION_TTL_HOURS`, a day by default, clamped to 1–720). Every surface that authenticates a key works unchanged with it. A login key is left out of `GET /api/auth/api-keys`, never counts as a surviving admin for the last-admin guard, and is deleted by logout, by a change to its user's password, role or active flag, with its user, or (once expired) on the next sign-in. The first user is seeded at boot from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; in production a placeholder or a password under 12 characters refuses the boot like a weak `API_MASTER_KEY`. Successful and refused sign-ins are audited as `user_login` / `user_login_failed` (the latter bounded per client IP, like an unresolved key), logout as `user_logout`, and user lifecycle as `user_created` / `user_updated` / `user_deleted`.
+A dashboard user is an email and password that signs in to the dashboard without pasting an API key. A user is not a credential the API accepts: signing in exchanges the password for a **login key**, an ordinary API key owned by the user (`api_keys.userId`) with the user's role, no IP, session or chat scope, and an expiry (`LOGIN_SESSION_TTL_HOURS`, a day by default, clamped to 1–720). Every surface that authenticates a key works unchanged with it. A login key is left out of `GET /api/auth/api-keys`, never counts as a surviving admin for the last-admin guard, and is deleted by logout, by a change to its user's password, role or active flag, with its user, or (once expired) on the next sign-in. The first user is seeded at boot from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; in production a placeholder or a password under 12 characters refuses the boot like a weak `API_MASTER_KEY`. Successful and refused sign-ins are audited as `user_login` / `user_login_failed` (the latter bounded per client IP, like an unresolved key), logout as `user_logout`, and user lifecycle as `user_created` / `user_updated` / `user_deleted` / `user_approved`.
+
+**Approval.** A user an admin creates (or the boot seeds) is approved at once (`approvedAt`). A self-service sign-up (`POST /api/auth/register`) is not: once it has paid it can sign in, but its login key is refused with `403 "Account pending approval"` on every route except `POST /api/auth/validate`, `GET /api/auth/me` and `POST /api/auth/logout` — on REST, the WebSocket handshake, MCP and Bull Board alike — so the dashboard it sees is locked, polling `GET /api/auth/me` until an admin approves it with `POST /api/auth/users/:id/approve`. The user is re-read on every request, so an approval unlocks the session the user is already signed in to, with no second sign-in. A key with no owner (created through the API or seeded) is never pending.
 
 #### GET /api/auth/login-options
 
@@ -5226,17 +5230,34 @@ Sign in with email and password and receive a login key.
   "role": "admin",
   "engineType": "baileys",
   "scoped": false,
-  "expiresAt": "2026-11-04T10:00:00.000Z"
+  "expiresAt": "2026-11-04T10:00:00.000Z",
+  "pendingApproval": false
 }
 ```
 
-`apiKey` is returned only here; send it as `X-API-Key` like any other key. `scoped` is always false.
+`apiKey` is returned only here; send it as `X-API-Key` like any other key. `scoped` is always false. `pendingApproval` is true for a sign-up an admin has not approved yet (see **Approval** above): the key signs in, but reaches only validate, `GET /api/auth/me` and logout.
 
 **Errors:** `400` malformed body or an undeclared field · `401` `"Invalid email or password"` for an unknown email, a wrong password and a deactivated user alike (an unknown address still costs a hash, so timing does not tell them apart) · `429` too many attempts from this client IP
 
+#### GET /api/auth/me
+
+The dashboard user behind the presented login key, and whether it still awaits approval. The locked dashboard polls this until `pendingApproval` turns false, then unlocks itself.
+
+**Auth:** API key (any role, unscoped). Admits the login key of a user awaiting approval.
+
+**Response** `200`
+
+```json
+{ "id": "0a941dac-…", "email": "dana@example.com", "role": "operator", "pendingApproval": true }
+```
+
+`approvedAt` appears once approved.
+
+**Errors:** `401` missing/invalid key · `403` the key is session-scoped or restricted with `allowedChats` · `404` the key is not a login key (no dashboard user signed in with it)
+
 #### POST /api/auth/logout
 
-Delete the login key the request presents. A key that is not a login key (no owner) is left as it is, so a logout can never destroy a credential created through the API.
+Delete the login key the request presents. A key that is not a login key (no owner) is left as it is, so a logout can never destroy a credential created through the API. Admits the login key of a user awaiting approval, so the locked dashboard can still sign out.
 
 **Auth:** API key (any role, unscoped). `@HttpCode(204)` — no response body.
 
@@ -5244,7 +5265,7 @@ Delete the login key the request presents. A key that is not a login key (no own
 
 #### POST /api/auth/register
 
-Self-service sign-up from the site (`/signup.html`): create a dashboard user and the recurring payment link for the Scalorus WA account. The user is created **inactive** (`operator` role) and cannot sign in until a card is saved on `paymentLink`; `GET /api/auth/register/:id` activates it once the link reports that.
+Self-service sign-up from the site (`/signup.html`): create a dashboard user and the recurring payment link for the Scalorus WA account. The user is created **inactive** (`operator` role) and cannot sign in until a card is saved on `paymentLink`; `GET /api/auth/register/:id` activates it once the link reports that. It is also **unapproved**: once active it signs in to a locked dashboard until an admin approves it (`POST /api/auth/users/:id/approve`), and `approved` in the response says where that stands.
 
 **Auth:** public. Rate-limited per client IP like `POST /api/auth/login`: 5 attempts a minute, 20 a quarter hour, 100 an hour (`429` beyond). Enabled only when `ARVY_API_TOKEN` is set.
 
@@ -5299,7 +5320,7 @@ The plan a sign-up is charged, as the site shows it: the monthly `amount` and `c
 
 #### GET /api/auth/register/:id
 
-Where a sign-up's payment stands. Reads the link from the payment service; the first time it reports `active` (or `completed`) the user is activated, so the sign-up page polls this until `active` is true and then sends the customer to the dashboard.
+Where a sign-up's payment stands. Reads the link from the payment service; the first time it reports `active` (or `completed`) the user is activated, so the sign-up page polls this until `active` is true and then sends the customer to the dashboard, which stays locked until an admin approves the account (`approved`).
 
 **Auth:** public (`id` is the unguessable user id the sign-up answered with).
 
@@ -5386,12 +5407,14 @@ Create a dashboard user.
   "email": "ops@example.com",
   "role": "operator",
   "isActive": true,
+  "pendingApproval": false,
+  "approvedAt": "2026-11-03T10:00:00.000Z",
   "createdAt": "2026-11-03T10:00:00.000Z",
   "updatedAt": "2026-11-03T10:00:00.000Z"
 }
 ```
 
-The password is never returned. `lastLoginAt` appears after the first sign-in.
+The password is never returned. `lastLoginAt` appears after the first sign-in. A user created here is approved at once; `pendingApproval` is true only for a self-service sign-up an admin has not approved yet (`approvedAt` is then absent).
 
 **Errors:** `400` validation failed or an undeclared field · `401` missing/invalid key · `403` role below ADMIN, or the key is scoped · `409` a user with this email already exists
 
@@ -5424,6 +5447,16 @@ Update a dashboard user. Every field is optional: `email`, `password`, `role`, `
 **Response** `200` — the updated user object.
 
 **Errors:** `400` validation failed or an undeclared field · `401` missing/invalid key · `403` role below ADMIN, or the key is scoped · `404` no user with this id · `409` another user already has this email
+
+#### POST /api/auth/users/:id/approve
+
+Approve a self-service sign-up. Its login keys, including the one it is already signed in with, reach every route its role allows from the next request on, so the locked dashboard unlocks on its next poll. Approving an approved user changes nothing and writes no audit row; otherwise audited as `user_approved`.
+
+**Auth:** API key (ADMIN, unscoped). `@HttpCode(200)`.
+
+**Response** `200` — the user object, with `pendingApproval: false` and `approvedAt` set.
+
+**Errors:** `401` missing/invalid key · `403` role below ADMIN, or the key is scoped · `404` no user with this id
 
 #### DELETE /api/auth/users/:id
 

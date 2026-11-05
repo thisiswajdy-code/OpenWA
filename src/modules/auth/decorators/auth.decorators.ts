@@ -9,6 +9,7 @@ export const SESSION_SCOPED_KEY = 'sessionScoped';
 export const UNSCOPED_KEY = 'requireUnscopedKey';
 export const CHAT_SCOPED_KEY = 'chatScoped';
 export const CHAT_QUOTED_ALLOWED_KEY = 'chatQuotedAllowed';
+export const PENDING_APPROVAL_ALLOWED_KEY = 'allowPendingApproval';
 
 /**
  * Mark a route as requiring a specific role
@@ -74,6 +75,15 @@ export const ChatScoped = (kind: ChatScopeKind) => SetMetadata(CHAT_SCOPED_KEY, 
  * reference the guard cannot see.
  */
 export const ChatQuotedAllowed = () => SetMetadata(CHAT_QUOTED_ALLOWED_KEY, true);
+
+/**
+ * Let the login key of a dashboard user an admin has not approved yet reach this route. Such a key
+ * is refused with 403 everywhere else (AuthService.validateApiKey), so the dashboard a paid sign-up
+ * sees is locked until approval: only self-validation, the pending-approval status read and logout
+ * are marked. A key that is not a login key is never pending, so the mark changes nothing for it.
+ * @example @AllowPendingApproval() @Get('me')
+ */
+export const AllowPendingApproval = () => SetMetadata(PENDING_APPROVAL_ALLOWED_KEY, true);
 
 /**
  * Get the current API key from request

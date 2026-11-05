@@ -7,7 +7,7 @@ import { test, before, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, isValidEmail, userPatch } from '../utils/users.ts';
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, isValidEmail, userPatch, userState } from '../utils/users.ts';
 
 function jsonResponse(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
@@ -20,6 +20,8 @@ const ops = {
   email: 'ops@example.com',
   role: 'operator',
   isActive: true,
+  pendingApproval: false,
+  approvedAt: '2026-01-01T00:00:00.000Z',
   lastLoginAt: '2026-03-04T05:06:07.000Z',
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
@@ -29,6 +31,7 @@ let createBody: Record<string, unknown> | undefined;
 let createStatus = 201;
 let updateBodies: Record<string, unknown>[] = [];
 let deleted: string[] = [];
+let approved: string[] = [];
 let planBodies: Record<string, unknown>[] = [];
 const plan = {
   description: 'Scalorus WA — 12 months',
@@ -56,6 +59,12 @@ function installFetchStub(): void {
     if (init?.method === 'PUT' && path.startsWith('/api/auth/users/')) {
       updateBodies.push(JSON.parse(String(init.body)));
       return Promise.resolve(jsonResponse(ops));
+    }
+    if (init?.method === 'POST' && path.startsWith('/api/auth/users/') && path.endsWith('/approve')) {
+      const id = path.slice('/api/auth/users/'.length, -'/approve'.length);
+      approved.push(id);
+      const row = userList.find(u => u.id === id) ?? ops;
+      return Promise.resolve(jsonResponse({ ...row, pendingApproval: false, approvedAt: '2026-11-05T10:00:00.000Z' }));
     }
     if (init?.method === 'DELETE' && path.startsWith('/api/auth/users/')) {
       deleted.push(path.slice('/api/auth/users/'.length));
@@ -105,6 +114,7 @@ afterEach(() => {
   createStatus = 201;
   updateBodies = [];
   deleted = [];
+  approved = [];
   planBodies = [];
 });
 
@@ -312,6 +322,44 @@ test('a delete asks first, names the address, and sends the DELETE on confirmati
   // The row's icon button is also named Delete, so the confirmation is found within the dialog.
   fireEvent.click(rtl.within(screen.getByRole('dialog')).getByRole('button', { name: 'Delete' }));
   await waitFor(() => assert.deepEqual(deleted, ['user-1']));
+});
+
+test('a paid sign-up shows as pending with an Approve button, and the banner counts it', async () => {
+  const { screen, fireEvent, waitFor } = rtl;
+  userList = [
+    ops,
+    { ...ops, id: 'user-paid', email: 'dana@example.com', pendingApproval: true, approvedAt: undefined },
+    {
+      ...ops,
+      id: 'user-unpaid',
+      email: 'late@example.com',
+      isActive: false,
+      pendingApproval: true,
+      approvedAt: undefined,
+    },
+  ];
+  renderUsers();
+  await screen.findByText('dana@example.com');
+  const rows = Array.from(document.querySelectorAll('tbody tr'));
+  assert.equal(rows[0].querySelector('.status-badge')?.textContent, 'Active');
+  assert.equal(rows[1].querySelector('.status-badge')?.textContent, 'Pending approval');
+  assert.equal(rows[2].querySelector('.status-badge')?.textContent, 'Awaiting payment');
+  // Only the paid sign-up is counted: an unpaid one has nothing to approve yet.
+  assert.equal(screen.getByRole('status').textContent?.includes('1'), true);
+  assert.equal(rows[0].querySelector('.icon-btn.approve'), null, 'an approved user offers Approve');
+  const approve = rows[1].querySelector<HTMLButtonElement>('.icon-btn.approve');
+  assert.ok(approve, 'the pending user has no Approve button');
+  assert.equal(approve.getAttribute('aria-label'), 'Approve account');
+  fireEvent.click(approve);
+  await waitFor(() => assert.deepEqual(approved, ['user-paid']));
+  await screen.findByText('Account approved');
+});
+
+test('userState reads approval and activity together', () => {
+  assert.equal(userState({ isActive: true, pendingApproval: false }), 'active');
+  assert.equal(userState({ isActive: true, pendingApproval: true }), 'pendingApproval');
+  assert.equal(userState({ isActive: false, pendingApproval: true }), 'awaitingPayment');
+  assert.equal(userState({ isActive: false, pendingApproval: false }), 'inactive');
 });
 
 test('userPatch holds the gateway to the fields the edit changed', () => {

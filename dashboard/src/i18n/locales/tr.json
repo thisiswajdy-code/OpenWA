@@ -892,7 +892,8 @@
     },
     "actions": {
       "edit": "Kullanıcıyı düzenle",
-      "delete": "Sil"
+      "delete": "Sil",
+      "approve": "Hesabı onayla"
     },
     "edit": {
       "title": "Kullanıcıyı düzenle",
@@ -913,7 +914,22 @@
       "saveFailed": "Plan kaydedilemedi.",
       "loadFailed": "Kayıt planı yüklenemedi.",
       "disabledHint": "Bu ağ geçidinde kayıt devre dışı: ARVY_API_TOKEN ayarlı değil. Fiyat yine de kaydedilir."
-    }
+    },
+    "state": {
+      "active": "Aktif",
+      "inactive": "Pasif",
+      "pendingApproval": "Onay bekliyor",
+      "awaitingPayment": "Ödeme bekliyor"
+    },
+    "approvedTitle": "Hesap onaylandı",
+    "pendingBanner": "Onayınızı bekleyen hesaplar: {{count}}. Onaylanana kadar kilitli bir panel görürler."
+  },
+  "pending": {
+    "title": "Onay bekleniyor",
+    "body": "Ödemeniz alındı. Bir yönetici her yeni hesabı inceler; hesabınız onaylanır onaylanmaz bu sayfa kendiliğinden açılır.",
+    "signedInAs": "{{email}} olarak oturum açıldı",
+    "check": "Yeniden kontrol et",
+    "loadFailed": "Onay durumu okunamadı. Sayfa yeniden deneyecek."
   },
   "logs": {
     "title": "Denetim Kayıtları (Audit Logs)",

@@ -18,6 +18,7 @@ export enum AuditAction {
   USER_LOGIN = 'user_login',
   USER_LOGIN_FAILED = 'user_login_failed',
   USER_LOGOUT = 'user_logout',
+  USER_APPROVED = 'user_approved',
   // The sign-up plan an admin sells through the site changed (signup-plan.controller.ts).
   SIGNUP_PLAN_UPDATED = 'signup_plan_updated',
 

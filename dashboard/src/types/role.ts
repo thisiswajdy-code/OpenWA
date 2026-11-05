@@ -14,4 +14,10 @@ export interface RoleContextType {
   /** Whether the key is restricted to selected sessions, so the cross-session routes refuse it. */
   scoped: boolean;
   setScoped: (scoped: boolean) => void;
+  /**
+   * True for a dashboard user an admin has not approved yet: the gateway refuses the login key on
+   * every route but validate, `GET /auth/me` and logout, so the dashboard shows the lock instead.
+   */
+  pendingApproval: boolean;
+  setPendingApproval: (pendingApproval: boolean) => void;
 }

@@ -28,7 +28,7 @@
   data-err-disabled="ההרשמה אינה זמינה כרגע. כתבו לנו ל-hello@scalorus.ai."
   data-err-generic="משהו השתבש. נסו שוב."
   data-status-pending="ממתינים לשמירת הכרטיס בעמוד התשלום…"
-  data-status-active="הכרטיס נשמר והחשבון פעיל."
+  data-status-active="הכרטיס נשמר. החשבון ממתין לאישור מנהל — אפשר להתחבר ללוח הבקרה ולעקוב אחרי הסטטוס."
   data-status-cancelled="התשלום בוטל. כתבו לנו ל-hello@scalorus.ai.">
 <div class="su-steps"><span data-step="account" data-n="1">בחירת חשבון</span><span data-step="register" data-n="2">פרטים</span><span data-step="pay" data-n="3">תשלום</span></div>
 
@@ -62,7 +62,7 @@
 <p id="register-error" class="su-error" role="alert"></p>
 <div class="su-actions"><button id="register-back" class="btn-ghost" type="button">חזרה</button><button class="btn-primary" type="submit">המשך לתשלום</button></div>
 </form>
-<p class="su-note">החשבון יופעל לאחר שמירת אמצעי התשלום. כבר רשומים? <a href="/app" class="text-primary">התחברו</a>.</p>
+<p class="su-note">לאחר שמירת אמצעי התשלום החשבון ממתין לאישור מנהל; נעדכן אתכם כשהוא יאושר. כבר רשומים? <a href="/app" class="text-primary">התחברו</a>.</p>
 </section>
 
 <section id="step-pay" class="su-step">
@@ -73,7 +73,7 @@
 <iframe id="pay-frame" title="עמוד תשלום" referrerpolicy="strict-origin-when-cross-origin"></iframe>
 <p id="pay-status" class="su-status"><span class="dot"></span><span id="pay-status-text"></span></p>
 <div id="pay-pending" class="su-actions"><a id="pay-open" class="btn-ghost" target="_blank" rel="noopener noreferrer" href="#">פתיחת עמוד התשלום בחלון חדש</a></div>
-<div id="pay-done" class="su-actions" hidden><a class="btn-primary" href="/app">כניסה ללוח הבקרה</a></div>
+<div id="pay-done" class="su-actions" hidden><a class="btn-primary" href="/app">התחברות ללוח הבקרה</a></div>
 </div>
 </section>
 </main>

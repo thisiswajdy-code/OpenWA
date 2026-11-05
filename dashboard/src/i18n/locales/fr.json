@@ -898,7 +898,8 @@
     },
     "actions": {
       "edit": "Modifier l'utilisateur",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "approve": "Approuver le compte"
     },
     "edit": {
       "title": "Modifier l'utilisateur",
@@ -919,7 +920,22 @@
       "saveFailed": "Le plan n'a pas pu être enregistré.",
       "loadFailed": "Le plan d'inscription n'a pas pu être chargé.",
       "disabledHint": "L'inscription est désactivée sur cette passerelle : ARVY_API_TOKEN n'est pas défini. Le prix est quand même enregistré."
-    }
+    },
+    "state": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "pendingApproval": "En attente d’approbation",
+      "awaitingPayment": "En attente de paiement"
+    },
+    "approvedTitle": "Compte approuvé",
+    "pendingBanner": "Comptes en attente de votre approbation : {{count}}. Ils voient un tableau de bord verrouillé jusqu’à l’approbation."
+  },
+  "pending": {
+    "title": "En attente d’approbation",
+    "body": "Votre paiement a été reçu. Un administrateur examine chaque nouveau compte ; cette page se déverrouillera d’elle-même dès que le vôtre sera approuvé.",
+    "signedInAs": "Connecté en tant que {{email}}",
+    "check": "Vérifier à nouveau",
+    "loadFailed": "Impossible de lire l’état d’approbation. La page réessaiera."
   },
   "logs": {
     "title": "Journaux d'audit",

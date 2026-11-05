@@ -45,6 +45,7 @@ test('startup validation: ok + role refreshes the cached role from the server', 
     action: 'role',
     role: 'viewer',
     scoped: false,
+    pendingApproval: false,
   });
 });
 
@@ -53,6 +54,7 @@ test('startup validation: ok + role also carries the engine the server reports',
     action: 'role',
     role: 'operator',
     scoped: false,
+    pendingApproval: false,
     engineType: 'baileys',
   });
 });
@@ -62,12 +64,31 @@ test('startup validation: ok + role carries whether the key is session-scoped', 
     action: 'role',
     role: 'admin',
     scoped: true,
+    pendingApproval: false,
   });
   // Anything but a literal true is unscoped.
   assert.deepEqual(resolveStartupValidation(200, { valid: true, role: 'admin', scoped: 'yes' }), {
     action: 'role',
     role: 'admin',
     scoped: false,
+    pendingApproval: false,
+  });
+});
+
+test('startup validation: ok + role carries whether the user still awaits approval', () => {
+  // A paid sign-up reloads the locked dashboard: the lock must survive the reload, and only a
+  // literal true locks (an older gateway that omits the field leaves every key unlocked).
+  assert.deepEqual(resolveStartupValidation(200, { valid: true, role: 'operator', pendingApproval: true }), {
+    action: 'role',
+    role: 'operator',
+    scoped: false,
+    pendingApproval: true,
+  });
+  assert.deepEqual(resolveStartupValidation(200, { valid: true, role: 'operator', pendingApproval: 'yes' }), {
+    action: 'role',
+    role: 'operator',
+    scoped: false,
+    pendingApproval: false,
   });
 });
 

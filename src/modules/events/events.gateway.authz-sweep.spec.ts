@@ -101,7 +101,7 @@ describe('EventsGateway API-key authorization sweep', () => {
   beforeEach(async () => {
     await repo.clear();
     const moduleRef = { get: () => gateway } as unknown as ModuleRef;
-    service = new AuthService(repo, new ApiKeyUsageTracker(repo), moduleRef);
+    service = new AuthService(repo, {} as never, new ApiKeyUsageTracker(repo), moduleRef);
     gateway = new EventsGateway(
       service,
       { logWarn: jest.fn().mockResolvedValue(null) } as unknown as AuditService,

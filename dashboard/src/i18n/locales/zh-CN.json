@@ -892,7 +892,8 @@
     },
     "actions": {
       "edit": "编辑用户",
-      "delete": "删除"
+      "delete": "删除",
+      "approve": "审批账户"
     },
     "edit": {
       "title": "编辑用户",
@@ -913,7 +914,22 @@
       "saveFailed": "无法保存套餐。",
       "loadFailed": "无法加载注册套餐。",
       "disabledHint": "此网关已禁用注册：未设置 ARVY_API_TOKEN。价格仍会保存。"
-    }
+    },
+    "state": {
+      "active": "活跃",
+      "inactive": "未激活",
+      "pendingApproval": "待审批",
+      "awaitingPayment": "待付款"
+    },
+    "approvedTitle": "账户已审批",
+    "pendingBanner": "等待您审批的账户：{{count}} 个。审批前他们看到的是锁定的控制台。"
+  },
+  "pending": {
+    "title": "等待审批",
+    "body": "已收到您的付款。管理员会审核每个新账户；您的账户通过审批后，此页面将自动解锁。",
+    "signedInAs": "当前登录：{{email}}",
+    "check": "再次检查",
+    "loadFailed": "无法读取审批状态，页面将重试。"
   },
   "logs": {
     "title": "审计日志",

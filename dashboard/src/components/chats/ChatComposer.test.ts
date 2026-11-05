@@ -64,6 +64,8 @@ before(async () => {
     setEngineType: () => undefined,
     scoped: false,
     setScoped: () => undefined,
+    pendingApproval: false,
+    setPendingApproval: () => undefined,
   };
   wrap = children =>
     createElement(

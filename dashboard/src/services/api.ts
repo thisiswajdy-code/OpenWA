@@ -224,8 +224,21 @@ export interface User {
   isActive: boolean;
   /** The last successful sign-in; absent before the first. */
   lastLoginAt?: string;
+  /** True until an admin approves the account; a self-service sign-up starts this way. */
+  pendingApproval: boolean;
+  /** When an admin approved the account; absent while pending. */
+  approvedAt?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+/** The dashboard user behind the login key the dashboard holds (`GET /auth/me`). */
+export interface CurrentUser {
+  id: string;
+  email: string;
+  role: 'admin' | 'operator' | 'viewer';
+  pendingApproval: boolean;
+  approvedAt?: string;
 }
 
 export interface AuditLog {
@@ -1263,6 +1276,13 @@ export const userApi = {
       body: JSON.stringify(data),
     }),
   delete: (id: string) => request<void>(`/auth/users/${id}`, { method: 'DELETE' }),
+  /** Approve a self-service sign-up: its locked dashboard unlocks on its next poll. */
+  approve: (id: string) => request<User>(`/auth/users/${id}/approve`, { method: 'POST' }),
+};
+
+/** The user signed in with the stored login key; 404 for a pasted API key. */
+export const currentUserApi = {
+  get: () => request<CurrentUser>('/auth/me'),
 };
 
 // =============================================================================

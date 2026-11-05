@@ -40,6 +40,8 @@ export class UserController {
       role: user.role,
       isActive: user.isActive,
       lastLoginAt: user.lastLoginAt ?? undefined,
+      pendingApproval: user.approvedAt === null,
+      approvedAt: user.approvedAt ?? undefined,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -101,6 +103,30 @@ export class UserController {
         passwordChanged: dto.password !== undefined,
       },
     });
+    return this.toResponse(user);
+  }
+
+  @Post(':id/approve')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Approve a self-service sign-up, unlocking the dashboard for it (admin only)' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user, approved. Approving an approved user changes nothing.',
+    type: UserResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'No user with this id.' })
+  async approve(
+    @Param('id') id: string,
+    @Req() req: Request,
+    @CurrentApiKey() actor?: ApiKey,
+  ): Promise<UserResponseDto> {
+    const { user, approved } = await this.userService.approve(id);
+    if (approved) {
+      await this.auditService.logInfo(AuditAction.USER_APPROVED, {
+        ...this.auditContext(req, actor),
+        metadata: { targetUserId: user.id, email: user.email, paymentLinkId: user.paymentLinkId },
+      });
+    }
     return this.toResponse(user);
   }
 

@@ -76,6 +76,12 @@ export class RegisterResponseDto {
 
   @ApiProperty({ description: 'Whether the user can sign in: true once a card was saved.', example: false })
   active!: boolean;
+
+  @ApiProperty({
+    description: 'Whether an admin has approved the account. Until then a sign-in lands on a locked dashboard.',
+    example: false,
+  })
+  approved!: boolean;
 }
 
 export class ArvyNotifyResponseDto {

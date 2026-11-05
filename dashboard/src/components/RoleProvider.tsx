@@ -53,6 +53,21 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // A paid sign-up signs in before an admin approves it. Kept beside the key like the scope: the
+  // lock the flag shows is enforced by the gateway, this only picks which screen to draw.
+  const [pendingApproval, setPendingApprovalState] = useState(
+    () => sessionStorage.getItem('openwa_pending_approval') === 'true',
+  );
+
+  const setPendingApproval = useCallback((next: boolean) => {
+    setPendingApprovalState(next);
+    if (next) {
+      sessionStorage.setItem('openwa_pending_approval', 'true');
+    } else {
+      sessionStorage.removeItem('openwa_pending_approval');
+    }
+  }, []);
+
   const value: RoleContextType = {
     role,
     setRole,
@@ -64,6 +79,8 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     setEngineType,
     scoped,
     setScoped,
+    pendingApproval,
+    setPendingApproval,
   };
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;

@@ -11,7 +11,14 @@ import './Login.css';
 export type LoginMethod = 'apiKey' | 'password';
 
 interface LoginProps {
-  onLogin: (apiKey: string, role?: string, engineType?: string, scoped?: boolean, method?: LoginMethod) => void;
+  onLogin: (
+    apiKey: string,
+    role?: string,
+    engineType?: string,
+    scoped?: boolean,
+    method?: LoginMethod,
+    pendingApproval?: boolean,
+  ) => void;
 }
 
 /** The sign-in answer the two methods share: a key to store, and what the gateway said about it. */
@@ -20,6 +27,8 @@ interface SignedIn {
   role?: string;
   engineType?: string;
   scoped: boolean;
+  /** A dashboard user an admin has not approved yet: the dashboard opens locked. */
+  pendingApproval: boolean;
 }
 
 export function Login({ onLogin }: LoginProps) {
@@ -84,12 +93,15 @@ export function Login({ onLogin }: LoginProps) {
     }
     // The validate body already carries the key's role — hand it up so the app can set it
     // directly instead of re-validating the same key a second time.
-    const data: { role?: string; engineType?: string; scoped?: unknown } = await response.json().catch(() => ({}));
+    const data: { role?: string; engineType?: string; scoped?: unknown; pendingApproval?: unknown } = await response
+      .json()
+      .catch(() => ({}));
     return {
       key,
       role: data.role,
       engineType: typeof data.engineType === 'string' ? data.engineType : undefined,
       scoped: data.scoped === true,
+      pendingApproval: data.pendingApproval === true,
     };
   };
 
@@ -104,15 +116,20 @@ export function Login({ onLogin }: LoginProps) {
       if (response.status === 401) return t('login.invalidCredentials');
       return refusalMessage(response, t('login.connectionError'));
     }
-    const data: { apiKey?: unknown; role?: string; engineType?: string; scoped?: unknown } = await response
-      .json()
-      .catch(() => ({}));
+    const data: {
+      apiKey?: unknown;
+      role?: string;
+      engineType?: string;
+      scoped?: unknown;
+      pendingApproval?: unknown;
+    } = await response.json().catch(() => ({}));
     if (typeof data.apiKey !== 'string' || !data.apiKey) return t('login.connectionError');
     return {
       key: data.apiKey,
       role: data.role,
       engineType: typeof data.engineType === 'string' ? data.engineType : undefined,
       scoped: data.scoped === true,
+      pendingApproval: data.pendingApproval === true,
     };
   };
 
@@ -138,7 +155,7 @@ export function Login({ onLogin }: LoginProps) {
       if (typeof result === 'string') {
         setError(result);
       } else {
-        onLogin(result.key, result.role, result.engineType, result.scoped, method);
+        onLogin(result.key, result.role, result.engineType, result.scoped, method, result.pendingApproval);
       }
     } catch {
       setError(t('login.connectionError'));

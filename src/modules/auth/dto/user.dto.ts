@@ -52,6 +52,32 @@ export class LoginResponseDto {
 
   @ApiProperty({ description: 'When the login key stops authenticating.', example: '2026-11-04T10:00:00.000Z' })
   expiresAt!: Date;
+
+  @ApiProperty({
+    description:
+      'True while an admin has not approved the account yet: the key then reaches only `POST /api/auth/validate`, ' +
+      '`GET /api/auth/me` and `POST /api/auth/logout`, and the dashboard shows a locked "pending approval" screen.',
+    example: false,
+  })
+  pendingApproval!: boolean;
+}
+
+/** The dashboard user behind the presented login key. */
+export class CurrentUserResponseDto {
+  @ApiProperty({ example: '0a941dac-a965-45e7-b318-74ae8be134f0' })
+  id!: string;
+
+  @ApiProperty({ example: 'ops@example.com' })
+  email!: string;
+
+  @ApiProperty({ enum: ApiKeyRole })
+  role!: ApiKeyRole;
+
+  @ApiProperty({ description: 'True until an admin approves the account.', example: false })
+  pendingApproval!: boolean;
+
+  @ApiPropertyOptional({ description: 'When an admin approved the account; absent while pending.' })
+  approvedAt?: Date;
 }
 
 export class LoginOptionsResponseDto {
@@ -142,6 +168,17 @@ export class UserResponseDto {
 
   @ApiPropertyOptional({ description: 'The last successful sign-in; absent before the first.' })
   lastLoginAt?: Date;
+
+  @ApiProperty({
+    description:
+      'True until an admin approves the account (`POST /api/auth/users/:id/approve`). A user an admin creates is ' +
+      'approved at once; a self-service sign-up is not, and signs in to a locked dashboard until approved.',
+    example: false,
+  })
+  pendingApproval!: boolean;
+
+  @ApiPropertyOptional({ description: 'When an admin approved the account; absent while pending.' })
+  approvedAt?: Date;
 
   @ApiProperty()
   createdAt!: Date;

@@ -25,6 +25,8 @@ function renderLayout(scoped = false): ReturnType<typeof import('@testing-librar
     setEngineType: () => undefined,
     scoped,
     setScoped: () => undefined,
+    pendingApproval: false,
+    setPendingApproval: () => undefined,
   };
   return rtl.render(
     createElement(

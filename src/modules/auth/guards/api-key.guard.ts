@@ -20,6 +20,7 @@ import {
   UNSCOPED_KEY,
   CHAT_SCOPED_KEY,
   CHAT_QUOTED_ALLOWED_KEY,
+  PENDING_APPROVAL_ALLOWED_KEY,
   ChatScopeKind,
 } from '../decorators/auth.decorators';
 import { resolveClientIp } from '../../../common/utils/ip';
@@ -98,8 +99,15 @@ export class ApiKeyGuard implements CanActivate {
       string | undefined;
     const clientIp = this.getClientIp(request);
 
-    // Validate API key
-    const apiKey = await this.authService.validateApiKey(apiKeyHeader, clientIp, sessionId);
+    // Validate API key. The login key of a user awaiting approval is refused unless the handler is
+    // marked @AllowPendingApproval (self-validation, the pending status read, logout).
+    const allowPending = this.reflector.getAllAndOverride<boolean>(PENDING_APPROVAL_ALLOWED_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    const apiKey = allowPending
+      ? await this.authService.validateApiKey(apiKeyHeader, clientIp, sessionId, { allowPendingUser: true })
+      : await this.authService.validateApiKey(apiKeyHeader, clientIp, sessionId);
 
     // Stamp the resolved actor into the per-request async context so downstream audit log writes —
     // which fire from services deep in the call stack without DI access to the key — can attribute
