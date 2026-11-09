@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ApiKeyRole } from '../entities/api-key.entity';
@@ -185,4 +185,53 @@ export class UserResponseDto {
 
   @ApiProperty()
   updatedAt!: Date;
+}
+
+/** The length of the code a password reset emails; the DTO and the service agree through it. */
+export const RESET_CODE_LENGTH = 6;
+
+export class RequestPasswordResetDto {
+  @ApiProperty({ description: 'The email address of the dashboard user.', example: 'ops@example.com' })
+  @Transform(({ value }) => normalizeEmail(value))
+  @IsEmail()
+  @MaxLength(EMAIL_MAX_LENGTH)
+  email!: string;
+}
+
+export class RequestPasswordResetResponseDto {
+  @ApiProperty({
+    description: 'Always true: whether the address has a user is never revealed. A code was emailed if it has.',
+    example: true,
+  })
+  sent!: boolean;
+}
+
+export class ConfirmPasswordResetDto {
+  @ApiProperty({ description: 'The email address the code was sent to.', example: 'ops@example.com' })
+  @Transform(({ value }) => normalizeEmail(value))
+  @IsEmail()
+  @MaxLength(EMAIL_MAX_LENGTH)
+  email!: string;
+
+  @ApiProperty({ description: `The ${RESET_CODE_LENGTH}-digit code from the email.`, example: '482913' })
+  @Transform(({ value }): unknown => (typeof value === 'string' ? value.replace(/\s+/g, '') : value))
+  @IsString()
+  @Matches(/^\d{6}$/, { message: `code must be ${RESET_CODE_LENGTH} digits` })
+  code!: string;
+
+  @ApiProperty({
+    description: 'The new password. Every login key the user holds is deleted, so they sign in again.',
+    minLength: PASSWORD_MIN_LENGTH,
+    maxLength: PASSWORD_MAX_LENGTH,
+    example: 'correct horse battery staple',
+  })
+  @IsString()
+  @MinLength(PASSWORD_MIN_LENGTH)
+  @MaxLength(PASSWORD_MAX_LENGTH)
+  password!: string;
+}
+
+export class ConfirmPasswordResetResponseDto {
+  @ApiProperty({ description: 'True: the password was changed and every login key deleted.', example: true })
+  reset!: boolean;
 }

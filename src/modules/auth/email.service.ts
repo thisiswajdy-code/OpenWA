@@ -136,13 +136,34 @@ export function adminSubscriptionEmail(user: Pick<User, 'email' | 'id'>, siteUrl
   return { subject: `Scalorus WA — new subscription awaiting approval: ${user.email}`, html };
 }
 
+/** The code a password reset emails: typed back into the dashboard within `minutes`. */
+export function passwordResetEmail(
+  user: Pick<User, 'email'>,
+  code: string,
+  minutes: number,
+  siteUrl: string,
+): SignupEmail {
+  const email = escapeHtml(user.email);
+  const digits = escapeHtml(code);
+  const box = `<p style="font-size:28px;letter-spacing:6px;font-weight:700;margin:12px 0" dir="ltr">${digits}</p>`;
+  const he =
+    `<p>שלום,</p>` +
+    `<p>התבקש איפוס סיסמה ללוח הבקרה של Scalorus WA עבור <strong dir="ltr">${email}</strong>. הקוד שלכם:</p>${box}` +
+    `<p>הקוד תקף ל‑${minutes} דקות. אם לא ביקשתם איפוס, אפשר להתעלם מהודעה זו; הסיסמה לא תשתנה.</p>`;
+  const en =
+    `<p>Hello,</p>` +
+    `<p>A password reset was requested for the Scalorus WA dashboard account <strong>${email}</strong>. Your code:</p>${box}` +
+    `<p>It is valid for ${minutes} minutes. If you did not ask for a reset, ignore this email; the password stays as it is.</p>`;
+  return { subject: `Scalorus WA — קוד לאיפוס סיסמה / Password reset code: ${code}`, html: bilingual(he, en, siteUrl) };
+}
+
 /**
  * Transactional mail for the sign-up flow, sent through the Scalorus CRM like the PHP sites do.
  * Every send is best-effort: it runs after the request's work is done, never throws, and logs a
  * refusal or timeout, because a registration or an activation must not fail over mail.
  */
 @Injectable()
-export class SignupEmailService {
+export class EmailService {
   private readonly logger = createLogger('SignupEmail');
   private readonly config: EmailConfig;
 
@@ -151,8 +172,8 @@ export class SignupEmailService {
   }
 
   /** For tests: a service with explicit settings. */
-  static withConfig(config: EmailConfig): SignupEmailService {
-    const service = new SignupEmailService();
+  static withConfig(config: EmailConfig): EmailService {
+    const service = new EmailService();
     (service as unknown as { config: EmailConfig }).config = config;
     return service;
   }
@@ -181,6 +202,11 @@ export class SignupEmailService {
         'subscription_active_admin',
       );
     }
+  }
+
+  /** The reset code is awaited: the request answers only once the mail was accepted or refused. */
+  sendPasswordReset(user: Pick<User, 'email'>, code: string, minutes: number): Promise<boolean> {
+    return this.send(user.email, passwordResetEmail(user, code, minutes, this.config.siteUrl), 'password_reset');
   }
 
   /** POST one email; true when the CRM accepted it. Never throws. */

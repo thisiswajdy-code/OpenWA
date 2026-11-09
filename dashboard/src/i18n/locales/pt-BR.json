@@ -364,7 +364,26 @@
     "signIn": "Entrar",
     "signingIn": "Entrando...",
     "useApiKey": "Entrar com uma chave de API",
-    "usePassword": "Entrar com e-mail e senha"
+    "usePassword": "Entrar com e-mail e senha",
+    "reset": {
+      "forgot": "Esqueceu a senha?",
+      "title": "Redefinir senha",
+      "intro": "Informe seu e-mail e enviaremos um código de 6 dígitos.",
+      "sendCode": "Enviar código",
+      "sending": "Enviando…",
+      "codeSent": "Enviamos um código para {{email}}. Informe-o com a nova senha.",
+      "code": "Código do e-mail",
+      "codePlaceholder": "6 dígitos",
+      "codeRequired": "Informe o código do e-mail",
+      "newPassword": "Nova senha",
+      "change": "Alterar senha",
+      "changing": "Alterando…",
+      "invalidCode": "Código inválido ou expirado. Solicite um novo se necessário.",
+      "unavailable": "A redefinição de senha não está disponível neste gateway.",
+      "done": "Sua senha foi alterada. Entre com a nova senha.",
+      "backToSignIn": "Voltar ao login",
+      "resend": "Enviar um novo código"
+    }
   },
   "dashboard": {
     "title": "Painel",

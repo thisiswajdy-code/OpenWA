@@ -31,6 +31,8 @@ export const PUBLIC_PATHS = [
   '/api/infra/health',
   '/api/auth/login',
   '/api/auth/login-options',
+  '/api/auth/password-reset/request',
+  '/api/auth/password-reset/confirm',
   '/api/auth/register',
   '/api/auth/register/plan',
   '/api/auth/register/{id}',

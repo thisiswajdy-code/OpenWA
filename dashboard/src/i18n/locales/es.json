@@ -364,7 +364,26 @@
     "signIn": "Iniciar sesión",
     "signingIn": "Iniciando sesión...",
     "useApiKey": "Iniciar sesión con una clave API en su lugar",
-    "usePassword": "Iniciar sesión con correo y contraseña en su lugar"
+    "usePassword": "Iniciar sesión con correo y contraseña en su lugar",
+    "reset": {
+      "forgot": "¿Olvidaste la contraseña?",
+      "title": "Restablecer contraseña",
+      "intro": "Introduce tu correo y te enviaremos un código de 6 dígitos.",
+      "sendCode": "Enviar código",
+      "sending": "Enviando…",
+      "codeSent": "Enviamos un código a {{email}}. Introdúcelo con tu nueva contraseña.",
+      "code": "Código del correo",
+      "codePlaceholder": "6 dígitos",
+      "codeRequired": "Introduce el código del correo",
+      "newPassword": "Nueva contraseña",
+      "change": "Cambiar contraseña",
+      "changing": "Cambiando…",
+      "invalidCode": "Código no válido o caducado. Solicita uno nuevo si hace falta.",
+      "unavailable": "El restablecimiento de contraseña no está disponible en este gateway.",
+      "done": "Tu contraseña se cambió. Inicia sesión con la nueva contraseña.",
+      "backToSignIn": "Volver a iniciar sesión",
+      "resend": "Enviar un código nuevo"
+    }
   },
   "dashboard": {
     "title": "Panel",

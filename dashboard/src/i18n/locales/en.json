@@ -359,7 +359,26 @@
     "signIn": "Sign in",
     "signingIn": "Signing in...",
     "useApiKey": "Sign in with an API key instead",
-    "usePassword": "Sign in with email and password instead"
+    "usePassword": "Sign in with email and password instead",
+    "reset": {
+      "forgot": "Forgot password?",
+      "title": "Reset password",
+      "intro": "Enter your email and we will send you a 6-digit code.",
+      "sendCode": "Send code",
+      "sending": "Sending…",
+      "codeSent": "We emailed a code to {{email}}. Enter it with your new password.",
+      "code": "Code from the email",
+      "codePlaceholder": "6 digits",
+      "codeRequired": "Enter the code from the email",
+      "newPassword": "New password",
+      "change": "Change password",
+      "changing": "Changing…",
+      "invalidCode": "Invalid or expired code. Request a new one if needed.",
+      "unavailable": "Password reset is not available on this gateway.",
+      "done": "Your password was changed. Sign in with the new password.",
+      "backToSignIn": "Back to sign in",
+      "resend": "Send a new code"
+    }
   },
   "dashboard": {
     "title": "Dashboard",

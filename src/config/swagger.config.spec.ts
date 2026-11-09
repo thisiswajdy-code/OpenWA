@@ -213,6 +213,7 @@ describe('documentErrorResponses', () => {
 describe('PUBLIC_PATHS drift guard', () => {
   const EXPECTED_PUBLIC_CONTROLLERS = [
     'src/modules/auth/arvy-notify.controller.ts',
+    'src/modules/auth/password-reset.controller.ts',
     'src/modules/auth/signup.controller.ts',
     'src/modules/auth/user-login.controller.ts',
     'src/modules/health/health.controller.ts',
@@ -254,6 +255,8 @@ describe('PUBLIC_PATHS drift guard', () => {
       [
         '/api/auth/login',
         '/api/auth/login-options',
+        '/api/auth/password-reset/confirm',
+        '/api/auth/password-reset/request',
         '/api/auth/register',
         '/api/auth/register/plan',
         '/api/auth/register/{id}',

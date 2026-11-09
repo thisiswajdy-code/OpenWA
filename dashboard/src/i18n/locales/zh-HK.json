@@ -359,7 +359,26 @@
     "signIn": "登入",
     "signingIn": "正在登入...",
     "useApiKey": "改用 API 金鑰登入",
-    "usePassword": "改用電郵及密碼登入"
+    "usePassword": "改用電郵及密碼登入",
+    "reset": {
+      "forgot": "忘記密碼？",
+      "title": "重設密碼",
+      "intro": "輸入你的電郵，我們會寄出一個 6 位驗證碼。",
+      "sendCode": "發送驗證碼",
+      "sending": "發送中…",
+      "codeSent": "我們已向 {{email}} 發送驗證碼。請連同新密碼一併輸入。",
+      "code": "電郵中的驗證碼",
+      "codePlaceholder": "6 位數字",
+      "codeRequired": "請輸入電郵中的驗證碼",
+      "newPassword": "新密碼",
+      "change": "更改密碼",
+      "changing": "更改中…",
+      "invalidCode": "驗證碼無效或已過期。如有需要請重新索取。",
+      "unavailable": "此閘道不支援重設密碼。",
+      "done": "密碼已更改。請使用新密碼登入。",
+      "backToSignIn": "返回登入",
+      "resend": "重新發送驗證碼"
+    }
   },
   "dashboard": {
     "title": "控制面板",

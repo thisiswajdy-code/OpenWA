@@ -359,7 +359,26 @@
     "signIn": "Giriş yap",
     "signingIn": "Giriş yapılıyor...",
     "useApiKey": "Bunun yerine API anahtarıyla giriş yap",
-    "usePassword": "Bunun yerine e-posta ve parolayla giriş yap"
+    "usePassword": "Bunun yerine e-posta ve parolayla giriş yap",
+    "reset": {
+      "forgot": "Şifrenizi mi unuttunuz?",
+      "title": "Şifreyi sıfırla",
+      "intro": "E-postanızı girin, size 6 haneli bir kod gönderelim.",
+      "sendCode": "Kod gönder",
+      "sending": "Gönderiliyor…",
+      "codeSent": "{{email}} adresine bir kod gönderdik. Yeni şifrenizle birlikte girin.",
+      "code": "E-postadaki kod",
+      "codePlaceholder": "6 hane",
+      "codeRequired": "E-postadaki kodu girin",
+      "newPassword": "Yeni şifre",
+      "change": "Şifreyi değiştir",
+      "changing": "Değiştiriliyor…",
+      "invalidCode": "Kod geçersiz veya süresi dolmuş. Gerekirse yeni bir kod isteyin.",
+      "unavailable": "Bu ağ geçidinde şifre sıfırlama kullanılamıyor.",
+      "done": "Şifreniz değiştirildi. Yeni şifrenizle giriş yapın.",
+      "backToSignIn": "Girişe dön",
+      "resend": "Yeni kod gönder"
+    }
   },
   "dashboard": {
     "title": "Kontrol Paneli",

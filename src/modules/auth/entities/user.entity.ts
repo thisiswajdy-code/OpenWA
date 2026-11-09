@@ -43,6 +43,18 @@ export class User {
   @Column({ type: 'datetime', nullable: true })
   approvedAt!: Date | null;
 
+  // A pending password reset (password-reset.service.ts): the scrypt hash of the emailed code, when
+  // it stops being accepted, and how many wrong codes were tried. All cleared once the password is
+  // reset or the code is exhausted; NULL / 0 when no reset is pending.
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  resetCodeHash!: string | null;
+
+  @Column({ type: 'datetime', nullable: true })
+  resetCodeExpiresAt!: Date | null;
+
+  @Column({ type: 'int', default: 0 })
+  resetAttempts!: number;
+
   @CreateDateColumn()
   createdAt!: Date;
 

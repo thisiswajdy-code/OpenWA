@@ -19,6 +19,11 @@ export enum AuditAction {
   USER_LOGIN_FAILED = 'user_login_failed',
   USER_LOGOUT = 'user_logout',
   USER_APPROVED = 'user_approved',
+  // Password reset by emailed code (password-reset.controller.ts): a request names an address only,
+  // a failed confirmation is bounded per client IP like a failed sign-in.
+  USER_PASSWORD_RESET_REQUESTED = 'user_password_reset_requested',
+  USER_PASSWORD_RESET = 'user_password_reset',
+  USER_PASSWORD_RESET_FAILED = 'user_password_reset_failed',
   // The sign-up plan an admin sells through the site changed (signup-plan.controller.ts).
   SIGNUP_PLAN_UPDATED = 'signup_plan_updated',
 

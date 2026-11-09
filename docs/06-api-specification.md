@@ -5192,7 +5192,7 @@ The login key of a dashboard user an admin has not approved yet is admitted here
 
 #### Dashboard users and password sign-in
 
-A dashboard user is an email and password that signs in to the dashboard without pasting an API key. A user is not a credential the API accepts: signing in exchanges the password for a **login key**, an ordinary API key owned by the user (`api_keys.userId`) with the user's role, no IP, session or chat scope, and an expiry (`LOGIN_SESSION_TTL_HOURS`, a day by default, clamped to 1–720). Every surface that authenticates a key works unchanged with it. A login key is left out of `GET /api/auth/api-keys`, never counts as a surviving admin for the last-admin guard, and is deleted by logout, by a change to its user's password, role or active flag, with its user, or (once expired) on the next sign-in. The first user is seeded at boot from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; in production a placeholder or a password under 12 characters refuses the boot like a weak `API_MASTER_KEY`. Successful and refused sign-ins are audited as `user_login` / `user_login_failed` (the latter bounded per client IP, like an unresolved key), logout as `user_logout`, and user lifecycle as `user_created` / `user_updated` / `user_deleted` / `user_approved`.
+A dashboard user is an email and password that signs in to the dashboard without pasting an API key. A user is not a credential the API accepts: signing in exchanges the password for a **login key**, an ordinary API key owned by the user (`api_keys.userId`) with the user's role, no IP, session or chat scope, and an expiry (`LOGIN_SESSION_TTL_HOURS`, a day by default, clamped to 1–720). Every surface that authenticates a key works unchanged with it. A login key is left out of `GET /api/auth/api-keys`, never counts as a surviving admin for the last-admin guard, and is deleted by logout, by a change to its user's password, role or active flag, with its user, or (once expired) on the next sign-in. The first user is seeded at boot from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; in production a placeholder or a password under 12 characters refuses the boot like a weak `API_MASTER_KEY`. Successful and refused sign-ins are audited as `user_login` / `user_login_failed` (the latter bounded per client IP, like an unresolved key), logout as `user_logout`, user lifecycle as `user_created` / `user_updated` / `user_deleted` / `user_approved`, and a password reset by emailed code as `user_password_reset_requested` / `user_password_reset` / `user_password_reset_failed` (`POST /api/auth/password-reset/request` and `/confirm` below).
 
 **Approval.** A user an admin creates (or the boot seeds) is approved at once (`approvedAt`). A self-service sign-up (`POST /api/auth/register`) is not: once it has paid it can sign in, but its login key is refused with `403 "Account pending approval"` on every route except `POST /api/auth/validate`, `GET /api/auth/me` and `POST /api/auth/logout` — on REST, the WebSocket handshake, MCP and Bull Board alike — so the dashboard it sees is locked, polling `GET /api/auth/me` until an admin approves it with `POST /api/auth/users/:id/approve`. The user is re-read on every request, so an approval unlocks the session the user is already signed in to, with no second sign-in. A key with no owner (created through the API or seeded) is never pending.
 
@@ -5262,6 +5262,52 @@ Delete the login key the request presents. A key that is not a login key (no own
 **Auth:** API key (any role, unscoped). `@HttpCode(204)` — no response body.
 
 **Errors:** `401` missing/invalid key · `403` the key is session-scoped or restricted with `allowedChats`
+
+#### POST /api/auth/password-reset/request
+
+Email a password reset code to a dashboard user. The code is six digits, valid for 15 minutes, hashed (scrypt) on the user row like a password; requesting again replaces it. The answer is the same whether or not the address has a user, after the same work, so neither the body nor its timing reveals which addresses exist. The email goes through the Scalorus CRM (`EMAIL_API_KEY`), bilingual Hebrew and English.
+
+**Auth:** public. Rate-limited per client IP tighter than sign-in, since each request costs an email: 3 a minute, 10 a quarter hour, 30 an hour (`429` beyond).
+
+**Request body**
+
+```json
+{ "email": "ops@example.com" }
+```
+
+**Response** `200`
+
+```json
+{ "sent": true }
+```
+
+Audited as `user_password_reset_requested` with the address and, in the audit row only, whether it had a user.
+
+**Errors:** `400` malformed body or an undeclared field · `429` too many requests from this client IP · `503` email is not configured (`EMAIL_API_KEY` unset)
+
+#### POST /api/auth/password-reset/confirm
+
+Set a new password with the emailed code. The code is single-use; five wrong codes discard it, as does its expiry, and a new one must be requested. A successful reset deletes every login key the user holds, exactly like a password change through `PUT /api/auth/users/:id`, so the user signs in again everywhere.
+
+**Auth:** public. Rate-limited per client IP like `POST /api/auth/login`: 5 attempts a minute, 20 a quarter hour, 100 an hour.
+
+**Request body**
+
+```json
+{ "email": "ops@example.com", "code": "482913", "password": "correct horse battery staple" }
+```
+
+`code` is the six digits from the email (spaces are dropped); `password` is 8–128 characters.
+
+**Response** `200`
+
+```json
+{ "reset": true }
+```
+
+Audited as `user_password_reset`; a refusal as `user_password_reset_failed` (bounded per client IP, like a refused sign-in).
+
+**Errors:** `400` malformed body, or `"Invalid or expired code"` for an unknown address, no pending reset, a wrong, used, expired or exhausted code, always the same message · `429` too many attempts from this client IP
 
 #### POST /api/auth/register
 

@@ -177,6 +177,32 @@
   text-decoration: underline;
 }
 
+.login-container .login-reset-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: start;
+}
+
+.login-container .login-reset-text {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: start;
+}
+
+.login-container .login-reset-done {
+  color: var(--primary-text);
+  font-weight: 500;
+}
+
+.login-container .login-switch:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .login-container .login-help {
   margin-top: 1.5rem;
   font-size: 0.875rem;

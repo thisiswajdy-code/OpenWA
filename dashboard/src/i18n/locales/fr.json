@@ -364,7 +364,26 @@
     "signIn": "Se connecter",
     "signingIn": "Connexion...",
     "useApiKey": "Se connecter avec une clé API à la place",
-    "usePassword": "Se connecter avec e-mail et mot de passe à la place"
+    "usePassword": "Se connecter avec e-mail et mot de passe à la place",
+    "reset": {
+      "forgot": "Mot de passe oublié ?",
+      "title": "Réinitialiser le mot de passe",
+      "intro": "Saisissez votre e-mail et nous vous enverrons un code à 6 chiffres.",
+      "sendCode": "Envoyer le code",
+      "sending": "Envoi…",
+      "codeSent": "Nous avons envoyé un code à {{email}}. Saisissez-le avec votre nouveau mot de passe.",
+      "code": "Code reçu par e-mail",
+      "codePlaceholder": "6 chiffres",
+      "codeRequired": "Saisissez le code reçu par e-mail",
+      "newPassword": "Nouveau mot de passe",
+      "change": "Changer le mot de passe",
+      "changing": "Modification…",
+      "invalidCode": "Code invalide ou expiré. Demandez-en un nouveau si besoin.",
+      "unavailable": "La réinitialisation du mot de passe n’est pas disponible sur cette passerelle.",
+      "done": "Votre mot de passe a été changé. Connectez-vous avec le nouveau mot de passe.",
+      "backToSignIn": "Retour à la connexion",
+      "resend": "Envoyer un nouveau code"
+    }
   },
   "dashboard": {
     "title": "Tableau de bord",

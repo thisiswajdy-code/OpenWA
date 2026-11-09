@@ -69,6 +69,9 @@
                 "user_login_failed",
                 "user_logout",
                 "user_approved",
+                "user_password_reset_requested",
+                "user_password_reset",
+                "user_password_reset_failed",
                 "signup_plan_updated",
                 "rate_limit_exceeded",
                 "queue_board_mutated",
@@ -1132,6 +1135,87 @@
         "tags": [
           "auth"
         ]
+      }
+    },
+    "/api/auth/password-reset/request": {
+      "post": {
+        "operationId": "PasswordResetController_request",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPasswordResetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Answered the same whether or not the address has a user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestPasswordResetResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is malformed or carries a field the DTO does not declare."
+          },
+          "429": {
+            "description": "Too many requests from this client IP."
+          },
+          "503": {
+            "description": "Email is not configured on this gateway (`EMAIL_API_KEY` unset)."
+          }
+        },
+        "summary": "Email a password reset code to a dashboard user",
+        "tags": [
+          "auth"
+        ],
+        "security": []
+      }
+    },
+    "/api/auth/password-reset/confirm": {
+      "post": {
+        "operationId": "PasswordResetController_confirm",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPasswordResetDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The password was changed and every login key of the user deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmPasswordResetResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed body, or `\"Invalid or expired code\"` for a wrong, used, expired or exhausted code."
+          },
+          "429": {
+            "description": "Too many attempts from this client IP."
+          }
+        },
+        "summary": "Set a new password with the emailed code",
+        "tags": [
+          "auth"
+        ],
+        "security": []
       }
     },
     "/api/auth/register/plan": {
@@ -19590,6 +19674,72 @@
           "email",
           "role",
           "pendingApproval"
+        ]
+      },
+      "RequestPasswordResetDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address of the dashboard user.",
+            "example": "ops@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "RequestPasswordResetResponseDto": {
+        "type": "object",
+        "properties": {
+          "sent": {
+            "type": "boolean",
+            "description": "Always true: whether the address has a user is never revealed. A code was emailed if it has.",
+            "example": true
+          }
+        },
+        "required": [
+          "sent"
+        ]
+      },
+      "ConfirmPasswordResetDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "The email address the code was sent to.",
+            "example": "ops@example.com"
+          },
+          "code": {
+            "type": "string",
+            "description": "The 6-digit code from the email.",
+            "example": "482913"
+          },
+          "password": {
+            "type": "string",
+            "description": "The new password. Every login key the user holds is deleted, so they sign in again.",
+            "minLength": 8,
+            "maxLength": 128,
+            "example": "correct horse battery staple"
+          }
+        },
+        "required": [
+          "email",
+          "code",
+          "password"
+        ]
+      },
+      "ConfirmPasswordResetResponseDto": {
+        "type": "object",
+        "properties": {
+          "reset": {
+            "type": "boolean",
+            "description": "True: the password was changed and every login key deleted.",
+            "example": true
+          }
+        },
+        "required": [
+          "reset"
         ]
       },
       "SignupPlanResponseDto": {

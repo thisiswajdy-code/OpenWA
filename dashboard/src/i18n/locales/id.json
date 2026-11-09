@@ -359,7 +359,26 @@
     "signIn": "Masuk",
     "signingIn": "Sedang masuk...",
     "useApiKey": "Masuk dengan kunci API saja",
-    "usePassword": "Masuk dengan email dan kata sandi saja"
+    "usePassword": "Masuk dengan email dan kata sandi saja",
+    "reset": {
+      "forgot": "Lupa kata sandi?",
+      "title": "Atur ulang kata sandi",
+      "intro": "Masukkan email Anda, kami akan mengirim kode 6 digit.",
+      "sendCode": "Kirim kode",
+      "sending": "Mengirim…",
+      "codeSent": "Kami mengirim kode ke {{email}}. Masukkan bersama kata sandi baru Anda.",
+      "code": "Kode dari email",
+      "codePlaceholder": "6 digit",
+      "codeRequired": "Masukkan kode dari email",
+      "newPassword": "Kata sandi baru",
+      "change": "Ubah kata sandi",
+      "changing": "Mengubah…",
+      "invalidCode": "Kode tidak valid atau kedaluwarsa. Minta kode baru bila perlu.",
+      "unavailable": "Atur ulang kata sandi tidak tersedia di gateway ini.",
+      "done": "Kata sandi Anda telah diubah. Masuk dengan kata sandi baru.",
+      "backToSignIn": "Kembali ke halaman masuk",
+      "resend": "Kirim kode baru"
+    }
   },
   "dashboard": {
     "title": "Dasbor",

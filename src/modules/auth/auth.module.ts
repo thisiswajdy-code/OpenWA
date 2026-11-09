@@ -17,7 +17,9 @@ import { SignupController } from './signup.controller';
 import { ArvyNotifyController } from './arvy-notify.controller';
 import { SignupPlanController } from './signup-plan.controller';
 import { SignupPlanService } from './signup-plan.service';
-import { SignupEmailService } from './signup-email.service';
+import { EmailService } from './email.service';
+import { PasswordResetService } from './password-reset.service';
+import { PasswordResetController } from './password-reset.controller';
 import { SignupService } from './signup.service';
 import { ArvyClient } from './arvy-client';
 import { ApiKeyGuard } from './guards/api-key.guard';
@@ -31,6 +33,7 @@ import { ProxyAwareThrottlerGuard } from '../../common/security/proxy-aware-thro
     AuthValidateController,
     UserController,
     UserLoginController,
+    PasswordResetController,
     SignupController,
     ArvyNotifyController,
     SignupPlanController,
@@ -40,7 +43,8 @@ import { ProxyAwareThrottlerGuard } from '../../common/security/proxy-aware-thro
     UserService,
     SignupService,
     SignupPlanService,
-    SignupEmailService,
+    EmailService,
+    PasswordResetService,
     ArvyClient,
     ApiKeyUsageTracker,
     ChatScopeService,

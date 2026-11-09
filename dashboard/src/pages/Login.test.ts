@@ -15,6 +15,13 @@ let reply: () => Response = okReply;
 let loginOptions: { password: boolean } | null = null;
 // The last POST /auth/login body, so a test can see what the email form sent.
 let loginBody: unknown = undefined;
+// Password reset: the bodies sent to request and confirm, and what the gateway answers.
+let resetBodies: Array<{ path: string; body: unknown }> = [];
+let resetReply: (path: string) => Response = () => jsonReply({ ok: true });
+
+function jsonReply(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
+}
 
 function okReply(): Response {
   return new Response(JSON.stringify({ valid: true, role: 'admin' }), {
@@ -29,6 +36,11 @@ function installFetchStub(): void {
       return Promise.resolve(
         new Response(JSON.stringify(loginOptions), { headers: { 'Content-Type': 'application/json' } }),
       );
+    }
+    if (url.includes('/auth/password-reset/')) {
+      const path = url.slice(url.indexOf('/auth/password-reset/'));
+      resetBodies.push({ path, body: JSON.parse(String(init?.body)) });
+      return Promise.resolve(resetReply(path));
     }
     if (url.endsWith('/auth/login')) loginBody = JSON.parse(String(init?.body));
     sentKey = new Headers(init?.headers).get('X-API-Key');
@@ -52,6 +64,8 @@ before(async () => {
 });
 
 afterEach(() => {
+  resetBodies = [];
+  resetReply = () => jsonReply({ ok: true });
   sentKey = null;
   reply = okReply;
   loginOptions = null;
@@ -216,4 +230,76 @@ test("the page offers sign-up on the site instead of documentation, in the reade
   assert.equal(signUp.getAttribute('href'), '/signup-en.html');
   assert.equal(signUp.getAttribute('target'), null, 'the sign-up page is the same site, not a new tab');
   assert.ok(screen.getByText('New account?'));
+});
+
+// ---------------------------------------------------------------------------------------------------
+// Password reset by emailed code: the address, then the code with the new password.
+// ---------------------------------------------------------------------------------------------------
+
+test('Forgot password asks for the address, then the code and new password, and returns to sign-in', async () => {
+  loginOptions = { password: true };
+  const { screen, fireEvent, waitFor } = rtl;
+  rtl.render(createElement(Login, { onLogin: () => assert.fail('nothing signed in') }));
+  fireEvent.change(await screen.findByLabelText('Email'), { target: { value: ' Dana@Example.com ' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Forgot password?' }));
+
+  // Step 1: the address is carried over from the sign-in form (an email field drops the padding) and sent trimmed.
+  const emailField = screen.getByLabelText('Email') as HTMLInputElement;
+  assert.equal(emailField.value, 'Dana@Example.com');
+  fireEvent.click(screen.getByRole('button', { name: 'Send code' }));
+  await waitFor(() => assert.equal(resetBodies.length, 1));
+  assert.deepEqual(resetBodies[0], { path: '/auth/password-reset/request', body: { email: 'Dana@Example.com' } });
+
+  // Step 2: the code (digits only) with the new password.
+  await screen.findByText('We emailed a code to Dana@Example.com. Enter it with your new password.');
+  fireEvent.change(screen.getByLabelText('Code from the email'), { target: { value: '48 29 13' } });
+  fireEvent.change(screen.getByLabelText('New password'), { target: { value: 'correct horse battery staple' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Change password' }));
+  await waitFor(() => assert.equal(resetBodies.length, 2));
+  assert.deepEqual(resetBodies[1], {
+    path: '/auth/password-reset/confirm',
+    body: { email: 'Dana@Example.com', code: '482913', password: 'correct horse battery staple' },
+  });
+
+  // Done: back to the sign-in form with the address filled and the password empty.
+  await screen.findByText('Your password was changed. Sign in with the new password.');
+  fireEvent.click(screen.getByRole('button', { name: 'Back to sign in' }));
+  assert.equal((screen.getByLabelText('Email') as HTMLInputElement).value, 'Dana@Example.com');
+  assert.equal((screen.getByLabelText('Password') as HTMLInputElement).value, '');
+  assert.ok(screen.getByRole('button', { name: 'Sign in' }));
+});
+
+test('a refused code is reported in the dashboard wording and the form stays; a gateway without email says so', async () => {
+  loginOptions = { password: true };
+  const { screen, fireEvent, waitFor } = rtl;
+  rtl.render(createElement(Login, { onLogin: () => assert.fail('nothing signed in') }));
+  await screen.findByLabelText('Email');
+  fireEvent.click(screen.getByRole('button', { name: 'Forgot password?' }));
+
+  resetReply = () => jsonReply({ statusCode: 503, message: 'Password reset is not available' }, 503);
+  fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'dana@example.com' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Send code' }));
+  await waitFor(() =>
+    assert.equal(
+      document.querySelector('.error-message')?.textContent,
+      'Password reset is not available on this gateway.',
+    ),
+  );
+
+  resetReply = path =>
+    path.endsWith('/request')
+      ? jsonReply({ sent: true })
+      : jsonReply({ statusCode: 400, message: 'Invalid or expired code' }, 400);
+  fireEvent.click(screen.getByRole('button', { name: 'Send code' }));
+  await screen.findByLabelText('Code from the email');
+  fireEvent.change(screen.getByLabelText('Code from the email'), { target: { value: '000000' } });
+  fireEvent.change(screen.getByLabelText('New password'), { target: { value: 'correct horse battery staple' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Change password' }));
+  await waitFor(() =>
+    assert.equal(
+      document.querySelector('.error-message')?.textContent,
+      'Invalid or expired code. Request a new one if needed.',
+    ),
+  );
+  assert.ok(screen.getByLabelText('Code from the email'), 'the refused code closed the form');
 });

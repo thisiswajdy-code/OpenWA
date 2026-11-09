@@ -12,7 +12,7 @@ import { ApiKeyRole } from './entities/api-key.entity';
 import { hashPassword } from './password-hash';
 import { RegisterDto } from './dto';
 import { SignupPlanService, type SignupPlan } from './signup-plan.service';
-import { SignupEmailService } from './signup-email.service';
+import { EmailService } from './email.service';
 import {
   ARVY_ACTIVE_EVENT,
   ARVY_LANG_FOR_LOCALE,
@@ -58,7 +58,7 @@ export class SignupService {
     private readonly userRepository: Repository<User>,
     private readonly arvy: ArvyClient,
     private readonly plans: SignupPlanService,
-    private readonly emails: SignupEmailService,
+    private readonly emails: EmailService,
   ) {}
 
   /** Called when the plan changes: a currency refused under the old plan gets another chance. */

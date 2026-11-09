@@ -359,7 +359,26 @@
     "signIn": "登录",
     "signingIn": "正在登录...",
     "useApiKey": "改用 API 密钥登录",
-    "usePassword": "改用邮箱和密码登录"
+    "usePassword": "改用邮箱和密码登录",
+    "reset": {
+      "forgot": "忘记密码？",
+      "title": "重置密码",
+      "intro": "输入您的邮箱，我们会发送一个 6 位验证码。",
+      "sendCode": "发送验证码",
+      "sending": "发送中…",
+      "codeSent": "我们已向 {{email}} 发送验证码。请连同新密码一起输入。",
+      "code": "邮件中的验证码",
+      "codePlaceholder": "6 位数字",
+      "codeRequired": "请输入邮件中的验证码",
+      "newPassword": "新密码",
+      "change": "修改密码",
+      "changing": "修改中…",
+      "invalidCode": "验证码无效或已过期。如有需要请重新获取。",
+      "unavailable": "此网关不支持重置密码。",
+      "done": "密码已修改。请使用新密码登录。",
+      "backToSignIn": "返回登录",
+      "resend": "重新发送验证码"
+    }
   },
   "dashboard": {
     "title": "仪表盘",

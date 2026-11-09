@@ -364,7 +364,26 @@
     "signIn": "Accedi",
     "signingIn": "Accesso in corso...",
     "useApiKey": "Accedi invece con una chiave API",
-    "usePassword": "Accedi invece con email e password"
+    "usePassword": "Accedi invece con email e password",
+    "reset": {
+      "forgot": "Password dimenticata?",
+      "title": "Reimposta la password",
+      "intro": "Inserisci la tua email e ti invieremo un codice di 6 cifre.",
+      "sendCode": "Invia codice",
+      "sending": "Invio…",
+      "codeSent": "Abbiamo inviato un codice a {{email}}. Inseriscilo con la nuova password.",
+      "code": "Codice ricevuto via email",
+      "codePlaceholder": "6 cifre",
+      "codeRequired": "Inserisci il codice ricevuto via email",
+      "newPassword": "Nuova password",
+      "change": "Cambia password",
+      "changing": "Modifica in corso…",
+      "invalidCode": "Codice non valido o scaduto. Richiedine uno nuovo se serve.",
+      "unavailable": "La reimpostazione della password non è disponibile su questo gateway.",
+      "done": "La password è stata cambiata. Accedi con la nuova password.",
+      "backToSignIn": "Torna all’accesso",
+      "resend": "Invia un nuovo codice"
+    }
   },
   "dashboard": {
     "title": "Dashboard",

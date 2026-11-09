@@ -359,7 +359,26 @@
     "signIn": "Anmelden",
     "signingIn": "Anmeldung läuft...",
     "useApiKey": "Stattdessen mit einem API-Schlüssel anmelden",
-    "usePassword": "Stattdessen mit E-Mail und Passwort anmelden"
+    "usePassword": "Stattdessen mit E-Mail und Passwort anmelden",
+    "reset": {
+      "forgot": "Passwort vergessen?",
+      "title": "Passwort zurücksetzen",
+      "intro": "Geben Sie Ihre E-Mail ein, wir senden Ihnen einen 6-stelligen Code.",
+      "sendCode": "Code senden",
+      "sending": "Wird gesendet…",
+      "codeSent": "Wir haben einen Code an {{email}} gesendet. Geben Sie ihn mit dem neuen Passwort ein.",
+      "code": "Code aus der E-Mail",
+      "codePlaceholder": "6 Ziffern",
+      "codeRequired": "Geben Sie den Code aus der E-Mail ein",
+      "newPassword": "Neues Passwort",
+      "change": "Passwort ändern",
+      "changing": "Wird geändert…",
+      "invalidCode": "Code ungültig oder abgelaufen. Fordern Sie bei Bedarf einen neuen an.",
+      "unavailable": "Das Zurücksetzen des Passworts ist auf diesem Gateway nicht verfügbar.",
+      "done": "Ihr Passwort wurde geändert. Melden Sie sich mit dem neuen Passwort an.",
+      "backToSignIn": "Zurück zur Anmeldung",
+      "resend": "Neuen Code senden"
+    }
   },
   "dashboard": {
     "title": "Dashboard",
