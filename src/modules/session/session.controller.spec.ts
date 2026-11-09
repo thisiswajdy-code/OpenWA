@@ -27,6 +27,7 @@ describe('SessionController — create() response contract', () => {
     proxyType: 'http',
     connectedAt: null,
     lastActiveAt: null,
+    ownerUserId: null,
     nodeId: null,
     claimedAt: null,
     nodeUrl: null,
@@ -53,6 +54,25 @@ describe('SessionController — create() response contract', () => {
       auditService as unknown as AuditService,
       new ChatScopeService(),
     );
+  });
+
+  it('passes the login key’s user as the session owner, and no owner for an API key', async () => {
+    await controller.create({ name: 'test-session' }, {
+      id: 'k-login',
+      role: ApiKeyRole.OPERATOR,
+      userId: 'u1',
+    } as ApiKey);
+    expect(sessionService.create).toHaveBeenLastCalledWith({ name: 'test-session' }, 'u1');
+    expect(auditService.logInfo).toHaveBeenLastCalledWith(
+      AuditAction.SESSION_CREATED,
+      expect.objectContaining({ metadata: { ownerUserId: 'u1' } }),
+    );
+    await controller.create({ name: 'test-session' }, {
+      id: 'k-api',
+      role: ApiKeyRole.OPERATOR,
+      userId: null,
+    } as ApiKey);
+    expect(sessionService.create).toHaveBeenLastCalledWith({ name: 'test-session' }, null);
   });
 
   it('strips internal entity fields from the response', async () => {
@@ -162,6 +182,7 @@ describe('SessionController — logout() audit + error forwarding contract', () 
     proxyType: null,
     connectedAt: null,
     lastActiveAt: null,
+    ownerUserId: null,
     nodeId: null,
     claimedAt: null,
     nodeUrl: null,
@@ -228,6 +249,7 @@ describe('SessionController — start/stop lifecycle', () => {
     proxyType: null,
     connectedAt: new Date('2026-01-01T01:00:00Z'),
     lastActiveAt: null,
+    ownerUserId: null,
     nodeId: null,
     claimedAt: null,
     nodeUrl: null,

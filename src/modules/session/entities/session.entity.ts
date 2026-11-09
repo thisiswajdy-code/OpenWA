@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import { DateTransformer } from '../../../common/transformers/date.transformer';
 import { NulFreeTransformer } from '../../../common/transformers/nul-free.transformer';
 import { jsonColumnType, dateColumnType } from '../../../common/utils/column-types';
@@ -51,6 +51,14 @@ export class Session {
 
   @Column({ type: dateColumnType(), nullable: true, transformer: DateTransformer })
   lastActiveAt!: Date | null;
+
+  // The dashboard user whose login key created the session, or NULL for one created with an API key
+  // (or before ownership existed). A non-admin user's login key is scoped to the sessions they own
+  // (AuthService.applyOwnerScope), so this is what makes sessions visible per user; admins and
+  // unscoped API keys see every session regardless.
+  @Index('IDX_sessions_ownerUserId')
+  @Column({ type: 'varchar', length: 36, nullable: true })
+  ownerUserId!: string | null;
 
   /**
    * Which process currently hosts this session's engine, or NULL when nobody does.

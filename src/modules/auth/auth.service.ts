@@ -17,6 +17,7 @@ import { ipMatches } from '../../common/utils/ip';
 import { hashApiKey } from './api-key-hash';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
 import { User } from './entities/user.entity';
+import { Session } from '../session/entities/session.entity';
 import { CreateApiKeyDto, UpdateApiKeyDto } from './dto';
 import { createLogger } from '../../common/services/logger.service';
 import { setRequestActor } from '../../common/services/request-context';
@@ -85,6 +86,11 @@ export function loginKeyName(email: string): string {
 
 /** The 403 a login key gets while its user awaits approval; the dashboard shows the lock on it. */
 export const PENDING_APPROVAL_MESSAGE = 'Account pending approval';
+/**
+ * The session scope of a non-admin dashboard user who owns no session yet: an id no session has, so
+ * the key matches nothing (every enforcement site reads an EMPTY list as "every session").
+ */
+export const OWNER_SCOPE_NO_SESSIONS = 'no-owned-sessions';
 
 @Injectable()
 export class AuthService implements OnModuleInit, OnModuleDestroy {
@@ -93,9 +99,12 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @InjectRepository(ApiKey, 'main')
     private readonly apiKeyRepository: Repository<ApiKey>,
-    // Read only for a login key (userId set), to refuse one whose user awaits approval.
+    // Read only for a login key (userId set): to refuse one whose user awaits approval, and to scope
+    // a non-admin user's key to the sessions they own.
     @InjectRepository(User, 'main')
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Session, 'data')
+    private readonly sessionRepository: Repository<Session>,
     private readonly usageTracker: ApiKeyUsageTracker,
     private readonly moduleRef: ModuleRef,
     @Optional() private readonly keyIndex?: ActiveKeyIndex,
@@ -577,7 +586,22 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
    */
   async findAuthorizationStates(ids: string[]): Promise<ApiKey[]> {
     if (ids.length === 0) return [];
-    return this.apiKeyRepository.findBy({ id: In(ids) });
+    const keys = await this.apiKeyRepository.findBy({ id: In(ids) });
+    // A login key's socket carries the owner scope its validation applied; the row it is compared
+    // with must carry it too, or every sweep would read the difference as a change and evict it.
+    for (const key of keys) {
+      if (key.userId) await this.applyOwnerScope(key, await this.userOf(key));
+    }
+    return keys;
+  }
+
+  /** The dashboard user behind a login key, or null for a key with no owner or whose user is gone. */
+  private async userOf(apiKey: Pick<ApiKey, 'userId'>): Promise<Pick<User, 'id' | 'role' | 'approvedAt'> | null> {
+    if (!apiKey.userId) return null;
+    return this.userRepository.findOne({
+      where: { id: apiKey.userId },
+      select: { id: true, role: true, approvedAt: true },
+    });
   }
 
   /**
@@ -587,12 +611,25 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
    */
   async isPendingApproval(apiKey: Pick<ApiKey, 'userId'>): Promise<boolean> {
     if (!apiKey.userId) return false;
-    const user = await this.userRepository.findOne({
-      where: { id: apiKey.userId },
-      select: { id: true, approvedAt: true },
-    });
     // A login key whose user is gone fails closed; the user's keys are deleted with it anyway.
+    const user = await this.userOf(apiKey);
     return !user || user.approvedAt === null;
+  }
+
+  /**
+   * Make sessions visible per user: the login key of a non-admin dashboard user is scoped, for this
+   * request, to the sessions that user owns (`sessions.ownerUserId`), exactly as if the key carried
+   * them in `allowedSessions`, so every session fence and filter applies unchanged. A user with no
+   * session yet gets a scope that matches nothing (an empty list would mean "every session"). An
+   * admin's key, and a key with no owner, are left as stored. Re-read on every request, so a session
+   * created a moment ago is in scope on the next one.
+   */
+  async applyOwnerScope(apiKey: ApiKey, user: Pick<User, 'id' | 'role'> | null): Promise<ApiKey> {
+    if (!user || user.role === ApiKeyRole.ADMIN) return apiKey;
+    const owned = await this.sessionRepository.find({ where: { ownerUserId: user.id }, select: { id: true } });
+    apiKey.allowedSessions = owned.length > 0 ? owned.map(s => s.id) : [OWNER_SCOPE_NO_SESSIONS];
+    apiKey.ownerScoped = true;
+    return apiKey;
   }
 
   async validateApiKey(
@@ -657,8 +694,19 @@ export class AuthService implements OnModuleInit, OnModuleDestroy {
     // only the routes marked @AllowPendingApproval (the HTTP guard passes `allowPendingUser` for
     // those); every other surface — REST, WebSocket, MCP, Bull Board — refuses it. 403 like the
     // other scope refusals: the key is valid, so the dashboard must not discard it.
-    if (!allowPendingUser && (await this.isPendingApproval(apiKey))) {
-      throw new ForbiddenException(PENDING_APPROVAL_MESSAGE);
+    if (apiKey.userId) {
+      const user = await this.userOf(apiKey);
+      if (!allowPendingUser && (!user || user.approvedAt === null)) {
+        throw new ForbiddenException(PENDING_APPROVAL_MESSAGE);
+      }
+      // Sessions are visible per user: a non-admin user's key is scoped to the sessions they own,
+      // before the session restriction below is checked against the requested session.
+      await this.applyOwnerScope(apiKey, user);
+      if (apiKey.allowedSessions && apiKey.allowedSessions.length > 0 && sessionId) {
+        if (!apiKey.allowedSessions.includes(sessionId)) {
+          throw new ForbiddenException('API key not authorized for this session');
+        }
+      }
     }
 
     // Advisory stats only; the tracker coalesces the write and never throws. A caller that validates

@@ -66,4 +66,13 @@ export class ApiKey {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  /**
+   * Not a column. Set by AuthService.applyOwnerScope on the login key of a non-admin dashboard user:
+   * `allowedSessions` was replaced, for this request, by the sessions that user owns. The guard lets
+   * such a key through the @RequireUnscopedKey fence only where the handler is marked
+   * @AllowOwnerScoped (creating a session, logout, me), so a tenant can add a session without being
+   * able to reach the credential-minting surfaces a session-scoped API key is fenced off.
+   */
+  ownerScoped?: boolean;
 }

@@ -22,6 +22,7 @@ describe('API key DTO contract', () => {
     const service = new AuthService(
       repository as unknown as Repository<ApiKey>,
       {} as never,
+      {} as never,
       {} as ApiKeyUsageTracker,
       {} as never,
     );

@@ -5,9 +5,15 @@ import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { UserService } from './user.service';
 import { AuthService } from './auth.service';
-import { AllowPendingApproval, CurrentApiKey, Public, RequireUnscopedKey } from './decorators/auth.decorators';
+import {
+  AllowOwnerScoped,
+  AllowPendingApproval,
+  CurrentApiKey,
+  Public,
+  RequireUnscopedKey,
+} from './decorators/auth.decorators';
 import { CurrentUserResponseDto, LoginDto, LoginOptionsResponseDto, LoginResponseDto } from './dto';
-import type { ApiKey } from './entities/api-key.entity';
+import { type ApiKey, ApiKeyRole } from './entities/api-key.entity';
 import { EngineFactory } from '../../engine/engine.factory';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
@@ -75,8 +81,10 @@ export class UserLoginController {
         apiKey: rawKey,
         role: user.role,
         engineType: this.engineFactory.getCurrentEngine(),
-        scoped: false,
         expiresAt: apiKey.expiresAt as Date,
+        // A non-admin user's key is scoped to the sessions they own, so the dashboard behaves as for
+        // a session-scoped key (no cross-session reads, no credential pages).
+        scoped: user.role !== ApiKeyRole.ADMIN,
         pendingApproval: user.approvedAt === null,
       };
     } catch (err) {
@@ -96,6 +104,7 @@ export class UserLoginController {
   @Get('me')
   @RequireUnscopedKey()
   @AllowPendingApproval()
+  @AllowOwnerScoped()
   @ApiOperation({ summary: 'The dashboard user behind the presented login key, and whether it awaits approval' })
   @ApiResponse({ status: 200, description: 'The signed-in user.', type: CurrentUserResponseDto })
   @ApiResponse({ status: 404, description: 'The key is not a login key: no dashboard user signed in with it.' })
@@ -114,6 +123,7 @@ export class UserLoginController {
   @Post('logout')
   @RequireUnscopedKey()
   @AllowPendingApproval()
+  @AllowOwnerScoped()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'End a password sign-in by deleting its login key' })
   @ApiResponse({

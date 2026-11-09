@@ -52,6 +52,7 @@ import {
   ChatScoped,
   CurrentApiKey,
   RequireRole,
+  AllowOwnerScoped,
   RequireUnscopedKey,
   SessionScoped,
 } from '../auth/decorators/auth.decorators';
@@ -87,7 +88,10 @@ export class SessionController {
   // Creating a session has no existing session id for the class-level @SessionScoped fence to check,
   // and the new session is outside the caller's allowlist by construction — so a key restricted to
   // specific sessions cannot create one. Different metadata key from @SessionScoped; they coexist.
+  // A dashboard user's login key is the exception: the session it creates becomes the user's own and
+  // is inside their owner scope from the next request on.
   @RequireUnscopedKey()
+  @AllowOwnerScoped()
   @ApiOperation({ summary: 'Create a new WhatsApp session' })
   @ApiResponse({
     status: 201,
@@ -108,10 +112,13 @@ export class SessionController {
     if (dto.proxyUrl && apiKey?.role !== ApiKeyRole.ADMIN) {
       throw new ForbiddenException('Setting proxyUrl requires an ADMIN key');
     }
-    const session = await this.sessionService.create(dto);
+    // A session created with a dashboard user's login key belongs to that user (sessions are visible
+    // per user); one created with an API key has no owner.
+    const session = await this.sessionService.create(dto, apiKey?.userId ?? null);
     await this.auditService.logInfo(AuditAction.SESSION_CREATED, {
       sessionId: session.id,
       sessionName: session.name,
+      metadata: apiKey?.userId ? { ownerUserId: apiKey.userId } : undefined,
     });
     return this.transformSession(session);
   }

@@ -338,6 +338,9 @@ CREATE TABLE sessions (
     "proxyType" VARCHAR(10),
     "connectedAt" TIMESTAMP,
     "lastActiveAt" TIMESTAMP,
+    -- The dashboard user whose login key created the session (sessions are visible per user: a
+    -- non-admin user's key is scoped to the sessions they own); NULL for one created with an API key.
+    "ownerUserId" VARCHAR(36),                      -- indexed (IDX_sessions_ownerUserId)
     -- Session ownership / multi-node routing: which process runs the engine, since when, where it
     -- answers HTTP for peers, and how long its claim survives unrenewed. All NULL on a single node.
     "nodeId" VARCHAR(190),
@@ -354,7 +357,7 @@ CREATE TABLE sessions (
 ```
 
 > [!NOTE]
-> The **types** above are illustrative — the schema is defined by the TypeORM entity (`src/modules/session/entities/session.entity.ts`) and column types are dialect-portable (`jsonColumnType()` → `simple-json`, dates via `DateTransformer`). The **column names are literal**: see the naming note at the top of §5.3 above before writing SQL against any of these tables. The `sessions` entity declares only the index implied by the `UNIQUE` constraint on `name`; there are no separate `status`/`phone`/`createdAt` indexes.
+> The **types** above are illustrative — the schema is defined by the TypeORM entity (`src/modules/session/entities/session.entity.ts`) and column types are dialect-portable (`jsonColumnType()` → `simple-json`, dates via `DateTransformer`). The **column names are literal**: see the naming note at the top of §5.3 above before writing SQL against any of these tables. The `sessions` entity declares the index implied by the `UNIQUE` constraint on `name` and `IDX_sessions_ownerUserId`; there are no separate `status`/`phone`/`createdAt` indexes.
 
 > [!NOTE]
 > Auth state is **not** stored in this table. Both engines persist credentials on the **filesystem**: `whatsapp-web.js` through LocalAuth, Baileys in a multi-file auth dir with the layout of its `useMultiFileAuthState`, written atomically. An unparseable Baileys `creds.json` is moved aside with its key files to `corrupt-<ms>-<suffix>/` and the session relinks by QR. The `baileys_stored_messages` table holds only Baileys' serialized message store (the library ships none), not credentials.
@@ -979,7 +982,8 @@ src/database/migrations/           # data connection (pluggable)
 ├── 1790812800000-AddMessageWindowIndexes.ts   # compound timestamp indexes for message-time pagination
 ├── 1791100000000-AddIntegrationDeliveryFailureDeliveryIndex.ts   # (pluginId, instanceId, deliveryId) index for the dead-letter guards
 ├── 1791200000000-AddWebhookOutboxSessionIndex.ts   # (sessionId) index for the per-session outbox delete
-└── 1791300000000-BackfillLegacyMessageTypes.ts   # converts raw wwebjs message types to the neutral vocabulary, once
+├── 1791300000000-BackfillLegacyMessageTypes.ts   # converts raw wwebjs message types to the neutral vocabulary, once
+└── 1792400000000-AddSessionOwner.ts   # sessions.ownerUserId + index (sessions visible per dashboard user)
 ```
 
 > [!NOTE]

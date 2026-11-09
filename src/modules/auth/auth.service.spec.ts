@@ -20,8 +20,10 @@ import {
   bannerKeyLine,
   UnresolvedApiKeyException,
   PENDING_APPROVAL_MESSAGE,
+  OWNER_SCOPE_NO_SESSIONS,
 } from './auth.service';
 import { User } from './entities/user.entity';
+import { Session } from '../session/entities/session.entity';
 import { ApiKeyUsageTracker } from './api-key-usage-tracker.service';
 import { getRequestActor, runWithRequestId } from '../../common/services/request-context';
 import { ActiveKeyIndex } from './active-key-index';
@@ -141,10 +143,12 @@ describe('AuthService', () => {
   let lastAdminFragments: string[];
   let keyIndex: { refreshSoon: jest.Mock };
   let userRepository: { findOne: jest.Mock };
+  let sessionRepository: { find: jest.Mock };
 
   beforeEach(async () => {
     keyIndex = { refreshSoon: jest.fn() };
     userRepository = { findOne: jest.fn().mockResolvedValue(null) };
+    sessionRepository = { find: jest.fn().mockResolvedValue([]) };
     repository = {
       count: jest.fn(),
       find: jest.fn(),
@@ -167,6 +171,7 @@ describe('AuthService', () => {
           useValue: repository,
         },
         { provide: getRepositoryToken(User, 'main'), useValue: userRepository },
+        { provide: getRepositoryToken(Session, 'data'), useValue: sessionRepository },
         { provide: ActiveKeyIndex, useValue: keyIndex },
       ],
     }).compile();
@@ -886,7 +891,7 @@ describe('AuthService', () => {
         await expect(service.validateApiKey(rawKey)).rejects.toThrow(new ForbiddenException(PENDING_APPROVAL_MESSAGE));
         expect(userRepository.findOne).toHaveBeenCalledWith({
           where: { id: 'u1' },
-          select: { id: true, approvedAt: true },
+          select: { id: true, role: true, approvedAt: true },
         });
       });
 
@@ -905,6 +910,62 @@ describe('AuthService', () => {
       it('fails closed when the user is gone', async () => {
         userRepository.findOne.mockResolvedValue(null);
         await expect(service.validateApiKey(rawKey)).rejects.toThrow(ForbiddenException);
+      });
+    });
+
+    describe('sessions are visible per user: the owner scope on a login key', () => {
+      const rawKey = 'owner-key';
+      const approved = (role: ApiKeyRole) => ({ id: 'u1', role, approvedAt: new Date() });
+      beforeEach(() => {
+        (repository.findOne as jest.Mock).mockResolvedValue(
+          createMockApiKey({ keyHash: hashKey(rawKey), userId: 'u1' }),
+        );
+        (repository.save as jest.Mock).mockImplementation(k => Promise.resolve(k));
+      });
+
+      it('scopes an operator’s key to the sessions the user owns, read fresh each time', async () => {
+        userRepository.findOne.mockResolvedValue(approved(ApiKeyRole.OPERATOR));
+        sessionRepository.find.mockResolvedValue([{ id: 's-own-1' }, { id: 's-own-2' }]);
+        const key = await service.validateApiKey(rawKey);
+        expect(key.allowedSessions).toEqual(['s-own-1', 's-own-2']);
+        expect(key.ownerScoped).toBe(true);
+        expect(sessionRepository.find).toHaveBeenCalledWith({ where: { ownerUserId: 'u1' }, select: { id: true } });
+      });
+
+      it('refuses another user’s session on a session route, and admits an owned one', async () => {
+        userRepository.findOne.mockResolvedValue(approved(ApiKeyRole.OPERATOR));
+        sessionRepository.find.mockResolvedValue([{ id: 's-own-1' }]);
+        await expect(service.validateApiKey(rawKey, undefined, 's-other')).rejects.toThrow(
+          'API key not authorized for this session',
+        );
+        await expect(service.validateApiKey(rawKey, undefined, 's-own-1')).resolves.toMatchObject({ userId: 'u1' });
+      });
+
+      it('matches nothing for a user with no session yet, rather than everything', async () => {
+        userRepository.findOne.mockResolvedValue(approved(ApiKeyRole.VIEWER));
+        sessionRepository.find.mockResolvedValue([]);
+        const key = await service.validateApiKey(rawKey);
+        expect(key.allowedSessions).toEqual([OWNER_SCOPE_NO_SESSIONS]);
+        await expect(service.validateApiKey(rawKey, undefined, 's-any')).rejects.toThrow(ForbiddenException);
+      });
+
+      it('leaves an admin’s key unscoped', async () => {
+        userRepository.findOne.mockResolvedValue(approved(ApiKeyRole.ADMIN));
+        const key = await service.validateApiKey(rawKey);
+        expect(key.allowedSessions).toBeNull();
+        expect(key.ownerScoped).toBeUndefined();
+        expect(sessionRepository.find).not.toHaveBeenCalled();
+      });
+
+      it('applies the same scope to the rows the WebSocket sweep compares sockets against', async () => {
+        userRepository.findOne.mockResolvedValue(approved(ApiKeyRole.OPERATOR));
+        sessionRepository.find.mockResolvedValue([{ id: 's-own-1' }]);
+        const row = createMockApiKey({ id: 'k-login', userId: 'u1' });
+        (repository.findBy as jest.Mock | undefined)?.mockResolvedValue([row]);
+        repository.findBy = jest.fn().mockResolvedValue([row]);
+        const [state] = await service.findAuthorizationStates(['k-login']);
+        expect(state.allowedSessions).toEqual(['s-own-1']);
+        expect(state.ownerScoped).toBe(true);
       });
     });
 

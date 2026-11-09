@@ -5,6 +5,7 @@ import { createHash } from 'crypto';
 import { IsNull } from 'typeorm';
 import { AuthService, loginKeyName } from './auth.service';
 import { User } from './entities/user.entity';
+import { Session } from '../session/entities/session.entity';
 import { ApiKeyUsageTracker } from './api-key-usage-tracker.service';
 import { ApiKey, ApiKeyRole } from './entities/api-key.entity';
 
@@ -52,6 +53,7 @@ describe('AuthService — login keys', () => {
         AuthService,
         { provide: getRepositoryToken(ApiKey, 'main'), useValue: repo },
         { provide: getRepositoryToken(User, 'main'), useValue: { findOne: jest.fn() } },
+        { provide: getRepositoryToken(Session, 'data'), useValue: { find: jest.fn().mockResolvedValue([]) } },
         { provide: ApiKeyUsageTracker, useValue: usageTracker },
         {
           provide: ModuleRef,

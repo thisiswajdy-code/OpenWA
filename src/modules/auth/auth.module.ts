@@ -20,6 +20,7 @@ import { SignupPlanService } from './signup-plan.service';
 import { EmailService } from './email.service';
 import { PasswordResetService } from './password-reset.service';
 import { PasswordResetController } from './password-reset.controller';
+import { Session } from '../session/entities/session.entity';
 import { SignupService } from './signup.service';
 import { ArvyClient } from './arvy-client';
 import { ApiKeyGuard } from './guards/api-key.guard';
@@ -27,7 +28,11 @@ import { ProxyAwareThrottlerGuard } from '../../common/security/proxy-aware-thro
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([ApiKey, User, Setting], 'main')],
+  imports: [
+    TypeOrmModule.forFeature([ApiKey, User, Setting], 'main'),
+    // Read-only: AuthService scopes a dashboard user's login key to the sessions they own.
+    TypeOrmModule.forFeature([Session], 'data'),
+  ],
   controllers: [
     AuthController,
     AuthValidateController,

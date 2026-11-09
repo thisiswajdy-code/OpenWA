@@ -21,6 +21,7 @@ import {
   CHAT_SCOPED_KEY,
   CHAT_QUOTED_ALLOWED_KEY,
   PENDING_APPROVAL_ALLOWED_KEY,
+  OWNER_SCOPED_ALLOWED_KEY,
   ChatScopeKind,
 } from '../decorators/auth.decorators';
 import { resolveClientIp } from '../../../common/utils/ip';
@@ -149,8 +150,13 @@ export class ApiKeyGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+    // A non-admin dashboard user's login key is scoped to the sessions the user owns (ownerScoped);
+    // it passes this fence only where the handler is marked @AllowOwnerScoped.
     if (requireUnscoped && (apiKey.allowedSessions?.length ?? 0) > 0) {
-      throw new ForbiddenException('Session-scoped API keys are not permitted on this route');
+      const ownerAllowed =
+        apiKey.ownerScoped === true &&
+        this.reflector.getAllAndOverride<boolean>(OWNER_SCOPED_ALLOWED_KEY, [context.getHandler(), context.getClass()]);
+      if (!ownerAllowed) throw new ForbiddenException('Session-scoped API keys are not permitted on this route');
     }
 
     // Attach API key to request for use in controllers

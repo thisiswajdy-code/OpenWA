@@ -550,7 +550,7 @@ Get session statistics for multi-session monitoring.
 
 Create a new WhatsApp session.
 
-**Auth:** API key (OPERATOR) that is not restricted to specific sessions. Creating a session is a deployment-level act: the new session is outside the caller's `allowedSessions` by construction, so a session-scoped key is rejected with `403` (`@RequireUnscopedKey`). An unscoped OPERATOR/ADMIN key may create a session; setting `proxyUrl` requires an ADMIN key.
+**Auth:** API key (OPERATOR) that is not restricted to specific sessions. Creating a session is a deployment-level act: the new session is outside the caller's `allowedSessions` by construction, so a session-scoped key is rejected with `403` (`@RequireUnscopedKey`). An unscoped OPERATOR/ADMIN key may create a session; setting `proxyUrl` requires an ADMIN key. A dashboard user's login key may create a session although it is scoped: the session becomes that user's own (`ownerUserId`) and is visible to them from the next request on.
 
 **Request body** — `CreateSessionDto`
 
@@ -5194,6 +5194,8 @@ The login key of a dashboard user an admin has not approved yet is admitted here
 
 A dashboard user is an email and password that signs in to the dashboard without pasting an API key. A user is not a credential the API accepts: signing in exchanges the password for a **login key**, an ordinary API key owned by the user (`api_keys.userId`) with the user's role, no IP, session or chat scope, and an expiry (`LOGIN_SESSION_TTL_HOURS`, a day by default, clamped to 1–720). Every surface that authenticates a key works unchanged with it. A login key is left out of `GET /api/auth/api-keys`, never counts as a surviving admin for the last-admin guard, and is deleted by logout, by a change to its user's password, role or active flag, with its user, or (once expired) on the next sign-in. The first user is seeded at boot from `ADMIN_EMAIL` + `ADMIN_PASSWORD` while that address has no user; in production a placeholder or a password under 12 characters refuses the boot like a weak `API_MASTER_KEY`. Successful and refused sign-ins are audited as `user_login` / `user_login_failed` (the latter bounded per client IP, like an unresolved key), logout as `user_logout`, user lifecycle as `user_created` / `user_updated` / `user_deleted` / `user_approved`, and a password reset by emailed code as `user_password_reset_requested` / `user_password_reset` / `user_password_reset_failed` (`POST /api/auth/password-reset/request` and `/confirm` below).
 
+**Sessions are visible per user.** A session created with a dashboard user's login key records that user as its owner (`sessions.ownerUserId`; a session created with an API key has none). On every request, the login key of a user whose role is not admin is scoped, exactly as if it carried `allowedSessions`, to the sessions that user owns: the session list, every per-session route, the WebSocket subscriptions, MCP and the audit log show and act on those sessions only, and a user who owns no session yet sees none. The scope is re-read per request, so a session created a moment ago is in scope on the next one. Such a key is refused on the `@RequireUnscopedKey` surfaces like a session-scoped API key (key and user management, infrastructure, plugins, cross-session statistics), except `POST /api/sessions` (the new session becomes the user's own), `GET /api/auth/me` and `POST /api/auth/logout`. An admin user's key, and every API key, see every session as before.
+
 **Approval.** A user an admin creates (or the boot seeds) is approved at once (`approvedAt`). A self-service sign-up (`POST /api/auth/register`) is not: once it has paid it can sign in, but its login key is refused with `403 "Account pending approval"` on every route except `POST /api/auth/validate`, `GET /api/auth/me` and `POST /api/auth/logout` — on REST, the WebSocket handshake, MCP and Bull Board alike — so the dashboard it sees is locked, polling `GET /api/auth/me` until an admin approves it with `POST /api/auth/users/:id/approve`. The user is re-read on every request, so an approval unlocks the session the user is already signed in to, with no second sign-in. A key with no owner (created through the API or seeded) is never pending.
 
 #### GET /api/auth/login-options
@@ -5235,7 +5237,7 @@ Sign in with email and password and receive a login key.
 }
 ```
 
-`apiKey` is returned only here; send it as `X-API-Key` like any other key. `scoped` is always false. `pendingApproval` is true for a sign-up an admin has not approved yet (see **Approval** above): the key signs in, but reaches only validate, `GET /api/auth/me` and logout.
+`apiKey` is returned only here; send it as `X-API-Key` like any other key. `scoped` is true for every role but admin: the key is scoped to the sessions the user owns (see **Sessions are visible per user** below), so the dashboard behaves as for a session-scoped API key. `pendingApproval` is true for a sign-up an admin has not approved yet (see **Approval** above): the key signs in, but reaches only validate, `GET /api/auth/me` and logout.
 
 **Errors:** `400` malformed body or an undeclared field · `401` `"Invalid email or password"` for an unknown email, a wrong password and a deactivated user alike (an unknown address still costs a hash, so timing does not tell them apart) · `429` too many attempts from this client IP
 

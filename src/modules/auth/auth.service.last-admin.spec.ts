@@ -21,7 +21,7 @@ describe('AuthService last-admin guard and expiring admins', () => {
     await ds.initialize();
     repo = ds.getRepository(ApiKey);
     const tracker = { record: jest.fn(), forget: jest.fn() } as unknown as ApiKeyUsageTracker;
-    service = new AuthService(repo, {} as never, tracker, { get: () => undefined } as never);
+    service = new AuthService(repo, {} as never, {} as never, tracker, { get: () => undefined } as never);
   });
 
   afterAll(async () => {

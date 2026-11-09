@@ -12,7 +12,9 @@ import {
   CHAT_QUOTED_ALLOWED_KEY,
   CHAT_SCOPED_KEY,
   PENDING_APPROVAL_ALLOWED_KEY,
+  OWNER_SCOPED_ALLOWED_KEY,
   REQUIRED_ROLE_KEY,
+  UNSCOPED_KEY,
 } from '../decorators/auth.decorators';
 
 function createMockApiKey(overrides: Partial<ApiKey> = {}): ApiKey {
@@ -150,6 +152,28 @@ describe('ApiKeyGuard', () => {
     metadata = {};
     await expect(guard.canActivate(createMockContext({ 'x-api-key': 'my-key' }))).resolves.toBe(true);
     expect(authService.validateApiKey).toHaveBeenLastCalledWith('my-key', '127.0.0.1', undefined);
+  });
+
+  it('lets an owner-scoped login key through the unscoped fence only where the handler allows it', async () => {
+    (authService.hasPermission as jest.Mock).mockReturnValue(true);
+    const ownerKey = createMockApiKey({ allowedSessions: ['s-own'], userId: 'u1' });
+    ownerKey.ownerScoped = true;
+    (authService.validateApiKey as jest.Mock).mockResolvedValue(ownerKey);
+
+    // Marked (creating a session, logout, me): admitted.
+    metadata = { [UNSCOPED_KEY]: true, [OWNER_SCOPED_ALLOWED_KEY]: true };
+    await expect(guard.canActivate(createMockContext({ 'x-api-key': 'k' }))).resolves.toBe(true);
+
+    // Unmarked (key management, users, infra…): refused like any session-scoped key.
+    metadata = { [UNSCOPED_KEY]: true };
+    await expect(guard.canActivate(createMockContext({ 'x-api-key': 'k' }))).rejects.toThrow(
+      'Session-scoped API keys are not permitted on this route',
+    );
+
+    // A session-scoped API key (no owner scope) is refused even where the handler is marked.
+    (authService.validateApiKey as jest.Mock).mockResolvedValue(createMockApiKey({ allowedSessions: ['s1'] }));
+    metadata = { [UNSCOPED_KEY]: true, [OWNER_SCOPED_ALLOWED_KEY]: true };
+    await expect(guard.canActivate(createMockContext({ 'x-api-key': 'k' }))).rejects.toThrow(ForbiddenException);
   });
 
   it('should accept Authorization Bearer header', async () => {

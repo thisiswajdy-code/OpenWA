@@ -36,6 +36,7 @@ function createMockSession(overrides: Partial<Session> = {}): Session {
     proxyType: null,
     connectedAt: null,
     lastActiveAt: null,
+    ownerUserId: null,
     nodeId: null,
     claimedAt: null,
     leaseExpiresAt: null,

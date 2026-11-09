@@ -4,6 +4,7 @@ import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserLoginController } from './user-login.controller';
 import { UserController } from './user.controller';
 import {
+  OWNER_SCOPED_ALLOWED_KEY,
   PENDING_APPROVAL_ALLOWED_KEY,
   PUBLIC_KEY,
   REQUIRED_ROLE_KEY,
@@ -24,6 +25,11 @@ describe('UserLoginController — route markers', () => {
   it('logout is not public and refuses a session-scoped key like every global route', () => {
     expect(Reflect.getMetadata(PUBLIC_KEY, handler(UserLoginController.prototype, 'logout'))).toBeUndefined();
     expect(Reflect.getMetadata(UNSCOPED_KEY, handler(UserLoginController.prototype, 'logout'))).toBe(true);
+  });
+
+  it.each(['me', 'logout'] as const)('%s admits the owner-scoped login key of a non-admin user', name => {
+    // Such a key is scoped to the user's own sessions, so the unscoped fence would otherwise refuse it.
+    expect(Reflect.getMetadata(OWNER_SCOPED_ALLOWED_KEY, handler(UserLoginController.prototype, name))).toBe(true);
   });
 
   it.each(['me', 'logout'] as const)('%s admits the login key of a user awaiting approval', name => {
@@ -172,6 +178,8 @@ describe('UserLoginController — sign-in audit trail', () => {
     await expect(controller.login({ email: 'dana@example.com', password: 'pw' }, req)).resolves.toMatchObject({
       apiKey: 'owa_k1_raw2',
       pendingApproval: true,
+      // Not an admin: the key is scoped to the user's own sessions, and the dashboard behaves as scoped.
+      scoped: true,
     });
   });
 

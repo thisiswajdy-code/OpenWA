@@ -45,7 +45,9 @@ export class LoginResponseDto {
   engineType!: string;
 
   @ApiProperty({
-    description: 'Always false: a login key is never restricted to selected sessions.',
+    description:
+      'True for every role but admin: the key is scoped to the sessions the user owns (created with it), so the ' +
+      'dashboard hides cross-session reads and the credential pages, exactly as for a session-scoped API key.',
     example: false,
   })
   scoped!: boolean;

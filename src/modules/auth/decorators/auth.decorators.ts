@@ -10,6 +10,7 @@ export const UNSCOPED_KEY = 'requireUnscopedKey';
 export const CHAT_SCOPED_KEY = 'chatScoped';
 export const CHAT_QUOTED_ALLOWED_KEY = 'chatQuotedAllowed';
 export const PENDING_APPROVAL_ALLOWED_KEY = 'allowPendingApproval';
+export const OWNER_SCOPED_ALLOWED_KEY = 'allowOwnerScoped';
 
 /**
  * Mark a route as requiring a specific role
@@ -84,6 +85,16 @@ export const ChatQuotedAllowed = () => SetMetadata(CHAT_QUOTED_ALLOWED_KEY, true
  * @example @AllowPendingApproval() @Get('me')
  */
 export const AllowPendingApproval = () => SetMetadata(PENDING_APPROVAL_ALLOWED_KEY, true);
+
+/**
+ * Let the login key of a non-admin dashboard user, which AuthService scopes to the sessions that
+ * user owns (`ApiKey.ownerScoped`), through a @RequireUnscopedKey fence on this handler. Only for
+ * routes a tenant needs that have no session dimension yet are safe for them: creating a session
+ * (it becomes theirs), logout and `me`. A session-scoped API key is still refused: the mark is read
+ * only for an owner-scoped key.
+ * @example @RequireUnscopedKey() @AllowOwnerScoped() @Post()
+ */
+export const AllowOwnerScoped = () => SetMetadata(OWNER_SCOPED_ALLOWED_KEY, true);
 
 /**
  * Get the current API key from request
